@@ -612,6 +612,9 @@ class BaseGame {
     
     $(window).on('resize', this.onResize.bind(this));
     $(window).trigger('game-ready');
+
+    if (DEV) 
+      setTimeout(this.gameState.start.bind(this.gameState), 500);
   }
 
   soundControl() {

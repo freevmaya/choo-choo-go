@@ -4,6 +4,7 @@ class RailGame extends BaseGame {
     this.rendererManager = new RendererManager(this.container);
     this.rendererManager.init();
     this.cameraController = new CameraController(this);
+    this.levelLoader = new LevelLoader(this);
     this.lights = [];
     this.createLights();
   }
@@ -63,28 +64,26 @@ class RailGame extends BaseGame {
     this.cameraController.reset();
     this.ground = (new Ground(null, env.GROUND_IMAGE_PATH)).init(this.scene);
 
-    let trails = [{
-      type: StraightTrack,
-      location: [0, 0, 1]
-    },{
-      type: StraightTrack,
-      location: [1, 0, 1]
-    },{
-      type: CurvedTrack,
-      location: [2, 0, 1]
-    },{
-      type: StraightTrack,
-      location: [2, 1, 0]
-    },{
-      type: CurvedTrack,
-      location: [2, 2, 0]
-    },{
-      type: StraightTrack,
-      location: [1, 2, 1]
-    }];
-
-    trails.forEach((trail)=>{
-      (new trail.type(trail.location, trail.location[2])).init(this.scene);
+    this.levelLoader.Load({
+      trails: [{
+        type: StraightTrack,
+        location: [0, 0, 1]
+      },{
+        type: StraightTrack,
+        location: [1, 0, 1]
+      },{
+        type: CurvedTrack,
+        location: [2, 0, 1]
+      },{
+        type: StraightTrack,
+        location: [2, 1, 0]
+      },{
+        type: CurvedTrack,
+        location: [2, 2, 0]
+      },{
+        type: StraightTrack,
+        location: [1, 2, 1]
+      }]
     });
   }
 

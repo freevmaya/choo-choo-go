@@ -10,10 +10,16 @@ class CameraController {
     this.targetY = 0;
     this.followSpeed = CAMERA_FOLLOW_SPEED;
     this.heightOffset = CAMERA_HEIGHT_OFFSET;
+    this.lookPoint = [0, 0];
+    this.setLookPoint([1, 1]);
   }
 
   calcTargetFocus() {
     return this.game.rendererManager.renderer.domElement.clientWidth < 500 ? 40 : 40;
+  }
+
+  setLookPoint(value) {
+    this.targetPoint = [1, 1];
   }
 
   setFocus(f) {
@@ -37,14 +43,19 @@ class CameraController {
     return direction;
   }
   
-  update(dt, targetY) {
-    this.camera.position.set(10, 10, 10);
-    this.camera.lookAt(0, 0, 0);
-    /*
-    let diff = this.targetFocus - this.camera.fov;
-    if (Math.abs(diff) > 0.1)
-      this.setFocus(this.camera.fov + diff * dt);
-      */
+  update(dt) {
+
+    this.lookPoint[0] = this.lookPoint[0] + (this.targetPoint[0] - this.lookPoint[0]) * this.followSpeed * dt;
+    this.lookPoint[1] = this.lookPoint[1] + (this.targetPoint[1] - this.lookPoint[1]) * this.followSpeed * dt;
+
+    let lookAt = {
+      x: this.lookPoint[0] * GAME_SETTINGS.CELL_SIZE,
+      y: 0,
+      z: this.lookPoint[1] * GAME_SETTINGS.CELL_SIZE
+    };
+
+    this.camera.position.set(lookAt.x + this.heightOffset, lookAt.y + this.heightOffset, lookAt.z + this.heightOffset);
+    this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
   }
   
   setPosition(x, y, z) {

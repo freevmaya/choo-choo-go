@@ -9,6 +9,7 @@
       'core/BaseGame',
       'core/RendererManager',
       'core/CameraController',
+      'core/LevelLoader',
       'core/state-manager',
       'models/BasePlatform',
       'models/Ground',
