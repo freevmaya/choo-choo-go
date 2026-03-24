@@ -4,8 +4,12 @@ class LevelLoader {
 	}
 
 	Load(data) {
-	    data.trails.forEach((trail)=>{
-	      (new trail.type(trail.location, trail.location[2])).init(this.game.scene);
+
+		let items = [];
+	    data.track.forEach((trackItem)=>{
+			items.push((new trackItem.type(items, trackItem.location, trackItem.location[2])).init(this.game));
 	    });
+
+	    return items;
 	}
 }

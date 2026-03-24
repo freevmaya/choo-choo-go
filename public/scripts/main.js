@@ -62,37 +62,33 @@ class RailGame extends BaseGame {
 
     super.createGameObjects();
     this.cameraController.reset();
-    this.ground = (new Ground(null, env.GROUND_IMAGE_PATH)).init(this.scene);
+    this.ground = (new Ground(env.GROUND_IMAGE_PATH)).init(this);
 
-    this.levelLoader.Load({
-      trails: [{
-        type: StraightTrack,
-        location: [0, 0, 1]
-      },{
-        type: StraightTrack,
-        location: [1, 0, 1]
-      },{
-        type: CurvedTrack,
-        location: [2, 0, 1]
-      },{
-        type: StraightTrack,
-        location: [2, 1, 0]
-      },{
-        type: CurvedTrack,
-        location: [2, 2, 0]
-      },{
-        type: StraightTrack,
-        location: [1, 2, 1]
-      }]
-    });
-  }
+    this.train = new Train();
 
-  clearGameObject() {
+    let track = [
+        {
+          type: CurvedTrack,
+          location: [0, 0, 3]
+        },
+        {
+          type: CurvedTrack,
+          location: [0, -1, 1]
+        },
+        {
+          type: StraightTrack,
+          location: [-1, -1, 1]
+        },
+        {
+          type: CurvedTrack,
+          location: [1, 0, 1]
+        }
+    ];
 
-    if (this.ground) {
-      this.ground.dispose();
-      this.ground = null;
-    }
+    let items = this.levelLoader.Load({track: track});
+
+    this.train.init(this, items, 3);
+    //this.train.start(true);
   }
   
   onResize() {
@@ -103,7 +99,6 @@ class RailGame extends BaseGame {
   update(dt) {
     super.update(dt);
     this.cameraController.update(dt);
-    this.ground.update(dt);
     this.rendererManager.render(this.scene, this.cameraController.getCamera());
   }
 }

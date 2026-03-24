@@ -2,6 +2,6 @@
 
 $lang = [
     // App name
-    'app_name' => 'Tree Jump — прыжки по деревьям'
+    'app_name' => 'Чух чух поехали!'
 ];
 ?>

@@ -1,4 +1,10 @@
-class CurvedTrack extends BasePlatform {
+class CurvedTrack extends BaseTrack {
+
+    constructor(trackItems, sellPosition = null, rotation = 0) {
+        super(trackItems, sellPosition, rotation);
+        this.startAngle = 0;
+        this.endAngle = PI_HALF;
+    }
     
     createModel() {
         const group = new THREE.Group();
@@ -13,29 +19,32 @@ class CurvedTrack extends BasePlatform {
             roughness: 0.9
         });
         
+        // Регистрируем материалы
+        this._registerMaterial(railMaterial);
+        this._registerMaterial(sleeperMaterial);
+        
         const radius = GAME_SETTINGS.CELL_SIZE - (GAME_SETTINGS.CELL_SIZE - GAME_SETTINGS.RAIL_SPACE) / 2;
         const center = GAME_SETTINGS.CELL_SIZE / 2;
         const railSpacing = GAME_SETTINGS.RAIL_SPACE;
-        const segments = 3;
-        const startAngle = 0;
-        const endAngle = Math.PI / 2;
-        const railHeight = 0.12;
-        const railWidth = 0.08;
+        const segments = 8;
+
+        const railHeight = GAME_SETTINGS.RAIL_HEIGHT;
+        const railWidth = GAME_SETTINGS.RAIL_WIDTH;
+        const railY = GAME_SETTINGS.RAIL_HEIGHT / 2 + GAME_SETTINGS.SLEEPER_HEIGHT / 2;
         
         // Сохраняем точки для внешней и внутренней рельсы
         const pointsOuter = [];
         const pointsInner = [];
-        const y = 0.1;
         
         for (let i = 0; i <= segments; i++) {
-            const angle = startAngle + (i / segments) * endAngle;
+            const angle = this.startAngle + (i / segments) * this.endAngle;
             const x = Math.sin(angle) * radius;
             const z = Math.cos(angle) * radius;
             
-            pointsOuter.push(new THREE.Vector3(x - center, y, z - center));
+            pointsOuter.push(new THREE.Vector3(x - center, railY, z - center));
             pointsInner.push(new THREE.Vector3(
                 Math.sin(angle) * (radius - railSpacing) - center, 
-                y, 
+                railY, 
                 Math.cos(angle) * (radius - railSpacing) - center
             ));
         }
@@ -48,22 +57,23 @@ class CurvedTrack extends BasePlatform {
         
         // Шпалы на кривой
         const sleeperCount = 5;
-        const sleeperWidth = GAME_SETTINGS.CELL_SIZE * 0.7;
+        const slp_startAngle = this.startAngle + Math.PI / 4 / sleeperCount;
         
-        for (let i = 0; i <= sleeperCount; i++) {
+        for (let i = 0; i < sleeperCount; i++) {
             const t = i / sleeperCount;
-            const angle = startAngle + t * endAngle;
+            const angle = slp_startAngle + t * this.endAngle;
             const midRadius = radius - railSpacing / 2;
             const x = Math.sin(angle) * midRadius;
             const z = Math.cos(angle) * midRadius;
             
             const sleeper = new THREE.Mesh(
-                new THREE.BoxGeometry(GAME_SETTINGS.SLEEPER_SIZE, GAME_SETTINGS.SLEEPER_HEIGHT, sleeperWidth),
+                new THREE.BoxGeometry(GAME_SETTINGS.SLEEPER_SIZE, GAME_SETTINGS.SLEEPER_HEIGHT, GAME_SETTINGS.SLEEPER_LENGTH),
                 sleeperMaterial
             );
-            sleeper.position.set(x - center, 0, z - center);
+            sleeper.position.set(x - center, GAME_SETTINGS.SLEEPER_HEIGHT / 2, z - center);
             sleeper.rotation.y = angle;
             sleeper.castShadow = true;
+            this._registerGeometry(sleeper.geometry);
             group.add(sleeper);
         }
         
@@ -104,6 +114,9 @@ class CurvedTrack extends BasePlatform {
                 material
             );
             
+            // Регистрируем геометрию
+            this._registerGeometry(railSegment.geometry);
+            
             // Позиционируем сегмент по центру между точками
             const midPoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
             railSegment.position.copy(midPoint);
@@ -117,18 +130,23 @@ class CurvedTrack extends BasePlatform {
         }
     }
 
-    getConnections() {
-        // Поворот соединяется по двум направлениям
-        if (this.direction === 'left') {
-            return [
-                { x: this.position.x, y: this.position.y + 1 },
-                { x: this.position.x - 1, y: this.position.y }
-            ];
-        } else {
-            return [
-                { x: this.position.x, y: this.position.y + 1 },
-                { x: this.position.x + 1, y: this.position.y }
-            ];
-        }
+    /* relPathPos от -1 до 1 */
+    calcPathPoint(relPathPos, path = 0) {
+
+        const rotationY = this.rotation * PI_HALF;
+
+        const angle = this.startAngle + (relPathPos + 1) / 2 * this.endAngle + rotationY;
+        const center = GAME_SETTINGS.CELL_SIZE / 2;
+
+        let pos = (new THREE.Vector3(0, 0, center)).applyEuler(new THREE.Euler(0, angle, 0));
+
+        pos.add((new THREE.Vector3(-center, 0, -center)).applyEuler(new THREE.Euler(0, rotationY, 0)));
+        pos.add(this.getPosition());
+
+        return {...pos, ...{rotation: angle + PI_HALF}};
+    }
+
+    getPath(index) {
+        return [0, 3];
     }
 }

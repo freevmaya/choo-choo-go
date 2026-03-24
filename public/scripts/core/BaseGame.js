@@ -8,6 +8,9 @@ class BaseGame {
     this.stateManager = new StateManager();
     this.allow_playing = true;
     this.paramsIndex = START_GAME;
+    this.gameObjects = [];
+    this.raycasterManager = null;
+
     this.advProvider = () => {
       return new Promise((resolve, reject)=>{
         resolve(true);
@@ -34,6 +37,112 @@ class BaseGame {
 
   initScene() {
 
+  }
+
+  initRaycaster() {
+    When(()=>this.cameraController && this.scene)
+      .then(()=>{
+        this.raycasterManager = new RaycasterManager(this);
+        eventBus.on('gameObject:click', this.handleObjectClick.bind(this));
+        eventBus.on('gameObject:tap', this.handleObjectTap.bind(this));
+      })
+  }
+
+  handleObjectClick(data) {
+    // Проверяем структуру данных
+    let hit = null;
+    
+    if (data.intersects && data.intersects[0]) {
+      hit = data.intersects[0];
+    } else {
+      console.warn('handleObjectClick: Invalid data format', data);
+      return;
+    }
+    
+    if (!hit) return;
+    
+    const object = hit.object;
+    // Находим корневой игровой объект
+    let gameObject = object.userData?.gameObject;
+    if (!gameObject) {
+      // Ищем в родителях
+      let current = object;
+      while (current && !gameObject) {
+        gameObject = current.userData?.gameObject;
+        current = current.parent;
+      }
+    }
+    
+    if (gameObject && typeof gameObject.onClick === 'function') {
+      gameObject.onClick(hit, data);
+    }
+    
+    // Генерируем событие с информацией об объекте
+    eventBus.emit(`click:${object.uuid}`, {
+      object: object,
+      hit: hit,
+      distance: hit.distance,
+      point: hit.point
+    });
+  }
+
+  handleObjectTap(data) {
+    // Проверяем структуру данных - в data может быть как объект с touches, 
+    // так и напрямую intersects (если событие пришло из другого места)
+    let hit = null;
+    let touch = null;
+    
+    if (data.touches && data.touches[0] && data.touches[0].intersects && data.touches[0].intersects[0]) {
+      // Старый формат: data.touches[0].intersects[0]
+      hit = data.touches[0].intersects[0];
+      touch = data.touches[0];
+    } else if (data.intersects && data.intersects[0]) {
+      // Новый формат: data.intersects[0]
+      hit = data.intersects[0];
+      touch = data.touch;
+    } else {
+      console.warn('handleObjectTap: Invalid data format', data);
+      return;
+    }
+    
+    if (!hit) return;
+    
+    const object = hit.object;
+    
+    let gameObject = object.userData?.gameObject;
+    if (!gameObject) {
+      let current = object;
+      while (current && !gameObject) {
+        gameObject = current.userData?.gameObject;
+        current = current.parent;
+      }
+    }
+    
+    if (gameObject && typeof gameObject.onClick === 'function') {
+      gameObject.onClick(hit, data);
+    }
+    
+    eventBus.emit(`tap:${object.uuid}`, {
+      object: object,
+      hit: hit,
+      point: hit.point
+    });
+  }
+
+  registerClickableObject(object, gameObject = null) {
+    if (this.raycasterManager) {
+      this.raycasterManager.addClickableObject(object);
+      if (gameObject) {
+        object.userData = object.userData || {};
+        object.userData.gameObject = gameObject;
+      }
+    }
+  }
+
+  unregisterClickableObject(object) {
+    if (this.raycasterManager) {
+      this.raycasterManager.removeClickableObject(object);
+    }
   }
 
   initUI() {
@@ -597,11 +706,10 @@ class BaseGame {
     this.updateScoreIndicator();
   }
   
-  init() {
-    
-    // Создание игровых объектов (но не активируем физику)
+  init() {    
+
     this.createGameObjects();
-    // Запуск анимации
+    this.initRaycaster();
     this.animate();
 
     this.showStartModal();
@@ -643,6 +751,17 @@ class BaseGame {
   }
 
   clearGameObject() {
+
+    // Очищаем кликабельные объекты
+    if (this.raycasterManager) {
+      this.raycasterManager.clearClickableObjects();
+    }
+
+    this.gameObjects.forEach((ga) => {
+      ga.dispose();
+    });
+
+    this.gameObjects = [];
   }
   
   resetGame() {
@@ -690,6 +809,10 @@ class BaseGame {
     // Проверка конца игры, только после 30 кадров игры
     if (this.frame_num > 30)
       this.doCheckGameOver();
+
+    this.gameObjects.forEach((ga)=>{
+      ga.update(dt);
+    });
   }
   
   animate() {

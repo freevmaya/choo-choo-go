@@ -41,7 +41,6 @@ body {
   flex-direction: column;
   height: 100dvh;
   width: 100dvw;
-  max-width: 700px;
   margin: auto;
   position: relative;
 }

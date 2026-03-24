@@ -49,7 +49,7 @@ const BOUNCE_SPEED = 7;
 const MAX_VELOCITY = 5.2;
 
 // Камера
-const CAMERA_FOLLOW_SPEED = 1;
+const CAMERA_FOLLOW_SPEED = 4;
 const CAMERA_HEIGHT_OFFSET = 10;
 const CAMERA_START_Y = -CYLINDER_HALF_HEIGHT;
 
@@ -134,17 +134,29 @@ const GAME_PARAMS = {
     }
 }
 
+const PI_HALF = Math.PI / 2;
+
 // Настройки игры
 const GAME_SETTINGS = {
-    TRAIN_SPEED: 2.0,               // Скорость движения поезда (единиц в секунду)
-    START_PATCHES: 3,               // Стартовое количество заплаток
+    TRAIN_SPEED: 1,               // Скорость движения поезда (единиц в секунду)
+    TRAIN_WHEEL_RADIUS : 0.25,
+    TRAIN_LEIGHT: 1.5,
+
     CELL_SIZE: 2.0,                 // Размер одной ячейки сетки в 3D пространстве
     CAMERA_FOLLOW_SPEED: 5.0,       // Скорость следования камеры
     MAX_UNDO_HISTORY: 10,           // Максимальная история для отмены действий
     ANIMATION_DURATION: 0.3,        // Длительность анимаций в секундах
     DEFAULT_WAGON_COUNT: 1,          // Количество вагонов по умолчанию
-    SLEEPER_SIZE: 0.2,
+
+    SLEEPER_SIZE: 0.17,
     SLEEPER_HEIGHT: 0.06,
-    RAIL_SPACE: 0.9,
-    BASE_PLATFORM_SIZE: 10
+    SLEEPER_LENGTH: 1.2,
+    SLEEPER_STEP: 0.4,
+
+    RAIL_WIDTH: 0.08,
+    RAIL_HEIGHT: 0.12,
+    RAIL_SPACE: 0.7,
+
+    BASE_PLATFORM_SIZE: 6,
+    GROUND_DENSITY: 4
 };

@@ -3,6 +3,7 @@
     $is_developer = Page::isDev();
     $scripts =  [
       'utils/Utils',
+      'utils/Vector2Int',
       'languages/Lang',
       'constants',
       'GameState',
@@ -11,11 +12,13 @@
       'core/CameraController',
       'core/LevelLoader',
       'core/state-manager',
-      'models/BasePlatform',
+      'models/BaseGameObject',
+      'models/BaseTrack',
       'models/Ground',
       'models/StraightTrack',
       'models/CurvedTrack',
-      'controls/MouseRotationControl',
+      'models/Train',
+      'controls/RaycasterManager',
       'utils/EventEmitter',
       'utils/TextureLoader',
       'utils/MathUtils',

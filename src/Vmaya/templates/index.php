@@ -20,6 +20,7 @@
   <script>
     var DEV = <?=DEV ? 'true' : 'false'?>;
   </script>
+  <?include('tracker.php')?>
 </head>
 <body>
     <?=$content?>

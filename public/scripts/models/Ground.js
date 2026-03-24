@@ -1,19 +1,24 @@
 // scripts/models/Ground.js
 
-class Ground extends BasePlatform {
-  constructor(position, texturePath) {
-    super(position, 0);
+class Ground extends BaseGameObject {
+  constructor(texturePath) {
+    super();
     this.texturePath = texturePath;
+    this._texture = null;      // Для хранения текстуры
+    this._fallbackTexture = null; // Для хранения fallback текстуры
   }
   
   createModel() {
-    
+
+    let group = new THREE.Group();
     // Параметры плоскости грунта
     this.size = GAME_SETTINGS.BASE_PLATFORM_SIZE * GAME_SETTINGS.CELL_SIZE; // Размер плоскости
     this.segments = 8; // Сегментация для лучшего отображения текстуры
 
     // Создаем геометрию плоскости
     const geometry = new THREE.CircleGeometry(this.size, this.segments);
+    // Регистрируем геометрию для последующего освобождения
+    this._registerGeometry(geometry);
     
     // Создаем материал
     const material = new THREE.MeshStandardMaterial({
@@ -23,11 +28,10 @@ class Ground extends BasePlatform {
       side: THREE.DoubleSide,
       transparent: false
     });
+    // Регистрируем материал
+    this._registerMaterial(material);
     
     this.mesh = new THREE.Mesh(geometry, material);
-    
-    let pos = this.absPosition();
-    this.mesh.position.set(pos.x, pos.y, pos.z);
     
     // Поворачиваем плоскость горизонтально (по умолчанию CircleGeometry смотрит вверх по Y)
     this.mesh.rotation.x = Math.PI * 0.5;
@@ -41,26 +45,90 @@ class Ground extends BasePlatform {
     
     // Создаем сетку (GridHelper) в центре сцены (0, 0, 0)
     // Параметры: размер, количество делений, цвет линий, цвет центральных линий
-    const gridSize = this.size;
-    this.gridHelper = new THREE.GridHelper(gridSize, GAME_SETTINGS.BASE_PLATFORM_SIZE, 0xffffff, 0xffffff);
+
+    this.gridHelper = new THREE.GridHelper(this.size, GAME_SETTINGS.BASE_PLATFORM_SIZE, 0xffffff, 0xffffff);
+    
+    // Регистрируем геометрию и материал GridHelper
+    if (this.gridHelper.geometry) {
+      this._registerGeometry(this.gridHelper.geometry);
+    }
+    if (this.gridHelper.material) {
+      if (Array.isArray(this.gridHelper.material)) {
+        this.gridHelper.material.forEach(m => this._registerMaterial(m));
+      } else {
+        this._registerMaterial(this.gridHelper.material);
+      }
+    }
     
     // Позиционируем сетку так, чтобы она лежала на поверхности земли
-    this.gridHelper.position.set(pos.x, pos.y + 0.01, pos.z); // небольшое смещение вверх, чтобы избежать z-fighting
+    this.gridHelper.position.set(0, 0.01, 0); // небольшое смещение вверх, чтобы избежать z-fighting
     this.gridHelper.material.transparent = true;
     this.gridHelper.material.opacity = 0.7; // делаем линии полупрозрачными для лучшей видимости
     
-    return this.mesh;
+    group.add(this.mesh);
+    group.add(this.gridHelper);
+    return group;
   }
 
-  loadModel() {
-    
-    this.scene.add(this.mesh);
-    this.scene.add(this.gridHelper);
+  loadModel(scene) {
+    scene.add(this.model);
+
+    When(() => this.game && this.game.raycasterManager)
+      .then(() => {
+        this.game.registerClickableObject(this.mesh, this);
+        console.log("Ground registered as clickable object (retry)");
+      });
+  }
+
+  onClick(hit, eventData) {
+
+    const c = GAME_SETTINGS.CELL_SIZE / 2;
+    const p = new Vector2Int(Math.round((hit.point.x - c) / GAME_SETTINGS.CELL_SIZE), Math.round((hit.point.z - c) / GAME_SETTINGS.CELL_SIZE));
+    this.game.cameraController.setLookPoint(p);
+
+    eventBus.emit('ground-down', p);
+  }
+
+  drawText(text, cellX, cellY) {
+
+
+    // Создаем canvas элемент
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 512;
+    canvas.height = 512;
+
+    // Рисуем текст на canvas
+    context.font = 'Bold 60px Arial';
+    context.fillStyle = '#FFFFFF';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('Three.js Текст', canvas.width / 2, canvas.height / 2);
+
+    // Создаем текстуру из canvas
+    const texture = new THREE.CanvasTexture(canvas);
+
+    // Создаем материал с текстурой
+    const text_material = new THREE.MeshBasicMaterial({ 
+        map: texture,
+        side: THREE.DoubleSide,
+        transparent: true
+    });
+
+    // Создаем плоскость и накладываем текст
+    const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(3, 3),
+        text_material
+    );
+
+    plane.position(cellX * GAME_SETTINGS.CELL_SIZE, 0.01, cellY * GAME_SETTINGS.CELL_SIZE);
+    this.game.scene.add(plane);
+    this._registerGeometry(plane);
   }
   
   loadTexture() {
-    let repeat = { x: GAME_SETTINGS.BASE_PLATFORM_SIZE, 
-                  y: GAME_SETTINGS.BASE_PLATFORM_SIZE };
+    let repeat = { x: GAME_SETTINGS.BASE_PLATFORM_SIZE * GAME_SETTINGS.GROUND_DENSITY, 
+                  y: GAME_SETTINGS.BASE_PLATFORM_SIZE* GAME_SETTINGS.GROUND_DENSITY };
     textureLoader.loadTexture(
       this.texturePath,
       (texture) => {
@@ -69,9 +137,23 @@ class Ground extends BasePlatform {
         texture.wrapT = THREE.RepeatWrapping;
         texture.repeat.set(repeat.x, repeat.y);
         
+        // Регистрируем текстуру для последующего освобождения
+        this._registerTexture(texture);
+        
+        // Если был fallback, освобождаем его
+        if (this._fallbackTexture) {
+          this._disposeTexture(this._fallbackTexture);
+          this._fallbackTexture = null;
+        }
+        
+        // Если у материала уже есть текстура, освобождаем её
+        if (this.mesh.material.map && this.mesh.material.map !== texture) {
+          this._disposeTexture(this.mesh.material.map);
+        }
+        
         this.mesh.material.map = texture;
         this.mesh.material.needsUpdate = true;
-        this.texture = texture;
+        this._texture = texture;
         
         console.log('Текстура грунта загружена');
       },
@@ -129,9 +211,32 @@ class Ground extends BasePlatform {
     fallbackTexture.wrapT = THREE.RepeatWrapping;
     fallbackTexture.repeat.set(8, 8);
     
+    // Регистрируем fallback текстуру
+    this._registerTexture(fallbackTexture);
+    this._fallbackTexture = fallbackTexture;
+    
+    // Если у материала уже есть текстура, освобождаем её
+    if (this.mesh.material.map) {
+      this._disposeTexture(this.mesh.material.map);
+    }
+    
     this.mesh.material.map = fallbackTexture;
     this.mesh.material.needsUpdate = true;
-    this.texture = fallbackTexture;
+    this._texture = fallbackTexture;
+  }
+  
+  /**
+   * Безопасное освобождение текстуры
+   * @param {THREE.Texture} texture - текстура для освобождения
+   */
+  _disposeTexture(texture) {
+    if (texture && texture.dispose) {
+      try {
+        texture.dispose();
+      } catch (e) {
+        console.warn('Error disposing texture:', e);
+      }
+    }
   }
   
   setOpacity(opacity) {
@@ -147,54 +252,52 @@ class Ground extends BasePlatform {
     }
   }
   
-  setSize(size) {
-    this.size = size;
-    if (this.mesh) {
-      this.scene.remove(this.mesh);
-      const geometry = new THREE.CircleGeometry(size, this.segments);
-      this.mesh.geometry.dispose();
-      this.mesh.geometry = geometry;
-      this.scene.add(this.mesh);
+  /**
+   * Безопасное освобождение геометрии
+   * @param {THREE.BufferGeometry} geometry - геометрия для освобождения
+   */
+  _disposeGeometry(geometry) {
+    if (geometry && geometry.dispose) {
+      try {
+        geometry.dispose();
+      } catch (e) {
+        console.warn('Error disposing geometry:', e);
+      }
+    }
+  }
+  
+  /**
+   * Безопасное освобождение материала
+   * @param {THREE.Material} material - материал для освобождения
+   */
+  _disposeMaterial(material) {
+    if (material && material.dispose) {
+      try {
+        // Освобождаем текстуры материала
+        if (material.map) {
+          this._disposeTexture(material.map);
+          material.map = null;
+        }
+        if (material.alphaMap) {
+          this._disposeTexture(material.alphaMap);
+          material.alphaMap = null;
+        }
+        if (material.envMap) {
+          this._disposeTexture(material.envMap);
+          material.envMap = null;
+        }
+        material.dispose();
+      } catch (e) {
+        console.warn('Error disposing material:', e);
+      }
     }
   }
   
   update(deltaTime) {
     // Можно добавить анимацию текстурных координат для эффекта движения
-    // if (this.texture) {
-    //   this.texture.offset.x += deltaTime * 0.01;
-    //   this.texture.offset.y += deltaTime * 0.01;
+    // if (this._texture) {
+    //   this._texture.offset.x += deltaTime * 0.01;
+    //   this._texture.offset.y += deltaTime * 0.01;
     // }
-  }
-  
-  dispose() {
-    if (this.mesh) {
-      this.scene.remove(this.mesh);
-      
-      if (this.mesh.geometry) {
-        this.mesh.geometry.dispose();
-      }
-      
-      if (this.mesh.material) {
-        if (Array.isArray(this.mesh.material)) {
-          this.mesh.material.forEach(m => m.dispose());
-        } else {
-          this.mesh.material.dispose();
-        }
-      }
-    }
-    
-    if (this.gridHelper) {
-      this.scene.remove(this.gridHelper);
-      if (this.gridHelper.geometry) {
-        this.gridHelper.geometry.dispose();
-      }
-      if (this.gridHelper.material) {
-        this.gridHelper.material.dispose();
-      }
-    }
-    
-    if (this.texture) {
-      this.texture.dispose();
-    }
   }
 }
