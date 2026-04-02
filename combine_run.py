@@ -6,7 +6,7 @@ def combine_project_files():
     """Объединяет все файлы в текущей директории и поддиректориях"""
     
     output_file     = "combined.txt"
-    exclude_files   = ["combine_run.py", output_file]
+    exclude_files   = ["combine_run.py", output_file, 'bootstrap', 'jquery', 'three', 'crypto']
     exclude_paths   = ["vendor", "dev", "prepare"]
     scan_dir        = './public';
     
@@ -17,8 +17,14 @@ def combine_project_files():
 Придерживайся объектно ориентированной концепции и событийной модели.
 Придерживаться изначальных именований классов, методов, функций, констант, переменных и не переименовывать при модификации.
 Если требуется создать отдельный класс и код его больше 100 строк, создавай его в отдельном файле
-Константы должны быть написаны в ВЕРХНЕМ РЕГИСТРЕ
-Важно: При модификации показывай весь код изменяемого файла!'''
+Константы должны быть написаны в ВЕРХНЕМ РЕГИСТРЕ.
+Важно: При модификации показывай весь код изменяемого файла!
+Придерживайся простоты и лаконичности кода.
+Не придумывай излишние механизмы, методы и алгоритмы которые не обговорены в задании.
+При создании моделей: 
+1. Используй уже реализованые методы конструирования примитивов.
+2. Переменные материалов создавай как свойство
+3. см. пример конструирования паровозика'''
     
     with open(output_file, "w", encoding="utf-8") as outfile:
         outfile.write(prompt + "\n\n")
@@ -32,7 +38,7 @@ def combine_project_files():
             if not any(substring in root for substring in exclude_paths):
                 for file in files:
                     file_ext = os.path.splitext(file)[1].lower()
-                    if file_ext in target_extensions and file not in exclude_files:
+                    if file_ext in target_extensions and not any(excluded in file for excluded in exclude_files):
                         full_path = os.path.join(root, file)
                         project_files.append((full_path, file_ext))
         

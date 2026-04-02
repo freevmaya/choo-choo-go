@@ -48,11 +48,6 @@ const GRAVITY = -7.5;
 const BOUNCE_SPEED = 7;
 const MAX_VELOCITY = 5.2;
 
-// Камера
-const CAMERA_FOLLOW_SPEED = 4;
-const CAMERA_HEIGHT_OFFSET = 10;
-const CAMERA_START_Y = -CYLINDER_HALF_HEIGHT;
-
 // Управление мышью
 const ROTATION_SPEED = 0.025;
 const ROTATION_SMOOTH = 0.5;
@@ -115,32 +110,23 @@ const USER_TITLES = {
 
 const START_GAME = 'TEST';
 
-// Параметры игры - ИНДЕКСЫ для локализации названий уровней
-const GAME_PARAMS = {
-    TEST: {
-        NAME: 'difficulty_test', // Индекс для локализации
-        ENV: {
-            BACKGROUND_COLOR: 0xBBBBFF,
-            KEY_LIGHT_COLOR: 0xffffff,
-            RIM_LIGHT_COLOR: 0x818cf8,
-            FILL_LIGHT_COLOR: 0x63a188,
-            GRASS_IMAGE_PATH: 'textures/grass-s.png',
-            GROUND_IMAGE_PATH:'textures/ground.jpg',
-            AMBIENT_LIGHT_INTENSITY: 1,
-            KEY_LIGHT_INTENSITY: 3,
-            FILL_LIGHT_INTENSITY: 2,
-            RIM_LIGHT_INTENSITY: 0.6
-        }
-    }
-}
-
 const PI_HALF = Math.PI / 2;
+
+// Камера
+const CAMERA_FOLLOW_SPEED = 6;
+const CAMERA_HEIGHT_OFFSET = 40;
+const CAMERA_FOCUS = [50, 20];
+const MAXSCREENSIZE = 1024;
 
 // Настройки игры
 const GAME_SETTINGS = {
-    TRAIN_SPEED: 1,               // Скорость движения поезда (единиц в секунду)
-    TRAIN_WHEEL_RADIUS : 0.25,
+    TRAIN_POWER: 3,               // Мощность паровозика 
+    TRAIN_WEIGHT: 0.5,
+    TRAIN_WHEEL_RADIUS : 0.18,
     TRAIN_LEIGHT: 1.5,
+    MAX_VELOCITY: 2,
+
+    WAGON_WEIGHT: 0.1,
 
     CELL_SIZE: 2.0,                 // Размер одной ячейки сетки в 3D пространстве
     CAMERA_FOLLOW_SPEED: 5.0,       // Скорость следования камеры
@@ -157,6 +143,8 @@ const GAME_SETTINGS = {
     RAIL_HEIGHT: 0.12,
     RAIL_SPACE: 0.7,
 
-    BASE_PLATFORM_SIZE: 6,
-    GROUND_DENSITY: 4
+    BASE_PLATFORM_SIZE: 10,
+    GROUND_DENSITY: 2,
+
+    GROUND_COLOR: 0x336633
 };

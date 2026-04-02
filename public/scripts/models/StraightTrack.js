@@ -3,21 +3,6 @@ class StraightTrack extends BaseTrack {
     createModel() {
         const group = new THREE.Group();
         
-        // Материалы
-        const railMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0xccccdd, 
-            metalness: 0.8, 
-            roughness: 0.3
-        });
-        const sleeperMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x8B5A2B, 
-            roughness: 0.9
-        });
-        
-        // Регистрируем материалы для последующего освобождения
-        this._registerMaterial(railMaterial);
-        this._registerMaterial(sleeperMaterial);
-        
         const trackLength = GAME_SETTINGS.CELL_SIZE;
         const railSpacing = GAME_SETTINGS.RAIL_SPACE;
         
@@ -25,26 +10,13 @@ class StraightTrack extends BaseTrack {
         const railHeight = GAME_SETTINGS.RAIL_HEIGHT;
         const railY = GAME_SETTINGS.RAIL_HEIGHT / 2 + GAME_SETTINGS.SLEEPER_HEIGHT / 2;
         
-        // Левая рельса
-        const leftRail = new THREE.Mesh(
-            new THREE.BoxGeometry(railWidth, railHeight, trackLength),
-            railMaterial
-        );
+        const leftRail = this.createBox(railWidth, railHeight, trackLength, this.railMaterial);
         leftRail.position.set(-railSpacing / 2, railY, 0);
-        leftRail.castShadow = true;
-        leftRail.receiveShadow = true;
-        this._registerGeometry(leftRail.geometry);
         group.add(leftRail);
         
         // Правая рельса
-        const rightRail = new THREE.Mesh(
-            new THREE.BoxGeometry(railWidth, railHeight, trackLength),
-            railMaterial
-        );
+        const rightRail = this.createBox(railWidth, railHeight, trackLength, this.railMaterial);
         rightRail.position.set(railSpacing / 2, railY, 0);
-        rightRail.castShadow = true;
-        rightRail.receiveShadow = true;
-        this._registerGeometry(rightRail.geometry);
         group.add(rightRail);
         
         // Шпалы
@@ -55,16 +27,14 @@ class StraightTrack extends BaseTrack {
             const t = i / sleeperCount;
             const pos = (t - 0.5) * trackLength + step / 2;
             
-            const sleeper = new THREE.Mesh(
-                new THREE.BoxGeometry(GAME_SETTINGS.SLEEPER_SIZE, GAME_SETTINGS.SLEEPER_HEIGHT, GAME_SETTINGS.SLEEPER_LENGTH),
-                sleeperMaterial
-            );
+            const sleeper = this.createBox(GAME_SETTINGS.SLEEPER_SIZE, GAME_SETTINGS.SLEEPER_HEIGHT, 
+                GAME_SETTINGS.SLEEPER_LENGTH, this.sleeperMaterial);
+
             sleeper.position.set(0, GAME_SETTINGS.SLEEPER_HEIGHT / 2, pos);
             sleeper.rotation.y = PI_HALF;
-            sleeper.castShadow = true;
-            sleeper.receiveShadow = true;
-            this._registerGeometry(sleeper.geometry);
             group.add(sleeper);
+
+            //this._registerClickable(sleeper);
         }
         
         return group;
@@ -80,10 +50,14 @@ class StraightTrack extends BaseTrack {
         const euler = new THREE.Euler(0, rotation, 0);
         offset.applyEuler(euler);
         
-        return {...pos.add(offset), ...{rotation: rotation} };
+        pos.add(offset);
+        pos.rotation = rotation;
+        
+        return pos;
     }
 
     getPath(index) {
         return [3, 1];
     }
 }
+registerClass(StraightTrack);

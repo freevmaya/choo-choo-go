@@ -1,3 +1,5 @@
+// scripts/core/BaseGame.js
+
 class BaseGame {
   constructor() {
     this.mouseControl = null;
@@ -23,6 +25,11 @@ class BaseGame {
     this.game_container = $('#game-container');
     this.container      = $('#canvas-container');
 
+    this.container.on('contextmenu', function(e) {
+      e.preventDefault();
+      return false;
+    });
+
     this.initScene();
     this.initUI();
 
@@ -44,7 +51,6 @@ class BaseGame {
       .then(()=>{
         this.raycasterManager = new RaycasterManager(this);
         eventBus.on('gameObject:click', this.handleObjectClick.bind(this));
-        eventBus.on('gameObject:tap', this.handleObjectTap.bind(this));
       })
   }
 
@@ -76,57 +82,6 @@ class BaseGame {
     if (gameObject && typeof gameObject.onClick === 'function') {
       gameObject.onClick(hit, data);
     }
-    
-    // Генерируем событие с информацией об объекте
-    eventBus.emit(`click:${object.uuid}`, {
-      object: object,
-      hit: hit,
-      distance: hit.distance,
-      point: hit.point
-    });
-  }
-
-  handleObjectTap(data) {
-    // Проверяем структуру данных - в data может быть как объект с touches, 
-    // так и напрямую intersects (если событие пришло из другого места)
-    let hit = null;
-    let touch = null;
-    
-    if (data.touches && data.touches[0] && data.touches[0].intersects && data.touches[0].intersects[0]) {
-      // Старый формат: data.touches[0].intersects[0]
-      hit = data.touches[0].intersects[0];
-      touch = data.touches[0];
-    } else if (data.intersects && data.intersects[0]) {
-      // Новый формат: data.intersects[0]
-      hit = data.intersects[0];
-      touch = data.touch;
-    } else {
-      console.warn('handleObjectTap: Invalid data format', data);
-      return;
-    }
-    
-    if (!hit) return;
-    
-    const object = hit.object;
-    
-    let gameObject = object.userData?.gameObject;
-    if (!gameObject) {
-      let current = object;
-      while (current && !gameObject) {
-        gameObject = current.userData?.gameObject;
-        current = current.parent;
-      }
-    }
-    
-    if (gameObject && typeof gameObject.onClick === 'function') {
-      gameObject.onClick(hit, data);
-    }
-    
-    eventBus.emit(`tap:${object.uuid}`, {
-      object: object,
-      hit: hit,
-      point: hit.point
-    });
   }
 
   registerClickableObject(object, gameObject = null) {
@@ -343,7 +298,7 @@ class BaseGame {
 
     // Подписка на старт игры
     this.gameState.on(GAME_STATE.START, () => {
-      console.log("Start callback вызван");
+      console.log("Start callback вызван", this.game_container);
       this.game_container.removeClass('start-blocking');
       this.hideStartModal();
       this.updateGameDisplay();
@@ -454,13 +409,15 @@ class BaseGame {
   loadLevelTextures() {
     return new Promise((resolve, reject)=>{
       let textures = collectPaths(GAME_PARAMS[this.paramsIndex]);
-      this.visibleLoader(true);
-      textureLoader.loadTexturesParallel(textures, (result)=>{
-        this.visibleLoader(false);
-        if (result)
-          resolve(result);
-        else reject();
-      });
+      if (textures.length > 0) {
+        this.visibleLoader(true);
+        textureLoader.loadTexturesParallel(textures, (result)=>{
+          this.visibleLoader(false);
+          if (result)
+            resolve(result);
+          else reject();
+        });
+      } else resolve(true);
     })
   }
 
@@ -722,7 +679,7 @@ class BaseGame {
     $(window).trigger('game-ready');
 
     if (DEV) 
-      setTimeout(this.gameState.start.bind(this.gameState), 500);
+      setTimeout(this.gameState.start.bind(this.gameState), 1000);
   }
 
   soundControl() {
@@ -750,14 +707,22 @@ class BaseGame {
     this.updateScoreIndicator();
   }
 
-  clearGameObject() {
+  removeGameObject(ga) {
+    let idx = this.gameObjects.indexOf(ga);
+    if (idx > -1)
+      this.gameObjects.splice(idx, 1);
+  }
+
+  clearGameObjects() {
 
     // Очищаем кликабельные объекты
     if (this.raycasterManager) {
       this.raycasterManager.clearClickableObjects();
     }
 
-    this.gameObjects.forEach((ga) => {
+    let copy = [...this.gameObjects];
+
+    copy.forEach((ga) => {
       ga.dispose();
     });
 
@@ -766,7 +731,7 @@ class BaseGame {
   
   resetGame() {
     console.log("Сброс игры...");
-    this.clearGameObject();
+    this.clearGameObjects();
     this.createGameObjects();
 
     this.newTitle = null;

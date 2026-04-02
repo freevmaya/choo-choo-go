@@ -5,9 +5,9 @@ class LevelLoader {
 
 	Load(data) {
 
-		let items = [];
+		let items = new Cells();
 	    data.track.forEach((trackItem)=>{
-			items.push((new trackItem.type(items, trackItem.location, trackItem.location[2])).init(this.game));
+			items.add(trackItem);
 	    });
 
 	    return items;

@@ -3,30 +3,49 @@
     $is_developer = Page::isDev();
     $scripts =  [
       'utils/Utils',
+      'utils/ClassRegistry',
       'utils/Vector2Int',
       'languages/Lang',
       'constants',
+      'levels',
       'GameState',
+      'core/PositionCart',
       'core/BaseGame',
+      'core/Cells',
       'core/RendererManager',
       'core/CameraController',
       'core/LevelLoader',
       'core/state-manager',
       'models/BaseGameObject',
+      'models/BaseCellObject',
       'models/BaseTrack',
-      'models/Ground',
+      'models/BaseCurveTrack',
       'models/StraightTrack',
       'models/CurvedTrack',
+      'models/ForkTrack',
+      'models/PointTrack',
+      'models/FinishTrack',
+      'models/Ground',
+
+      'models/BaseCart',
       'models/Train',
+      'models/Wagon',
+      'models/PassengerWagon',
+
+      'models/ChristmasTree',
+      'models/SimpleTree',
+      'models/DeciduousTree',
+      'models/Snow',
+
       'controls/RaycasterManager',
       'utils/EventEmitter',
       'utils/TextureLoader',
       'utils/MathUtils',
       'utils/crypto-js.min',
       'effects/SparkEffect',
-      'effects/BounceEffect',
-      'physics/BallPhysics',
+      'effects/ParticleSystem',
       'audio/SoundManager',
+      'UI/Library',
       'main'
     ];
 ?>
@@ -39,9 +58,11 @@
   <div id="game-container" class="start-blocking">
 
     <div class="game-ui">
+      <!--
       <div class="game-top">
         <div id="game-title" class="status"></div>
       </div>
+      -->
       <div class="game-bottom">
         <div class="left">
         </div>
@@ -79,6 +100,27 @@
       <div class="score-indicator" id="score-indicator">
         <i class="bi bi-trophy-fill"></i> <span data-lang="score_indicator">Счет:</span> <span id="current-score">0</span>
       </div>
+
+      <div class="library-block">
+        <div class="container">
+          <div class="title"><?=Lang('Library')?></div>
+          <div class="container-items">
+            <div id="library" class="items">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <?if (DEV) {?>
+      <div class="dev-block">
+        <div class="container">
+          <button id="clearBtn">Clear</button>
+          <button id="resetBtn">Reset</button>
+          <button id="saveBtn">Save</button>
+          <button id="editorStateBtn">Editor state</button>
+        </div>
+      </div>
+      <?}?>
     </div>
     
     <div id="game-canvas-container">
@@ -236,7 +278,7 @@
   <!--<script src="<?=SCRIPTURL?>language-switcher.js?v=<?=$v?>"></script>-->
 
   <?if ($is_developer) {?>
-    <script type="module" src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>
+    <script src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>
     <!-- Eruda is console for mobile browsers-->
     <!--
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>

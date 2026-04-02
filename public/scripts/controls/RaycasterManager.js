@@ -5,6 +5,8 @@ class RaycasterManager {
     this.game = game;
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
+    this.down = new THREE.Vector2();
+    this.downObjects = [];
     this.enabled = true;
     this.clickableObjects = new Set(); // Объекты, которые могут быть кликабельны
     this.debugMode = false; // Для отладки, показывает луч
@@ -97,6 +99,7 @@ class RaycasterManager {
     if (objectsToCheck.length === 0) return [];
     
     // Выполняем рейкастинг
+    this.raycaster.layers.mask = 0b11;
     const intersects = this.raycaster.intersectObjects(objectsToCheck, true);
     
     // Сортируем по расстоянию от камеры
@@ -121,13 +124,25 @@ class RaycasterManager {
    */
   onClick(event) {
     if (!this.enabled) return;
+
+    let pos = new THREE.Vector2(event.clientX, event.clientY);
+
+    this.dispatchEvent('gameObject:up', {
+      type: 'up',
+      originalEvent: event,
+      pos: pos
+    });
+
+
+    if (pos.clone().sub(this.down).length() > 2)
+      return;
     
-    // Получаем координаты
-    const clientX = event.clientX;
-    const clientY = event.clientY;
-    
+    this.doRaycast(pos);
+  }
+
+  doRaycast(pos) {
     // Выполняем рейкастинг
-    const intersects = this.raycast(clientX, clientY);
+    const intersects = this.raycast(pos.x, pos.y);
     
     if (intersects.length > 0) {
       // Генерируем событие клика
@@ -135,37 +150,15 @@ class RaycasterManager {
         type: 'click',
         originalEvent: event,
         intersects: intersects,
-        mousePosition: { x: clientX, y: clientY }
+        pos: pos
       });
-      
-      // Генерируем событие для каждого объекта отдельно
-      intersects.forEach((intersect, index) => {
-        const targetObject = intersect.object;
-        
-        // Находим корневой объект, если это вложенный объект
-        let rootObject = targetObject;
-        while (rootObject.parent && !this.clickableObjects.has(rootObject)) {
-          rootObject = rootObject.parent;
-        }
-        
-        const objectId = rootObject.id || rootObject.uuid;
-        if (this.clickableObjects.has(rootObject) || this.clickableObjects.has(targetObject)) {
-          this.dispatchEvent(`gameObject:click:${objectId}`, {
-            type: 'click',
-            originalEvent: event,
-            intersect: intersect,
-            index: index,
-            totalHits: intersects.length,
-            rootObject: rootObject
-          });
-        }
-      });
+
     } else {
       // Клик мимо объектов
       this.dispatchEvent('gameObject:click:miss', {
         type: 'click',
         originalEvent: event,
-        mousePosition: { x: clientX, y: clientY }
+        pos: pos
       });
     }
   }
@@ -177,16 +170,15 @@ class RaycasterManager {
   onMouseDown(event) {
     if (!this.enabled) return;
     
-    const clientX = event.clientX;
-    const clientY = event.clientY;
-    const intersects = this.raycast(clientX, clientY);
+    this.down = new THREE.Vector2(event.clientX, event.clientY);
+    this.downObjects = this.raycast(this.down.x, this.down.y);
     
-    if (intersects.length > 0) {
-      this.dispatchEvent('gameObject:mousedown', {
-        type: 'mousedown',
+    if (this.downObjects.length > 0) {
+      this.dispatchEvent('gameObject:down', {
+        type: 'down',
         originalEvent: event,
-        intersects: intersects,
-        mousePosition: { x: clientX, y: clientY }
+        intersects: this.downObjects,
+        pos: this.down
       });
     }
   }
@@ -201,45 +193,25 @@ class RaycasterManager {
     
     const touch = event.touches[0];
     if (!touch) return;
-    
+
+    this.down = new THREE.Vector2(touch.clientX, touch.clientY);
     // Выполняем рейкастинг
-    const intersects = this.raycast(touch.clientX, touch.clientY);
+    this.downObjects = this.raycast(this.down.x, this.down.y);
     
-    if (intersects.length > 0) {
+    if (this.downObjects.length > 0) {
       // Генерируем событие тапа с правильной структурой
-      this.dispatchEvent('gameObject:tap', {
-        type: 'tap',
+      this.dispatchEvent('gameObject:down', {
+        type: 'down',
         originalEvent: event,
-        touch: touch,
-        intersects: intersects
+        pos: this.down,
+        intersects: this.downObjects
       });
-      
-      // Генерируем события для каждого объекта
-      intersects.forEach((intersect, index) => {
-        const targetObject = intersect.object;
-        
-        let rootObject = targetObject;
-        while (rootObject.parent && !this.clickableObjects.has(rootObject)) {
-          rootObject = rootObject.parent;
-        }
-        
-        const objectId = rootObject.id || rootObject.uuid;
-        if (this.clickableObjects.has(rootObject) || this.clickableObjects.has(targetObject)) {
-          this.dispatchEvent(`gameObject:tap:${objectId}`, {
-            type: 'tap',
-            originalEvent: event,
-            intersect: intersect,
-            touch: touch,
-            index: index,
-            rootObject: rootObject
-          });
-        }
-      });
+
     } else {
       this.dispatchEvent('gameObject:tap:miss', {
         type: 'tap',
         originalEvent: event,
-        touch: touch
+        pos: this.down
       });
     }
   }
@@ -250,11 +222,22 @@ class RaycasterManager {
    */
   onTouchEnd(event) {
     if (!this.enabled) return;
-    
-    this.dispatchEvent('gameObject:touchend', {
-      type: 'touchend',
-      originalEvent: event
+
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+
+    const pos = new THREE.Vector2(touch.clientX, touch.clientY);
+
+    this.dispatchEvent('gameObject:up', {
+      type: 'up',
+      originalEvent: event,
+      pos: pos
     });
+
+    if (pos.clone().sub(this.down).length() > 2)
+      return;
+    
+    this.doRaycast(pos);
   }
   
   /**
@@ -356,6 +339,36 @@ class RaycasterManager {
     if (enabled && !this.debugLines) {
       this.createDebugHelper();
     }
+  }
+
+  getIntersectionWithPlane(clientX, clientY, planePoint, planeNormal = null) {
+
+    if (!planeNormal)
+      planeNormal = new THREE.Vector3(0, 1, 0);
+
+    const mousePos = this.getMousePosition(clientX, clientY);
+    const camera = this.game.cameraController.getCamera();
+    this.raycaster.setFromCamera(mousePos, camera);
+    const rayDirection = this.raycaster.ray.direction.clone().normalize();
+    const rayOrigin = this.raycaster.ray.origin.clone();
+    const normal = planeNormal.clone().normalize();
+    const denominator = rayDirection.dot(normal);
+    
+    // Если знаменатель близок к нулю, луч параллелен плоскости
+    if (Math.abs(denominator) < 1e-6) {
+      return null;
+    }
+    const t = -(rayOrigin.clone().sub(planePoint).dot(normal)) / denominator;
+    
+    // Если t < 0, пересечение позади камеры
+    if (t < 0) {
+      return null;
+    }
+    
+    // Вычисляем точку пересечения
+    const intersectionPoint = rayOrigin.clone().add(rayDirection.multiplyScalar(t));
+    
+    return intersectionPoint;
   }
   
   /**

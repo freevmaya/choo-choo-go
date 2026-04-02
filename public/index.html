@@ -1,51 +1,70 @@
-
-<!DOCTYPE html>
-<html lang="ru">
-<head>
+<html lang="ru" data-lt-installed="true"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tree Jump — прыжки по деревьям</title>
+  <title>Чух чух поехали!</title>
   
   <!-- Bootstrap CSS -->
-  <link href="https://game-dev.local/styles/bootstrap.min.css" rel="stylesheet">
+  <link href="http://game-dev.local/styles/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="./styles/bootstrap-icons.css">
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="https://game-dev.local/styles/main.css?v=1">
-  <link rel="stylesheet" href="https://game-dev.local/styles/dialog.css?v=1">
-  <script src="https://game-dev.local/scripts/jquery-4.0.0.min.js"></script>
+  <link rel="stylesheet" href="http://game-dev.local/styles/main.css?v=2">
+  <link rel="stylesheet" href="http://game-dev.local/styles/dialog.css?v=2">
+
+  <!-- JQUERY -->
+  <script src="http://game-dev.local/scripts/jquery-4.0.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
   <script>
     var DEV = true;
   </script>
-</head>
-<body>
+  <script src="scripts/error-tracker.js?v=2"></script>
+<script type="text/javascript">
+  ErrorTracker.init({
+    version: 2,
+    user_id: 0,
+    excludeDomains: [
+      'generate-phrases',
+      'yandex',
+          'google',
+          'example.org',
+          'generate-audio',
+          'check-audio'
+      ]
+  });
+</script><script src="./scripts/languages/ru.js?v=2"></script></head>
+<body class="page-loaded" style="">
       <div class="loader">
       <div class="spinner-border" role="status">
       </div>
   </div>
 
   <!-- Основной контейнер игры -->
-  <div id="game-container" class="start-blocking">
+  <div id="game-container" class="">
 
     <div class="game-ui">
+      <!--
       <div class="game-top">
         <div id="game-title" class="status"></div>
       </div>
+      -->
       <div class="game-bottom">
         <div class="left">
         </div>
         <div>
           <div class="s-view" id="state-score">
-            <div class="status" data-lang="score_label">Счет</div>
-            <div class="value">123</div>
+            <div class="status" data-lang="score_label">Счет:</div>
+            <div class="value">-</div>
           </div>
           <div class="s-view" id="state-vin">
             <div class="status" data-lang="wins_label">Поб.</div>
-            <div class="value">123</div>
+            <div class="value">-</div>
           </div>
           <div class="s-view" id="state-title">
             <div class="status" data-lang="title_label">Зван.</div>
-            <div class="value">Рекрут</div>
+            <div class="value">Новичок</div>
           </div>
         </div>
         <div class="right">
@@ -68,15 +87,24 @@
       <div class="score-indicator" id="score-indicator">
         <i class="bi bi-trophy-fill"></i> <span data-lang="score_indicator">Счет:</span> <span id="current-score">0</span>
       </div>
+
+      <div class="library-block">
+        <div class="container">
+          <div class="title">Library</div>
+          <div id="library" class="items">
+            
+          <div class="item draggable ui-draggable ui-draggable-handle"><img src="images/library/StraightTrack.png"></div><div class="item draggable ui-draggable ui-draggable-handle"><img src="images/library/CurvedTrack.png"></div></div>
+        </div>
+      </div>
     </div>
     
     <div id="game-canvas-container">
-      <div id="canvas-container"></div>
+      <div id="canvas-container"><canvas data-engine="three.js r160" width="928" height="1780" style="display: block; width: 464px; height: 890px;"></canvas></div>
     </div>
   </div>
 
   <!-- Bootstrap модальное окно для Start Game -->
-  <div class="modal fade" id="startModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade" id="startModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" style="display: none;" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="dialog-1 modal-content">
         <div class="background">
@@ -93,9 +121,9 @@
               <p>
                 <i class="bi bi-exclamation-triangle-fill"></i> <span data-lang="start_info_2">Красные платформы смертельны при ударе сверху!</span>
               </p>
-              <p >
-                <span data-lang="gpu_speed">GPU speed:</span> <span id="testResult"></span>. 
-                <span data-lang="version">Version:</span> <span>1.0.1</span>
+              <p>
+                <span data-lang="gpu_speed">GPU speed:</span> <span id="testResult">27</span>. 
+                <span data-lang="version">Version:</span> <span>1.0.2</span>
               </p>
               <div class="text-center buttons">
                 <button type="button" class="btn" id="startGameButton" data-lang="start_button">Начать</button>
@@ -157,7 +185,7 @@
           <div class="middle">
             <div class="dialog-content">
               <p class="modal-subtitle status" data-lang="victory_title">Вы достигли вершины дерева!</p>
-              <p class="new-title status" data-lang="new_rank"></p>
+              <p class="new-title status" data-lang="new_rank">Вам присвоено новое звание:</p>
               <!-- Статистика игры -->
               <div class="stats-container victory-stats" id="victoryState">
                 <div class="row">
@@ -215,37 +243,48 @@
   </div>
 
   <!-- Подключаем Bootstrap JS глобально -->
-  <script src="https://game-dev.local/scripts/bootstrap.bundle.min.js"></script>
-  <script src="https://game-dev.local/scripts/three.min.js"></script>
+  <script src="http://game-dev.local/scripts/bootstrap.bundle.min.js"></script>
+  <script src="http://game-dev.local/scripts/three.min.js"></script>
 
-    <script src="https://game-dev.local/scripts/utils/Utils.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/languages/Lang.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/constants.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/GameState.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/core/BaseGame.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/core/RendererManager.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/core/CameraController.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/core/state-manager.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/models/Background.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/models/Ground.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/controls/MouseRotationControl.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/utils/EventEmitter.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/utils/TextureLoader.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/utils/MathUtils.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/utils/crypto-js.min.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/effects/SparkEffect.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/effects/BounceEffect.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/physics/BallPhysics.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/audio/SoundManager.js?v=1"></script>
-    <script src="https://game-dev.local/scripts/main.js?v=1"></script>
+    <script src="http://game-dev.local/scripts/utils/Utils.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/utils/Vector2Int.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/languages/Lang.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/constants.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/GameState.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/core/BaseGame.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/core/Cells.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/core/RendererManager.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/core/CameraController.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/core/LevelLoader.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/core/state-manager.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/BaseGameObject.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/BaseCellObject.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/BaseTrack.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/Ground.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/StraightTrack.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/CurvedTrack.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/Train.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/ChristmasTree.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/models/SimpleTree.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/controls/RaycasterManager.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/utils/EventEmitter.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/utils/TextureLoader.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/utils/MathUtils.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/utils/crypto-js.min.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/effects/SparkEffect.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/effects/BounceEffect.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/physics/BallPhysics.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/audio/SoundManager.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/UI/Library.js?v=2"></script>
+    <script src="http://game-dev.local/scripts/main.js?v=2"></script>
   
-  <!--<script src="https://game-dev.local/scripts/language-switcher.js?v=1"></script>-->
+  <!--<script src="http://game-dev.local/scripts/language-switcher.js?v=2"></script>-->
 
-      <script type="module" src="https://game-dev.local/scripts/test-unit.js?v=1"></script>
+      <script type="module" src="http://game-dev.local/scripts/test-unit.js?v=2"></script>
     <!-- Eruda is console for mobile browsers-->
     <!--
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
     -->
-  </body>
-</html>
+  
+</body></html>

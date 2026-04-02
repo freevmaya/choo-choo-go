@@ -1,4 +1,5 @@
 class RailGame extends BaseGame {
+
   initScene() {
     this.scene = new THREE.Scene();
     this.rendererManager = new RendererManager(this.container);
@@ -7,6 +8,131 @@ class RailGame extends BaseGame {
     this.levelLoader = new LevelLoader(this);
     this.lights = [];
     this.createLights();
+
+    eventBus.on('change-cells', this.onChangeCells.bind(this));
+
+    this.editorStates = ['play', 'edit', 'delete', 'playAndEdit'];
+    this.editorStateIndex = 0;
+  }
+
+  onChangeCells(cells) {
+  }
+
+  initUI() {
+
+    super.initUI();
+
+    new Library($('#library'), $('#canvas-container'), [
+      {
+        type: StraightTrack
+      },{
+        type: CurvedTrack
+      },{
+        type: ForkTrack
+      },{
+        type: PointTrack
+      },{
+        type: FinishTrack
+      },{
+        type: Train
+      },{
+        type: Wagon
+      },{
+        type: PassengerWagon
+      },{
+        type: SimpleTree
+      },{
+        type: ChristmasTree
+      },{
+        type: DeciduousTree
+      },{
+        type: Snow
+      }
+    ]);
+
+    if (DEV)
+      this.initDevTools();
+  }
+
+  isPlaying() {
+    return this.gameState.isPlaying() && ((this.editorState() == 'play') || (this.editorState() == 'playAndEdit'))
+  }
+
+  setEditorState(state) {
+
+    let index = 0;
+    if (typeof state == 'string')
+      index = this.editorStates.indexOf(state);
+    else index = state;
+
+    index = clamp(index, 0, this.editorStates.length - 1);
+    if (this.editorStateIndex != index) {
+      this.editorStateIndex = index;
+      if (this.ebtn)
+        this.ebtn.text(this.editorState());
+      console.log(`Change editorState: ${this.editorState()}`);
+      eventBus.emit('editor-state-change', this.editorState());
+    }
+  }
+
+  editorState() {
+    return this.editorStates[this.editorStateIndex];
+  }
+
+  saveProject() {
+    try {
+      let data = this.items.toSaveData();
+
+      if (DEV) {
+        Object.keys(data).forEach(k=>{
+          GAME_PARAMS[this.paramsIndex][k] = data[k];
+        });
+
+        this.stateManager.set('levels', GAME_PARAMS);
+        console.log(GAME_PARAMS);
+      } else {
+        this.stateManager.set('cells', data);
+      }
+
+      eventBus.emit('project-saved');
+      console.log('Saved');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  showMagicSwirl(x, y, z) {
+    let effect = new MagicSwirlParticles(this);
+    effect.setPosition(x, y, z);
+    effect.play();
+  }
+
+  initDevTools() {
+
+    /*
+    const geometry = new THREE.SphereGeometry(0.2, 32, 32);
+    const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+    const sphere = new THREE.Mesh(geometry, material);
+    this.scene.add(sphere);*/
+
+    $('#saveBtn').click(() => {
+      this.saveProject();
+    });
+
+    $('#resetBtn').click(() => {
+      this.resetGame();
+    });
+
+    $('#clearBtn').click(()=>{
+      this.clearItems();
+    });
+
+    this.ebtn = $('#editorStateBtn');
+
+    this.ebtn.click(() => {
+      this.setEditorState((this.editorStateIndex + 1) % this.editorStates.length);
+    });
+    this.ebtn.text(this.editorState());
   }
 
   clearLights() {
@@ -25,7 +151,7 @@ class RailGame extends BaseGame {
     let env = GAME_PARAMS[this.paramsIndex].ENV;
 
     this.scene.background = new THREE.Color(env.BACKGROUND_COLOR);
-    let distance = 20;
+    let distance = CAMERA_HEIGHT_OFFSET * 1.5;
     this.scene.fog = new THREE.Fog(env.BACKGROUND_COLOR, distance, distance * 2);
     
     const ambient = new THREE.AmbientLight(env.AMBIENT_LIGHT_COLOR, env.AMBIENT_LIGHT_INTENSITY);
@@ -57,38 +183,98 @@ class RailGame extends BaseGame {
     this.lights.push(rimLight);
   }
 
-  createGameObjects() {
-    let env = GAME_PARAMS[this.paramsIndex].ENV;
+  loadCells(cells) {
+    this.items = new Cells(this);
+    this.items.init(cells.items, cells.carts, cells.objects);
+  }
 
-    super.createGameObjects();
-    this.cameraController.reset();
-    this.ground = (new Ground(env.GROUND_IMAGE_PATH)).init(this);
-
-    this.train = new Train();
+  createDefaultTrain() {
 
     let track = [
         {
-          type: CurvedTrack,
-          location: [0, 0, 3]
-        },
-        {
-          type: CurvedTrack,
-          location: [0, -1, 1]
-        },
-        {
-          type: StraightTrack,
-          location: [-1, -1, 1]
-        },
-        {
-          type: CurvedTrack,
-          location: [1, 0, 1]
+          type: ForkTrack,
+          location: [1, 0, 0]
         }
     ];
 
-    let items = this.levelLoader.Load({track: track});
+    let objects = [
+      {
+        type: SimpleTree,
+        location: [0, 2, 0]
+      },{
+        type: SimpleTree,
+        location: [2, 0, 0]
+      },{
+        type: SimpleTree,
+        location: [-3, -1, 0]
+      }
+    ]
 
-    this.train.init(this, items, 3);
-    //this.train.start(true);
+    let carts = [
+    ]
+
+    this.items = new Cells(this);
+    this.items.init(track, carts, objects);
+  }
+
+  createForScreenshot() {
+    let track = [
+        {
+          type: ForkTrack,
+          location: [1, 1, 0]
+        }
+    ];
+
+    let carts = []
+
+    this.items = new Cells(this);
+    this.items.init(track, carts, [{
+      type: SimpleTree,
+      location: [-2, -1]
+    }]);
+  }
+
+  getEnv() {
+    return GAME_PARAMS[this.paramsIndex].ENV;
+  }
+
+  createGameObjects() {
+    let env = this.getEnv();
+
+    super.createGameObjects();
+    this.cameraController.reset();
+    this.ground = (new Ground(env.GROUND_IMAGE_PATH, env.GROUND_COLOR)).init(this); //
+
+    if (DEV) {
+      let levels = this.stateManager.get('levels');
+      if (levels) {
+        Object.keys(levels).forEach(k => {
+          GAME_PARAMS[k] = levels[k];
+        });
+      }
+    }
+
+    if (this.paramsIndex) {
+      this.loadCells(GAME_PARAMS[this.paramsIndex]);
+    } else {
+      let cells = this.stateManager.get('cells');
+      if (cells)
+        this.loadCells(cells);
+      else this.createDefaultTrain();
+    }
+  }
+
+  clearItems() {
+    if (this.items)
+      this.items.clear();
+  }
+
+  clearGameObjects() {
+    super.clearGameObjects();
+    if (this.items) {
+      this.items.dispose();
+      this.items = null;
+    }
   }
   
   onResize() {
@@ -97,7 +283,9 @@ class RailGame extends BaseGame {
   }
 
   update(dt) {
-    super.update(dt);
+    if (this.isPlaying())
+      super.update(dt);
+
     this.cameraController.update(dt);
     this.rendererManager.render(this.scene, this.cameraController.getCamera());
   }

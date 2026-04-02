@@ -237,3 +237,23 @@ function collectPaths(obj) {
   recursiveCollect(obj);
   return paths;
 }
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+function lerp(min, max, t) {
+    // t - коэффициент от 0 до 1
+    return min + (max - min) * clamp(t, 0, 1);
+}
+
+function isSubClass(Child, Parent) {
+    // Проверяем, что оба - классы (не экземпляры)
+    if (typeof Child !== 'function' || typeof Parent !== 'function') {
+        return false;
+    }
+    
+    // Проверяем цепочку прототипов
+    return Child.prototype instanceof Parent || 
+           Child === Parent;
+}

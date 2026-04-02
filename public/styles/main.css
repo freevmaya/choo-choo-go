@@ -2,6 +2,7 @@
 
 :root {
   --game-bg: radial-gradient(circle at top left, #7ed4e3, #223100);
+  --library-height: min(600px, 80vh);
 }
 
 /*
@@ -61,6 +62,24 @@ body {
 
 .start-blocking .game-ui {
   display: none;
+}
+
+.game-ui button {
+    padding: 12px 24px;
+    background: linear-gradient(178deg, #98b343 0%, #57350a 100%);
+    color: white;
+    border: none;
+    border-radius: 50px; /* или 999px для полного закругления */
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.game-ui button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .game-bottom, .game-top {
@@ -508,7 +527,7 @@ canvas {
   width: 129px;
   height: 50px;
   line-height: 37px;
-  top: 120px;
+  top: 10px;
   right: 20px;
 }
 
@@ -583,5 +602,98 @@ body {
 @media (max-aspect-ratio: 1/1) {
   body {
     background-image: url(dialog/background-23-512.jpg);
+  }
+}
+
+/*______________library____________*/
+
+
+.dev-block, .library-block {
+  position: absolute;
+}
+
+.dev-block {
+  bottom: 30px;
+  left: 10px;
+}
+
+.dev-block .container, .library-block .container {
+  position: relative;
+  background: #715f00;
+  color: gold;
+  padding: 10px;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  z-index: 100;
+  box-shadow: 2px 2px 6px black;
+}
+
+.library-block {
+  top: 50%;
+  left: 20px;
+}
+
+.library-block .title {
+  position: absolute;
+  background: #715f00;
+  width: calc(100% - 20px);
+  box-shadow: 2px 2px 6px black;
+  border-radius: 15px;
+  padding: 0 10px;
+  transform: translateY(-80%);
+}
+
+.library-block .container {
+  width: 129px;
+  height: var(--library-height);
+  line-height: 37px;
+  transform: translateY(-50%);
+}
+
+
+.library-block .container-items {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.library-block .items {
+  background: white;
+  border-radius: 15px;
+  display: flex;
+  justify-items: center;
+  flex-direction: column;
+  gap: 5px;
+  padding: 5px;
+}
+
+.items .item {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: gray;
+}
+
+.items .item img {
+  width: 100%;
+  height: auto;
+}
+
+.ui-draggable-dragging {
+  box-shadow: 2px 2px 6px black;
+  pointer-events: none;
+}
+
+@media (max-width: 500px) {
+  .library-block {
+    left: 0px;
+  }
+
+  .library-block .container {
+    width: 80px;
   }
 }

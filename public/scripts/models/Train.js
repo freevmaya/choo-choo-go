@@ -1,13 +1,8 @@
 // scripts/models/Train.js
 
-class Train extends BaseGameObject {
+class Train extends BaseCart {
     constructor() {
         super();
-        this.type = 'train';
-        this.speed = 0;
-        this.isMoving = false;
-        this.speed = 0;
-        this.forwardInTrack = true;
 
         this.eyeBlinkTimer = 0;
         this.eyeBlinkInterval = 3;
@@ -17,83 +12,219 @@ class Train extends BaseGameObject {
         this.smokeInterval = 0.5;
         this.whistleTimer = 0;
         this.whistleInterval = 8;
-        this.wheelAngle = 0;
-        this.wheelRotationSpeed = 0;
-        this.animationTime = 0;
+
+        this.force = GAME_SETTINGS.TRAIN_POWER;
+        this.brack = this.force * 2;
+
+        this.states = ['run', 'stop', 'braking'];
+        this.stateIndex = 1;
+        this.chain = [];
     }
 
-    init(game, track, startChainIndex = 0) {
-        super.init(game);
-        this.track = track;
-        this.setCurrentChain(startChainIndex, 0);
+    addChain(cart) {
+        if (!this.chain.includes(cart))
+            this.chain.push(cart);
     }
 
-    setCurrentChain(index, pathIndex) {
-        this.currentChainIndex  = index;
-        this.indexPosInChain    = -1;
-        this.pathIndex          = pathIndex;
-        this.updatePosition();
+    removeChain(cart) {
+        let idx = this.chain.indexOf(cart);
+        if (idx > -1)
+            this.chain.splice(idx, 1);
+    }
+
+    hasInChain(cart) {
+        return this.chain.indexOf(cart) > -1;
+    }
+
+    toSaveData() {
+        let data = super.toSaveData();
+        data.chain = [];
+        this.chain.forEach((cart)=>{
+            let idx = cart.index();
+            if (idx > -1)
+                data.chain.push(idx);
+        });
+        return data;
+    }
+
+    _resetChain(chain) {        
+        this.chain = [];
+        chain.forEach((idx)=>{
+            this.chain.push(this.game.items.carts[idx]);
+        });
+    }
+
+    init(game, data) {
+        super.init(game, data);
+
+        if (data.chain)
+            setTimeout(()=>{
+                this._resetChain(data.chain);
+            }, 100);
+
+        this.initListeners();
+        return this;
+    }
+
+    initListeners() {
+        eventBus.on('gameObject:down', (data)=>{
+
+            if ((data.intersects.length > 0) && (data.intersects[0].object.userData.gameObject == this)) 
+                this.beginDrag(data.pos);
+        });
+
+        eventBus.on('gameObject:up', (data)=>{
+            if (this.isDrag) 
+                this.endDrag(data.pos);
+        });
+
+        this.game.container.on('mouseleave', (data)=>{
+            if (this.isDrag) 
+                this.endDrag(data.pos);
+        });
+
+        $(window).on('blur', (data)=>{
+            if (this.isDrag) 
+                this.endDrag(data.pos);
+        });
+    }
+
+    beginDrag(pos) {
+        this.game.cameraController.setEnable(false);
+        this.startDragPoint = this.game.raycasterManager.getIntersectionWithPlane(pos.x, pos.y, this.getPosition());
+        this.isDrag = true;
+        this.State('braking'); 
+    }
+
+    endDrag(pos) {
+        if (this.isDrag) {
+            this.game.cameraController.setEnable(true);
+            this.isDrag = false;
+            let endDragPoint = this.game.raycasterManager.getIntersectionWithPlane(pos.x, pos.y, this.getPosition());
+            let direct = endDragPoint.clone().sub(this.startDragPoint);
+            console.log(direct);
+
+            let forward = new THREE.Vector3();
+            this.model.getWorldDirection(forward);
+
+            this.setForward(direct.dot(forward) < 0);
+            this.State('run'); 
+        }
+    }
+
+    headTrain() {
+        return this;
+    }
+
+    State(value = null) {
+        if (value) {
+            let index = this.states.indexOf(value);
+            if (index > -1) 
+                this.setState(index);
+        }
+        return this.states[this.stateIndex];
+    }
+
+    updatePS() {
+        if (this.particles) {
+             if (this.State() == 'run') {
+                this.particles.psList[0].options.lifetime = 1.5;
+                this.particles.psList[0].options.opacity = 1;
+            } else {
+                this.particles.psList[0].options.lifetime = 0.5;
+                this.particles.psList[0].options.opacity = 0.4;
+            }
+        }
+    }
+
+    setState(index) {
+        if (index != this.stateIndex) {
+            this.stateIndex = index;
+            if (this.State() == 'stop')
+                this.velocity = 0;
+
+            this.updatePS();
+        }
+    }
+
+    defaultWeight() {
+        return GAME_SETTINGS.TRAIN_WEIGHT;
+    }
+
+    size() {
+        let size = super.size();
+        size.height = 1.5;
+        return size;
+    }
+
+    getWheelPositions() {
+
+        let size = this.size();
+        let fc = size.width / 2 + size.wheel.width / 2;
+        let d = this.baseLength / 3;
+        return [
+            { x: -d, z: -fc, radius: size.wheel.radius },
+            { x: -d, z: fc, radius: size.wheel.radius },
+            { x: 0.0, z: -fc, radius: size.wheel.radius },
+            { x: 0.0, z: fc, radius: size.wheel.radius },
+            { x: d, z: -fc, radius: size.wheel.radius },
+            { x: d, z: fc, radius: size.wheel.radius }
+        ]
+    }
+
+    createEye(x, y, z, eyeMaterial, pupilMaterial) {
+        let eyeGroup = new THREE.Group();
+        const eye = this.createSphere(0.22, 32, eyeMaterial);
+        eyeGroup.add(eye);
+        eyeGroup.Eye = eye;
+
+        const pupil = this.createSphere(0.12, 32, pupilMaterial);
+        pupil.position.set(0.2, 0, 0);        
+        eyeGroup.add(pupil);
+        eyeGroup.Pupil = pupil;
+
+        eyeGroup.position.set(x, y, z);
+        this.base.add(eyeGroup);
+        return eyeGroup;
     }
     
     createModel() {
-        const base = new THREE.Group();
-        const group = new THREE.Group();
 
-        base.rotation.y = PI_HALF;
-
+        let group = super.createModel();
         let wweight = 0.14;
 
-        group.add(base);
-
-        let width = GAME_SETTINGS.RAIL_SPACE - wweight;
-        let length = GAME_SETTINGS.TRAIN_LEIGHT;
+        let size = this.size();
+        let width = size.width;
+        let length = size.baseLength;
         let width2 = width / 2;
         
         // Цвета
-        const mainColor = 0xFF4444;
         const darkColor = 0xCC3333;
-        const wheelColor = 0x333333;
-        const rimColor = 0xCCCC33;
         const eyeColor = 0xFFFFFF;
         const pupilColor = 0x000000;
         const pipeColor = 0x666666;
         
         // Материалы
-        const mainMaterial = new THREE.MeshStandardMaterial({ color: mainColor, roughness: 0.4, metalness: 0.3 });
         const darkMaterial = new THREE.MeshStandardMaterial({ color: darkColor, roughness: 0.5, metalness: 0.2 });
-        const wheelMaterial = new THREE.MeshStandardMaterial({ color: wheelColor, roughness: 0.6, metalness: 0.7});
-        const rimMaterial = new THREE.MeshStandardMaterial({ color: rimColor, roughness: 0.3, metalness: 0.8});
         const eyeMaterial = new THREE.MeshStandardMaterial({ color: eyeColor, roughness: 0.2, metalness: 0.1 });
         const pupilMaterial = new THREE.MeshStandardMaterial({ color: pupilColor, roughness: 0.1, metalness: 0.0 });
         const pipeMaterial = new THREE.MeshStandardMaterial({ color: pipeColor, roughness: 0.3, metalness: 0.6 });
         const highlightMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, emissive: 0xFFFFFF, emissiveIntensity: 0.5 });
         
-        this._registerMaterial(mainMaterial);
         this._registerMaterial(darkMaterial);
-        this._registerMaterial(wheelMaterial);
-        this._registerMaterial(rimMaterial);
         this._registerMaterial(eyeMaterial);
         this._registerMaterial(pupilMaterial);
         this._registerMaterial(pipeMaterial);
         this._registerMaterial(highlightMaterial);
         
-        // ========== ОСНОВНОЙ КОРПУС ==========
-        // Нижняя платформа
-        const basePlateGeo = new THREE.BoxGeometry(length, 0.2, width);
-        const basePlate = new THREE.Mesh(basePlateGeo, mainMaterial);
-        basePlate.position.y = GAME_SETTINGS.TRAIN_WHEEL_RADIUS;
-        basePlate.castShadow = true;
-        this._registerGeometry(basePlateGeo);
-        base.add(basePlate);
-        
         // Основной корпус (цилиндр, расположенный горизонтально)
         const bodyGeo = new THREE.CylinderGeometry(width2, width2, length * 0.8, 16);
-        const body = new THREE.Mesh(bodyGeo, mainMaterial);
+        const body = new THREE.Mesh(bodyGeo, this.mainMaterial);
         body.rotation.z = PI_HALF;
-        body.position.set(0.4, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 0.55, 0);
+        body.position.set((length - length * 0.7) / 2, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 0.55, 0);
         body.castShadow = true;
         this._registerGeometry(bodyGeo);
-        base.add(body);
+        this.base.add(body);
 
         const cab_group = new THREE.Group();
         
@@ -115,7 +246,7 @@ class Train extends BaseGameObject {
 
         cab_group.position.set(-0.6, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 1, 0);
 
-        base.add(cab_group);
+        this.base.add(cab_group);
         
         /*
         // Передняя часть
@@ -142,246 +273,61 @@ class Train extends BaseGameObject {
         this._registerGeometry(pipeTopGeo);
         pipe_group.add(pipeTop);
 
-        pipe_group.position.set(0.9, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 1.15);
+        pipe_group.position.set(length / 2 - 0.1, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 1.15);
 
-        base.add(pipe_group);
-
-        let eyeGroup = new THREE.Group();
+        this.base.add(pipe_group);
         
         // ========== БОЛЬШИЕ ГЛАЗА ==========
-        // Левое глазное яблоко
-        const leftEyeGeo = new THREE.SphereGeometry(0.22, 32, 32);
-        const leftEye = new THREE.Mesh(leftEyeGeo, eyeMaterial);
-        leftEye.castShadow = true;
-        this._registerGeometry(leftEyeGeo);
-        eyeGroup.add(leftEye);
-        eyeGroup.Eye = leftEye;
-        
-        // Зрачки
-        const pupilGeo = new THREE.SphereGeometry(0.12, 32, 32);
-        const pupil = new THREE.Mesh(pupilGeo, pupilMaterial);
-        pupil.position.set(0.2, 0, 0);
-        pupil.castShadow = true;
-        this._registerGeometry(pupilGeo);
-        eyeGroup.add(pupil);
-        eyeGroup.Pupil = pupil;
 
-        eyeGroup.position.set(1.3, 1, 0.4);
-        base.add(eyeGroup);
-
-        let eyeGroup2 = eyeGroup.clone();
-        eyeGroup2.position.set(1.3, 1, -0.4);
-        base.add(eyeGroup2);
-        
-        // ========== КОЛЁСА ==========
-        this.wheels = [];
-        let fc = width / 2 + wweight / 2;
-        let d = length / 3;
-        const wheelPositions = [
-            { x: -d, z: -fc, radius: GAME_SETTINGS.TRAIN_WHEEL_RADIUS },
-            { x: -d, z: fc, radius: GAME_SETTINGS.TRAIN_WHEEL_RADIUS },
-            { x: 0.0, z: -fc, radius: GAME_SETTINGS.TRAIN_WHEEL_RADIUS },
-            { x: 0.0, z: fc, radius: GAME_SETTINGS.TRAIN_WHEEL_RADIUS },
-            { x: d, z: -fc, radius: GAME_SETTINGS.TRAIN_WHEEL_RADIUS },
-            { x: d, z: fc, radius: GAME_SETTINGS.TRAIN_WHEEL_RADIUS }
-        ];
-        
-        wheelPositions.forEach((pos) => {
-
-            let wheelGroup = new THREE.Group();
-
-            // Основное колесо
-            const wheelGeo = new THREE.CylinderGeometry(pos.radius, pos.radius, wweight - .02, 24);
-            const wheel = new THREE.Mesh(wheelGeo, wheelMaterial);
-            wheel.rotation.x = PI_HALF;
-            wheel.castShadow = true;
-            this._registerGeometry(wheelGeo);
-            wheelGroup.add(wheel);
-            
-            // Ободок
-            const rimGeo = new THREE.CylinderGeometry(pos.radius - 0.05, pos.radius - 0.05, wweight, 24);
-            const rim = new THREE.Mesh(rimGeo, rimMaterial);
-            rim.rotation.x = PI_HALF;
-            rim.castShadow = true;
-            this._registerGeometry(rimGeo);
-            wheelGroup.add(rim);
-            
-            // Спицы (крестовина)
-            const spokeMat = new THREE.MeshStandardMaterial({ color: 0xCCCC99, metalness: 0.8 });
-            this._registerMaterial(spokeMat);
-            
-            const spoke1Geo = new THREE.BoxGeometry(0.08, 0.08, pos.radius * 1.4);
-            const spoke1 = new THREE.Mesh(spoke1Geo, spokeMat);
-            spoke1.rotation.x = PI_HALF;
-            spoke1.rotation.z = Math.PI / 4;
-            this._registerGeometry(spoke1Geo);
-            spoke1.position.set(0, 0, (wweight - 0.08) * (pos.z < 0 ? 1 : -1));
-            wheelGroup.add(spoke1);
-            /*
-            const spoke2Geo = new THREE.BoxGeometry(0.08, 0.08, pos.radius * 1.4);
-            const spoke2 = new THREE.Mesh(spoke2Geo, spokeMat);
-            spoke2.rotation.x = Math.PI;
-            spoke2.rotation.z = -Math.PI / 4;
-            spoke2.position.set(0, 0, wweight);
-            this._registerGeometry(spoke2Geo);
-            wheelGroup.add(spoke2);*/
-
-            wheelGroup.position.set(pos.x, pos.radius, pos.z);
-            wheelGroup.rotation.y = Math.PI;
-            base.add(wheelGroup);
-            
-            this.wheels.push({
-                mesh: wheel,
-                rim: rim,
-                spoke1: spoke1,
-                originalPos: { x: pos.x, z: pos.z }
-            });
-        });
-        
-        // ========== ФАРА ==========
-        const lampMaterial = new THREE.MeshStandardMaterial({ color: 0xFFAA66, emissive: 0xFF4422, emissiveIntensity: 0.6 });
-        this._registerMaterial(lampMaterial);
-        
-        const lampGeo = new THREE.SphereGeometry(0.13, 16, 16);
-        const lamp = new THREE.Mesh(lampGeo, lampMaterial);
-        lamp.position.set(1.15, 0.45, 0);
-        lamp.castShadow = true;
-        this._registerGeometry(lampGeo);
-        base.add(lamp);
-        
-        // ========== СВИСТОК ==========
-        const whistleGeo = new THREE.ConeGeometry(0.08, 0.25, 8);
-        const whistle = new THREE.Mesh(whistleGeo, rimMaterial);
-        whistle.position.set(-0.4, 0.85, 0.75);
-        whistle.rotation.x = 0.3;
-        whistle.rotation.z = 0.3;
-        whistle.castShadow = true;
-        this._registerGeometry(whistleGeo);
-        base.add(whistle);
+        let leftEyeGroup = this.createEye(length / 2, 1, 0.4, eyeMaterial, pupilMaterial);
+        let rightEyeGroup = this.createEye(length / 2, 1, -0.4, eyeMaterial, pupilMaterial);
         
         // ========== ДЕКОРАТИВНЫЕ ПОЛОСКИ ==========
         const stripeMat = new THREE.MeshStandardMaterial({ color: 0xFFDD88, metalness: 0.5 });
         this._registerMaterial(stripeMat);
         
-        const stripeGeo = new THREE.BoxGeometry(1.2, 0.06, 0.08);
+        const stripeGeo = new THREE.BoxGeometry(length, 0.06, 0.08);
         const stripe = new THREE.Mesh(stripeGeo, stripeMat);
-        stripe.position.set(0.2, 0.78, width2);
+        stripe.position.set(0, 0.78, width2);
         stripe.castShadow = true;
         this._registerGeometry(stripeGeo);
-        base.add(stripe);
+        this.base.add(stripe);
         
         const stripe2 = new THREE.Mesh(stripeGeo, stripeMat);
         stripe2.position.set(0.2, 0.78, -width2);
         stripe2.castShadow = true;
-        base.add(stripe2);
+        this.base.add(stripe2);
         
         // Сохраняем ссылки на анимируемые элементы
         this.animatedParts = {
-            eyes: [eyeGroup],
+            eyes: [leftEyeGroup, rightEyeGroup],
             wheels: this.wheels,
-            lamp: lamp,
             pipeTop: pipeTop
         };
         
         // Создаем систему дыма
-        this.createSmokeSystem(base);
+        this.createSmokeSystem(this.base);
 
-        When(() => this.game && this.game.raycasterManager)
-            .then(() => {
-                this.game.registerClickableObject(body, this);
-                this.game.registerClickableObject(cab, this);
-            });
+        let collider = this.createColliderBox((size.width + size.wheel.width * 2) * 1.2, size.height * 1.2, size.length * 1.2);
+        collider.position.y = size.height / 2 + size.wheel.radius;
+        group.add(collider)
+        this._registerClickable(collider);
 
         return group;
     }
 
     onClick(hit, eventData) {
-
-        if (DEV)
+        if (this.game.isPlaying())
             this.toggle();
+
+        super.onClick(hit, eventData);
     }
     
     createSmokeSystem(parentGroup) {
-        this.smokeGroup = new THREE.Group();
-        
-        const smokeMat = new THREE.MeshStandardMaterial({
-            color: 0xCCCCCC,
-            roughness: 0.8,
-            transparent: true,
-            opacity: 0.7
-        });
-        this._registerMaterial(smokeMat);
-        
-        this.smokeParticles = [];
-        
-        for (let i = 0; i < 6; i++) {
-            const smokeGeo = new THREE.SphereGeometry(0.6, 8, 8);
-            const particle = new THREE.Mesh(smokeGeo, smokeMat);
-            particle.visible = false;
-            particle.userData = {
-                active: false,
-                life: 0,
-                maxLife: 1.2,
-                yOffset: 0
-            };
-            this._registerGeometry(smokeGeo);
-            this.smokeGroup.add(particle);
-            this.smokeParticles.push(particle);
-        }
-
-        this.smokeGroup.position.set(0.9, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 1.8, 0);
-        
-        parentGroup.add(this.smokeGroup);
-    }
-    
-    updateSmoke(deltaTime) {
-        if (!this.smokeParticles) return;
-        
-        this.smokeTimer += deltaTime;
-        
-        if (this.smokeTimer >= this.smokeInterval && this.isMoving) {
-            this.smokeTimer = 0;
-            
-            const inactiveParticle = this.smokeParticles.find(p => !p.visible);
-            if (inactiveParticle) {
-                inactiveParticle.visible = true;
-                inactiveParticle.userData.active = true;
-                inactiveParticle.userData.life = 0;
-                inactiveParticle.material.opacity = 0.7;
-                inactiveParticle.scale.setScalar(0.1);
-                inactiveParticle.position.set(0, 0, 0);
-            }
-        }
-        
-        this.smokeParticles.forEach(particle => {
-            if (particle.visible) {
-                particle.userData.life += deltaTime;
-                const lifeProgress = particle.userData.life / 1.2;
-                
-                if (lifeProgress >= 1) {
-                    particle.visible = false;
-                } else {
-                    particle.position.y += deltaTime * 0.5;
-                    const newScale = 0.1 + lifeProgress * 0.15;
-                    particle.scale.setScalar(newScale);
-                    particle.material.opacity = 0.7 * (1 - lifeProgress);
-                }
-            }
-        });
-    }
-    
-    updateWheels(deltaTime) {
-        if (!this.isMoving) return;
-        
-        this.wheelAngle += this.wheelRotationSpeed * deltaTime;
-        const rotation = this.wheelAngle;
-        
-        this.wheels.forEach(wheel => {
-            wheel.mesh.rotation.y = rotation;
-            wheel.rim.rotation.y = rotation;
-            if (wheel.spoke1) wheel.spoke1.rotation.y = rotation;
-            //if (wheel.spoke2) wheel.spoke2.rotation.z = rotation;
-        });
+        this.particles = new SmokeParticles();
+        this.particles.init(this.game);
+        this.particles.play();
+        this.updatePS();
     }
     
     updateEyes(deltaTime) {
@@ -418,8 +364,13 @@ class Train extends BaseGameObject {
         }
     }
 
-    getAlt() {
-        return GAME_SETTINGS.SLEEPER_HEIGHT / 2  + GAME_SETTINGS.RAIL_HEIGHT / 2;
+    updateSmoke() {
+        if (this.particles) {
+            let p = new THREE.Vector3();
+            this.animatedParts.pipeTop.getWorldPosition(p);
+            p.y += 0.8;
+            this.particles.setPosition(p.x, p.y, p.z);
+        }
     }
     
     updateLamp(deltaTime) {
@@ -428,67 +379,131 @@ class Train extends BaseGameObject {
         this.animatedParts.lamp.material.emissiveIntensity = intensity;
     }
 
-    updatePosition() {
+    checkOverScreen(currentTrack) {
+        if (this.game.ground) {
+            let offset = this.game.ground.getCameraOffsetForCell(currentTrack.getCellPosition());
+            if (offset) {
 
-        let currentTrack = this.track[this.currentChainIndex];
-        if (currentTrack) {
-            let pos = currentTrack.calcPathPoint(this.indexPosInChain, this.pathIndex);
+                let lookCell = this.game.cameraController.getLookCell();
+                lookCell.x += offset.x < 0 ? -1 : (offset.x > 0 ? 1: 0);
+                lookCell.y += offset.y < 0 ? -1 : (offset.y > 0 ? 1: 0);
 
-            this.setPosition(pos.x, this.getAlt(), pos.z);
-            this.setRotation(0, pos.rotation + Math.PI + (this.forwardInTrack ? 0 : Math.PI), 0);
+                this.game.cameraController.setLookCell(lookCell);
+            }
         }
     }
 
-    swithToNextTrack() {
-        let currentTrack = this.track[this.currentChainIndex];
+    totalWeight() {
+        let weight = this.weight;
+        this.chain.forEach((cart)=>{ weight += cart.weight; });
+        return weight;
+    }
 
-        let nextIndex = currentTrack.getNearestTrackItem(this.pathIndex, this.forwardInTrack);
+    totalResistance() {
+        let resistance = this.trackPos.currentTrack.getPhysicMaterial().resistance;
+        this.chain.forEach((cart)=>{ resistance += cart.trackPos.currentTrack.getPhysicMaterial().resistance; });
+        return resistance;
+    }
 
-        if (nextIndex > -1) {
-            let nextTrack = this.track[nextIndex];
-            let path = nextTrack.getConnectPath(currentTrack.getCellPosition());
-            if (path) {
-                this.currentChainIndex  = nextIndex;
-                this.pathIndex          = path.pathIndex;
-                this.forwardInTrack     = path.forward;
-                this.indexPosInChain    = path.forward ? -1 : 1;
-                return;
+    applyVelocity(newVelocity, dt) {
+        let allChain = [...[this], ...this.chain];
+        let newPos = [];
+        let collisions = [];
+
+        let max_velocity = this.game.getEnv().MAX_VELOCITY ? this.game.getEnv().MAX_VELOCITY : GAME_SETTINGS.MAX_VELOCITY;
+
+        let vel = Math.min(newVelocity, max_velocity);
+
+        newVelocity = newVelocity > 0 ? vel : -vel;
+
+        allChain.forEach((cart)=>{
+            let pos = cart.trackPos.clone();
+            let collision = pos.applyVelocity(newVelocity, cart, dt, allChain);
+            if (collision)
+                collisions.push(collision);
+            newPos.push(pos);
+        });
+
+        if (collisions.length > 0) {
+            if (collisions.find(collision => collision.edgeTrack)) {
+                allChain.forEach((cart, i)=>{
+                    cart.forwardTrain = !cart.forwardTrain;
+                    cart.trackPos.toggleDirect();
+                    cart.velocity = newVelocity;
+                });
+            } else {
+                let collistion = collisions[0];
+
+                let sameDirect = collistion.dot > 0;
+                console.log(`sameDirect: ${sameDirect}`);
+
+                collistion.cart.setForward(sameDirect ? collistion.cart.trackPos.forwardInTrack : !collistion.cart.trackPos.forwardInTrack);
+
+                this.addChain(collistion.cart);
+                this.State('braking');
             }
-
-            tracer.error(`Incorrect connection in index: {nextIndex}`);
+        } else {
+            allChain.forEach((cart, i)=>{
+                cart.trackPos.copy(newPos[i]);
+                cart.velocity = newVelocity;
+            });
         }
-        this.stop();
     }
     
     update(dt) {
-        this.updateWheels(dt);
+
+        if ((this.State() != 'stop') && this.trackPos.currentTrack) {
+
+            let resistance = this.totalResistance();
+
+            let weight = this.totalWeight();
+
+            let acceleration = 0;
+
+            if (this.State() == 'braking')
+                resistance += this.brack;
+            else acceleration = this.force / weight;
+
+            const resistanceAcc = (resistance * this.velocity) / weight;
+            
+            // Итоговое ускорение
+            const totalAcc = acceleration - resistanceAcc;
+            
+            // Обновление скорости
+            let newVelocity = this.velocity + totalAcc * dt;
+
+            if ((Math.abs(newVelocity) < 0.02) && (this.State() == 'braking'))
+                this.State('stop');
+
+            this.applyVelocity(newVelocity, dt);
+        }
+        super.update(dt);
         this.updateEyes(dt);
         this.updateLamp(dt);
-        this.updateSmoke(dt);
-        if (this.isMoving) {
-
-            this.updatePosition();
-            this.indexPosInChain += this.speed * dt * (this.forwardInTrack ? 1 : -1);
-
-            if ((this.indexPosInChain > 1) || (this.indexPosInChain < -1)) {
-                this.swithToNextTrack();
-            }
-        }
-    }
-    
-    stop() {
-        this.isMoving = false;
-        this.wheelRotationSpeed = 0;
-    }
-    
-    start(forward = true) {
-        this.speed = GAME_SETTINGS.TRAIN_SPEED * (forward ? 1 : -1);
-        this.wheelRotationSpeed = this.speed * 2;
-        this.isMoving = true;
+        this.updateSmoke();
     }
 
     toggle() {
-        if (this.isMoving) this.stop();
-        else this.start();
+        if (this.State() == 'run')
+            this.State('braking');
+        else this.State('run');
+    }
+
+    _afterChangeForward() {
+        super._afterChangeForward();
+        this.chain.forEach((cart)=>{
+            if (cart != this) 
+                cart.setForward(!cart.forwardTrain);
+        });
+    }
+
+    dispose() {
+        super.dispose();
+        if (this.particles) {
+            this.particles.dispose();
+            this.particles = null;
+        }
     }
 }
+
+registerClass(Train);

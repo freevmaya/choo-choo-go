@@ -1,11 +1,28 @@
 // scripts/models/Ground.js
 
 class Ground extends BaseGameObject {
-  constructor(texturePath) {
+  constructor(texturePath = null, baseColor=null) {
     super();
     this.texturePath = texturePath;
+    this.baseColor = baseColor ? baseColor : GAME_SETTINGS.GROUND_COLOR;
     this._texture = null;      // Для хранения текстуры
     this._fallbackTexture = null; // Для хранения fallback текстуры
+    this._hoverPlane = null;   // Плоскость подсветки под курсором
+    this._lastHoverCell = null; // Последняя подсвеченная ячейка
+    this._materialHover = null;
+    
+    // Отступ от края экрана в пикселях (можно настраивать)
+    this.viewMargin = 200;
+
+    this._onDrag = this.onDrag.bind(this);
+    this._onDrop = this.onDrop.bind(this);
+  }
+
+  init(game) {
+    super.init(game);
+    eventBus.on('item-drag', this._onDrag);
+    eventBus.on('item-drop', this._onDrop);
+    return this;
   }
   
   createModel() {
@@ -16,7 +33,7 @@ class Ground extends BaseGameObject {
     this.segments = 8; // Сегментация для лучшего отображения текстуры
 
     // Создаем геометрию плоскости
-    const geometry = new THREE.CircleGeometry(this.size, this.segments);
+    const geometry = new THREE.CircleGeometry(this.size * 2, this.segments);
     // Регистрируем геометрию для последующего освобождения
     this._registerGeometry(geometry);
     
@@ -45,7 +62,6 @@ class Ground extends BaseGameObject {
     
     // Создаем сетку (GridHelper) в центре сцены (0, 0, 0)
     // Параметры: размер, количество делений, цвет линий, цвет центральных линий
-
     this.gridHelper = new THREE.GridHelper(this.size, GAME_SETTINGS.BASE_PLATFORM_SIZE, 0xffffff, 0xffffff);
     
     // Регистрируем геометрию и материал GridHelper
@@ -65,111 +81,345 @@ class Ground extends BaseGameObject {
     this.gridHelper.material.transparent = true;
     this.gridHelper.material.opacity = 0.7; // делаем линии полупрозрачными для лучшей видимости
     
+    // Создаем плоскость подсветки
+    this._createHoverPlane();
+    
     group.add(this.mesh);
     group.add(this.gridHelper);
+    group.add(this._hoverPlane);
     return group;
   }
 
-  loadModel(scene) {
-    scene.add(this.model);
+  /**
+   * Создает черную полупрозрачную плоскость для подсветки ячейки под курсором
+   */
+  _createHoverPlane() {
+    const size = GAME_SETTINGS.CELL_SIZE;
+    const geometry = new THREE.PlaneGeometry(size, size);
+    this._materialHover = new THREE.MeshStandardMaterial({
+      color: 0x000000,
+      emissive: 0x000000,
+      roughness: 0.5,
+      metalness: 0.0,
+      transparent: true,
+      opacity: 0.35,
+      side: THREE.DoubleSide
+    });
+    
+    this._registerGeometry(geometry);
+    this._registerMaterial(this._materialHover);
+    
+    this._hoverPlane = new THREE.Mesh(geometry, this._materialHover);
+    // Поворачиваем плоскость горизонтально
+    this._hoverPlane.rotation.x = -Math.PI / 2;
+    // Немного поднимаем над землей, чтобы избежать z-fighting
+    this._hoverPlane.position.y = 0.02;
+    this._hoverPlane.visible = false;
+    
+    // Сохраняем размеры для расчетов
+    this._hoverPlane.userData = { size: size };
+  }
 
-    When(() => this.game && this.game.raycasterManager)
-      .then(() => {
-        this.game.registerClickableObject(this.mesh, this);
-        console.log("Ground registered as clickable object (retry)");
+  loadModel(scene) {
+    super.loadModel(scene);
+    this._registerClickable(this.mesh);
+  }
+
+  /**
+   * Настраивает отслеживание движения курсора для подсветки ячеек
+   */
+  _setupHoverTracking() {
+    const container = this.game.container[0];
+    
+    // Обработчик движения мыши
+    container.addEventListener('mousemove', this._onMouseMove.bind(this));
+    container.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
+    
+    // Скрываем подсветку при выходе курсора за пределы
+    container.addEventListener('mouseleave', this._hideHoverPlane.bind(this));
+    container.addEventListener('touchend', this._hideHoverPlane.bind(this));
+    container.addEventListener('touchcancel', this._hideHoverPlane.bind(this));
+  }
+
+  /**
+   * Обработчик движения мыши
+   */
+  _onMouseMove(event) {
+    this._updateHoverPlane(event.clientX, event.clientY);
+  }
+
+  /**
+   * Обработчик касания
+   */
+  _onTouchMove(event) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    if (touch) {
+      this._updateHoverPlane(touch.clientX, touch.clientY);
+    }
+  }
+
+  onDrop(e) {
+    this._hideHoverPlane();
+  }
+
+  onDrag(e) {
+    let event = e.originalEvent.originalEvent;
+    let cell = this._updateHoverPlane(event.clientX, event.clientY);
+
+    if (e.callback) {
+      let checkResult = null;
+      eventBus.emit('check-cell', {
+        cell: cell,
+        item: e.item,
+        callback: (result)=>{
+          checkResult = result;
+        }
       });
+
+      this._materialHover.color.setHex(checkResult ? 0x00FF00 : 0xFF0000);
+      e.callback(checkResult, cell);
+    } else this._hideHoverPlane();
+  }
+
+  /**
+   * Обновляет позицию плоскости подсветки в зависимости от положения курсора
+   */
+  _updateHoverPlane(clientX, clientY) {
+    if (!this.game.raycasterManager) return;
+    
+    // Выполняем рейкастинг для определения позиции на плоскости земли
+    const intersects = this.game.raycasterManager.raycast(clientX, clientY, [this.mesh]);
+    
+    if (intersects.length > 0) {
+      const hit = intersects[0];
+      const point = hit.point;
+      
+      // Вычисляем координаты ячейки
+      const center = GAME_SETTINGS.CELL_SIZE / 2;
+      const cellX = Math.floor(point.x / GAME_SETTINGS.CELL_SIZE);
+      const cellZ = Math.floor(point.z / GAME_SETTINGS.CELL_SIZE);
+      
+      const cellKey = `${cellX},${cellZ}`;
+      const maxCell = GAME_SETTINGS.BASE_PLATFORM_SIZE / 2;
+
+      if (((cellX >= -maxCell) && (cellX < maxCell)) &&
+          ((cellZ >= -maxCell) && (cellZ < maxCell))) {
+      
+        // Если ячейка изменилась, обновляем позицию
+        if (this._lastHoverCell !== cellKey) {
+          this._lastHoverCell = cellKey;
+          
+          // Вычисляем позицию центра ячейки
+          const posX = cellX * GAME_SETTINGS.CELL_SIZE + center;
+          const posZ = cellZ * GAME_SETTINGS.CELL_SIZE + center;
+          
+          // Обновляем позицию плоскости подсветки
+          this._hoverPlane.position.x = posX;
+          this._hoverPlane.position.z = posZ;
+          this._hoverPlane.visible = true;
+        }
+
+        return new Vector2Int(cellX, cellZ);
+      }
+    }
+
+    this._hideHoverPlane();
+    return null;
+  }
+
+  /**
+   * Скрывает плоскость подсветки
+   */
+  _hideHoverPlane() {
+    this._lastHoverCell = null;
+    this._hoverPlane.visible = false;
   }
 
   onClick(hit, eventData) {
 
     const c = GAME_SETTINGS.CELL_SIZE / 2;
     const p = new Vector2Int(Math.round((hit.point.x - c) / GAME_SETTINGS.CELL_SIZE), Math.round((hit.point.z - c) / GAME_SETTINGS.CELL_SIZE));
-    this.game.cameraController.setLookPoint(p);
+    
+    //if (DEV) 
+      //this.game.cameraController.setLookCell(p);
+    console.log(p);
+    eventBus.emit('ground-click', p);
 
-    eventBus.emit('ground-down', p);
+    //this.game.showMagicSwirl(hit.point.x, 0, hit.point.z);
   }
 
-  drawText(text, cellX, cellY) {
-
-
-    // Создаем canvas элемент
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = 512;
-    canvas.height = 512;
-
-    // Рисуем текст на canvas
-    context.font = 'Bold 60px Arial';
-    context.fillStyle = '#FFFFFF';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText('Three.js Текст', canvas.width / 2, canvas.height / 2);
-
-    // Создаем текстуру из canvas
-    const texture = new THREE.CanvasTexture(canvas);
-
-    // Создаем материал с текстурой
-    const text_material = new THREE.MeshBasicMaterial({ 
-        map: texture,
-        side: THREE.DoubleSide,
-        transparent: true
-    });
-
-    // Создаем плоскость и накладываем текст
-    const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(3, 3),
-        text_material
+  /**
+   * Получает экранные координаты центра ячейки
+   * @param {Vector2Int} cell - координаты ячейки
+   * @returns {THREE.Vector2|null} экранные координаты (x, y) в пикселях, или null если точка за камерой
+   */
+  getScreenPosition(cell) {
+    if (!this.game || !this.game.cameraController) return null;
+    
+    const camera = this.game.cameraController.getCamera();
+    const center = GAME_SETTINGS.CELL_SIZE / 2;
+    
+    // Получаем мировые координаты центра ячейки
+    const worldPos = new THREE.Vector3(
+      cell.x * GAME_SETTINGS.CELL_SIZE + center,
+      0,
+      cell.y * GAME_SETTINGS.CELL_SIZE + center
     );
+    
+    // Проецируем на экран
+    const screenPos = worldPos.clone().project(camera);
+    
+    // Проверяем, находится ли точка перед камерой
+    if (screenPos.z <= 0 || screenPos.z > 1) {
+      return null;
+    }
+    
+    // Получаем размеры окна
+    const width = this.game.container.width();
+    const height = this.game.container.height();
+    
+    // Преобразуем нормализованные координаты (-1..1) в пиксели
+    const screenX = (screenPos.x + 1) / 2 * width;
+    const screenY = (1 - (screenPos.y + 1) / 2) * height;
+    
+    return new THREE.Vector2(screenX, screenY);
+  }
 
-    plane.position(cellX * GAME_SETTINGS.CELL_SIZE, 0.01, cellY * GAME_SETTINGS.CELL_SIZE);
-    this.game.scene.add(plane);
-    this._registerGeometry(plane);
+  /**
+   * Проверяет, находится ли ячейка в пределах видимости с учетом отступа
+   * @param {Vector2Int} cell - координаты ячейки
+   * @param {number} margin - отступ от края экрана в пикселях (если не указан, используется this.viewMargin)
+   * @returns {boolean} true, если ячейка находится в пределах видимости с учетом отступа
+   */
+  isCellInViewWithMargin(cell, margin = null) {
+    const marginPx = margin !== null ? margin : this.viewMargin;
+    const screenPos = this.getScreenPosition(cell);
+    
+    if (!screenPos) return false;
+    
+    const width = this.game.container.width();
+    const height = this.game.container.height();
+    
+    // Проверяем, находится ли точка в пределах экрана с учетом отступа
+    return screenPos.x >= marginPx && 
+           screenPos.x <= width - marginPx && 
+           screenPos.y >= marginPx && 
+           screenPos.y <= height - marginPx;
+  }
+
+  /**
+   * Проверяет, находится ли ячейка в пределах видимости камеры (без отступа)
+   * @param {Vector2Int} cell - координаты ячейки
+   * @returns {boolean} true, если ячейка находится в пирамиде видимости
+   */
+  isCellInView(cell) {
+    if (!this.game || !this.game.cameraController) return true;
+    
+    const camera = this.game.cameraController.getCamera();
+    const frustum = new THREE.Frustum();
+    const projScreenMatrix = new THREE.Matrix4();
+    
+    projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    frustum.setFromProjectionMatrix(projScreenMatrix);
+    
+    // Получаем центр ячейки в мировых координатах
+    const center = GAME_SETTINGS.CELL_SIZE / 2;
+    const worldPos = new THREE.Vector3(
+      cell.x * GAME_SETTINGS.CELL_SIZE + center,
+      0,
+      cell.y * GAME_SETTINGS.CELL_SIZE + center
+    );
+    
+    // Проверяем, попадает ли точка в пирамиду видимости
+    return frustum.containsPoint(worldPos);
+  }
+
+  /**
+   * Получает смещение камеры, необходимое для отображения указанной ячейки
+   * @param {Vector2Int} cell - координаты целевой ячейки
+   * @param {number} margin - отступ от края экрана в пикселях (если не указан, используется this.viewMargin)
+   * @returns {Vector2Int|null} смещение в клетках для центрирования ячейки, или null если ячейка уже в зоне видимости с учетом отступа
+   */
+  getCameraOffsetForCell(cell, margin = null) {
+    if (!this.game || !this.game.cameraController) return null;
+    
+    // Проверяем, видна ли ячейка с учетом отступа
+    if (this.isCellInViewWithMargin(cell, margin)) {
+      return null;
+    }
+    
+    const look = this.game.cameraController.getLookCell();look
+    
+    return new Vector2Int(cell.x - look.x, cell.y - look.y);
+  }
+
+  /**
+   * Устанавливает отступ от края экрана для проверки видимости
+   * @param {number} margin - отступ в пикселях
+   */
+  setViewMargin(margin) {
+    this.viewMargin = Math.max(0, margin);
+  }
+
+  /**
+   * Получает текущий отступ
+   * @returns {number} отступ в пикселях
+   */
+  getViewMargin() {
+    return this.viewMargin;
   }
   
   loadTexture() {
     let repeat = { x: GAME_SETTINGS.BASE_PLATFORM_SIZE * GAME_SETTINGS.GROUND_DENSITY, 
-                  y: GAME_SETTINGS.BASE_PLATFORM_SIZE* GAME_SETTINGS.GROUND_DENSITY };
-    textureLoader.loadTexture(
-      this.texturePath,
-      (texture) => {
-        // Настраиваем повторение текстуры для большей площади
-        texture.wrapS = THREE.RepeatWrapping;
-        texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(repeat.x, repeat.y);
-        
-        // Регистрируем текстуру для последующего освобождения
-        this._registerTexture(texture);
-        
-        // Если был fallback, освобождаем его
-        if (this._fallbackTexture) {
-          this._disposeTexture(this._fallbackTexture);
-          this._fallbackTexture = null;
+                  y: GAME_SETTINGS.BASE_PLATFORM_SIZE * GAME_SETTINGS.GROUND_DENSITY };
+    if (this.texturePath) {
+      textureLoader.loadTexture(
+        this.texturePath,
+        (texture) => {
+          // Настраиваем повторение текстуры для большей площади
+          texture.wrapS = THREE.RepeatWrapping;
+          texture.wrapT = THREE.RepeatWrapping;
+          texture.repeat.set(repeat.x, repeat.y);
+          
+          // Регистрируем текстуру для последующего освобождения
+          this._registerTexture(texture);
+          
+          // Если был fallback, освобождаем его
+          if (this._fallbackTexture) {
+            this._disposeTexture(this._fallbackTexture);
+            this._fallbackTexture = null;
+          }
+          
+          // Если у материала уже есть текстура, освобождаем её
+          if (this.mesh.material.map && this.mesh.material.map !== texture) {
+            this._disposeTexture(this.mesh.material.map);
+          }
+          
+          this.mesh.material.map = texture;
+          this.mesh.material.needsUpdate = true;
+          this._texture = texture;
+          
+          console.log('Текстура грунта загружена');
+        },
+        (error) => {
+          console.warn('Не удалось загрузить текстуру грунта:', error);
+          // Создаем запасную текстуру
+          this.createFallbackTexture();
+        },
+        {
+          repeat: repeat,
+          anisotropy: 16
         }
-        
-        // Если у материала уже есть текстура, освобождаем её
-        if (this.mesh.material.map && this.mesh.material.map !== texture) {
-          this._disposeTexture(this.mesh.material.map);
-        }
-        
-        this.mesh.material.map = texture;
-        this.mesh.material.needsUpdate = true;
-        this._texture = texture;
-        
-        console.log('Текстура грунта загружена');
-      },
-      (error) => {
-        console.warn('Не удалось загрузить текстуру грунта:', error);
-        // Создаем запасную текстуру
-        this.createFallbackTexture();
-      },
-      {
-        repeat: repeat,
-        anisotropy: 16
-      }
-    );
+      );
+    } else 
+      this.createFallbackTexture();
   }
   
   createFallbackTexture() {
+
+    const color = new THREE.Color(this.baseColor);
+
     // Создаем простую текстуру-заглушку для грунта
     const canvas = document.createElement('canvas');
     canvas.width = 256;
@@ -177,11 +427,11 @@ class Ground extends BaseGameObject {
     const ctx = canvas.getContext('2d');
     
     // Базовый цвет грунта
-    ctx.fillStyle = '#5d8c6b';
+    ctx.fillStyle = '#' + color.getHexString();
     ctx.fillRect(0, 0, 256, 256);
     
     // Добавляем текстуру - точки и линии
-    ctx.fillStyle = '#3a6b47';
+    ctx.fillStyle = '#' + color.multiplyScalar(0.2).getHexString();
     for (let i = 0; i < 200; i++) {
       const x = Math.random() * 256;
       const y = Math.random() * 256;
@@ -193,16 +443,18 @@ class Ground extends BaseGameObject {
     }
     
     // Добавляем линии-травинки
-    ctx.strokeStyle = '#2d5a3a';
+    ctx.strokeStyle = '#' + color.multiplyScalar(0.6).getHexString();
     ctx.lineWidth = 1;
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 500; i++) {
       const x = Math.random() * 256;
       const yStart = Math.random() * 256;
       const yEnd = yStart + Math.random() * 20;
+      const len = 5 + Math.random() * 10;
+      const a = Math.random() * Math.PI * 2;
       
       ctx.beginPath();
       ctx.moveTo(x, yStart);
-      ctx.lineTo(x + (Math.random() - 0.5) * 10, yEnd);
+      ctx.lineTo(x + Math.sin(a) * len, yStart + Math.cos(a) * len);
       ctx.stroke();
     }
     
@@ -252,52 +504,32 @@ class Ground extends BaseGameObject {
     }
   }
   
-  /**
-   * Безопасное освобождение геометрии
-   * @param {THREE.BufferGeometry} geometry - геометрия для освобождения
-   */
-  _disposeGeometry(geometry) {
-    if (geometry && geometry.dispose) {
-      try {
-        geometry.dispose();
-      } catch (e) {
-        console.warn('Error disposing geometry:', e);
-      }
-    }
-  }
-  
-  /**
-   * Безопасное освобождение материала
-   * @param {THREE.Material} material - материал для освобождения
-   */
-  _disposeMaterial(material) {
-    if (material && material.dispose) {
-      try {
-        // Освобождаем текстуры материала
-        if (material.map) {
-          this._disposeTexture(material.map);
-          material.map = null;
-        }
-        if (material.alphaMap) {
-          this._disposeTexture(material.alphaMap);
-          material.alphaMap = null;
-        }
-        if (material.envMap) {
-          this._disposeTexture(material.envMap);
-          material.envMap = null;
-        }
-        material.dispose();
-      } catch (e) {
-        console.warn('Error disposing material:', e);
-      }
-    }
-  }
-  
   update(deltaTime) {
     // Можно добавить анимацию текстурных координат для эффекта движения
     // if (this._texture) {
     //   this._texture.offset.x += deltaTime * 0.01;
     //   this._texture.offset.y += deltaTime * 0.01;
     // }
+  }
+
+  /**
+   * Очищает ресурсы при уничтожении объекта
+   */
+  dispose() {
+    // Удаляем обработчики событий
+    const container = this.game?.container[0];
+    if (container) {
+      container.removeEventListener('mousemove', this._onMouseMove);
+      container.removeEventListener('touchmove', this._onTouchMove);
+      container.removeEventListener('mouseleave', this._hideHoverPlane);
+      container.removeEventListener('touchend', this._hideHoverPlane);
+      container.removeEventListener('touchcancel', this._hideHoverPlane);
+    }
+
+    eventBus.off('item-drag', this._onDrag);
+    eventBus.off('item-drop', this._onDrop);
+    
+    // Вызываем родительский метод
+    super.dispose();
   }
 }

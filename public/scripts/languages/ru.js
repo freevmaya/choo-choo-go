@@ -52,7 +52,7 @@ window.LANG_RU = {
     'game_over_button': 'Продолжить',
     
     // Victory (Победа)
-    'victory_title': 'Вы достигли вершины дерева!',
+    'victory_title': 'Поздравляем! Вы достигли финиша!',
     'new_rank': 'Вам присвоено новое звание:',
     'victory_bounces': 'Отскоков',
     'victory_score': 'Очки',
@@ -142,5 +142,7 @@ window.LANG_RU = {
     'status_victory': 'Победа',
     'status_loading': 'Загрузка',
 
-    'liders_button': 'Лидеры'
+    'liders_button': 'Лидеры',
+    'start': 'Старт',
+    'finish': 'Финиш'
 };

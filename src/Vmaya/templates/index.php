@@ -16,7 +16,13 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="<?=BASEURL?>/styles/main.css?v=<?=$v?>">
   <link rel="stylesheet" href="<?=BASEURL?>/styles/dialog.css?v=<?=$v?>">
+
+  <!-- JQUERY -->
   <script src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
   <script>
     var DEV = <?=DEV ? 'true' : 'false'?>;
   </script>
