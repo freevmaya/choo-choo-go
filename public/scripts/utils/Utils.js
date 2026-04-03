@@ -257,3 +257,28 @@ function isSubClass(Child, Parent) {
     return Child.prototype instanceof Parent || 
            Child === Parent;
 }
+
+function toThreeColor(color) {
+    if (color instanceof THREE.Color) {
+        return color.clone();
+    }
+    if (typeof color === 'number') {
+        return new THREE.Color(color);
+    }
+    if (typeof color === 'string') {
+        return new THREE.Color(color);
+    }
+    return new THREE.Color(0xffffff);
+}
+
+function rndColorBetween(color1, color2) {
+    const start = toThreeColor(color1);
+    const end = toThreeColor(color2);
+    const t = Math.random();
+    return start.clone().lerp(end, t);
+}
+
+function getRandomColorWithIntensity(saturation = 0.8, lightness = 0.5) {
+    const hue = Math.random();
+    return new THREE.Color().setHSL(hue, saturation, lightness);
+}

@@ -89,6 +89,8 @@ const RESET_VELOCITY_Y = BOUNCE_SPEED;
 const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем существующий TREE_COLOR для обычных платформ
 const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
 
+const HUMAN_HEIGHT = 0.6;
+
 // Звания пользователей - ИНДЕКСЫ для локализации
 const USER_TITLES = {
     Novice: {
@@ -108,8 +110,25 @@ const USER_TITLES = {
     },
 }
 
-const START_GAME = 'TEST';
+const DEFAULT_LEVEL = {
+    NAME: '',
+    ENV: {
+        BACKGROUND_COLOR: 0xBBBBFF,
+        GROUND_COLOR: 0x884455,
+        KEY_LIGHT_COLOR: 0xffffff,
+        RIM_LIGHT_COLOR: 0x818cf8,
+        FILL_LIGHT_COLOR: 0x63a188,
+        AMBIENT_LIGHT_INTENSITY: 1,
+        KEY_LIGHT_INTENSITY: 3,
+        FILL_LIGHT_INTENSITY: 2,
+        RIM_LIGHT_INTENSITY: 0.6
+    },
+    items: [],
+    tracks: [],
+    objects: []
+};
 
+const START_GAME = 'TEST';
 const PI_HALF = Math.PI / 2;
 
 // Камера

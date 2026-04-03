@@ -16,7 +16,7 @@ class Train extends BaseCart {
         this.force = GAME_SETTINGS.TRAIN_POWER;
         this.brack = this.force * 2;
 
-        this.states = ['run', 'stop', 'braking'];
+        this.states = ['run', 'stop', 'braking', 'boarding'];
         this.stateIndex = 1;
         this.chain = [];
     }
@@ -93,7 +93,9 @@ class Train extends BaseCart {
         this.game.cameraController.setEnable(false);
         this.startDragPoint = this.game.raycasterManager.getIntersectionWithPlane(pos.x, pos.y, this.getPosition());
         this.isDrag = true;
-        this.State('braking'); 
+
+        if (this.State() == 'run')
+            this.State('braking'); 
     }
 
     endDrag(pos) {
@@ -102,13 +104,14 @@ class Train extends BaseCart {
             this.isDrag = false;
             let endDragPoint = this.game.raycasterManager.getIntersectionWithPlane(pos.x, pos.y, this.getPosition());
             let direct = endDragPoint.clone().sub(this.startDragPoint);
-            console.log(direct);
 
-            let forward = new THREE.Vector3();
-            this.model.getWorldDirection(forward);
+            if (this.State() != 'boarding') {
+                let forward = new THREE.Vector3();
+                this.model.getWorldDirection(forward);
 
-            this.setForward(direct.dot(forward) < 0);
-            this.State('run'); 
+                this.setForward(direct.dot(forward) < 0);
+                this.State('run'); 
+            } else eventBus.emit('toast', 'wrong_boarding');
         }
     }
 
@@ -319,8 +322,6 @@ class Train extends BaseCart {
     onClick(hit, eventData) {
         if (this.game.isPlaying())
             this.toggle();
-
-        super.onClick(hit, eventData);
     }
     
     createSmokeSystem(parentGroup) {

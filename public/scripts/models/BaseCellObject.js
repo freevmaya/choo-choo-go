@@ -1,15 +1,26 @@
 class BaseCellObject extends BaseGameObject {
 	
-    constructor(sellPosition = null, rotation = 0) {
+    constructor(data = null) {
 
     	super();
+
+        let sellPosition = data.location;
+
     	if (Array.isArray(sellPosition))
     		sellPosition = new Vector2Int(sellPosition[0], sellPosition[1]);
     	else sellPosition = {...sellPosition};
 
         this.id             = `object_${sellPosition.x}_${sellPosition.y}`;
         this.cellPosition   = sellPosition;
-        this.rotation       = rotation;
+        this.rotation       = data.location[2];
+    }
+
+    isBusyCell(cell) {
+        return this.getCellPosition().equals(cell);
+    }
+
+    nextRotation() {
+        this.setCellRotation((this.rotation + 1) % 4);
     }
 
     setCellRotation(value) {
@@ -78,17 +89,28 @@ class BaseCellObject extends BaseGameObject {
             }, options.duration || 2000);
         }
     }
-  
-  /**
-   * Скрывает текущий эффект
-   */
-  hideMagicEffect() {
-    if (this._activeEffect) {
-        this._activeEffect.stop();
-        this._activeEffect.dispose();
-        this._activeEffect = null;
+
+    getNearestCell(segment) {
+        let edge = (this.rotation + segment) % 4;
+        let offsets = [
+            [-1, 0],
+            [0, 1],
+            [1, 0],
+            [0, -1],
+        ];
+        let connectCell = this.getCellPosition();
+        connectCell.x += offsets[edge][0];
+        connectCell.y += offsets[edge][1];
+        return connectCell;
     }
-  }
+
+    hideMagicEffect() {
+        if (this._activeEffect) {
+            this._activeEffect.stop();
+            this._activeEffect.dispose();
+            this._activeEffect = null;
+        }
+    }
 }
 
 function calcCellPosition(cell) {

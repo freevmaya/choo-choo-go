@@ -252,6 +252,44 @@ class BaseGameObject {
         this._resourcesToDispose.materials.clear();
         this._resourcesToDispose.textures.clear();
     }
+  
+    _createMaterial(color, options = {}, texturePath = null) {
+        const materialOptions = {
+            color: color,
+            roughness: options.roughness !== undefined ? options.roughness : 0.4,
+            metalness: options.metalness !== undefined ? options.metalness : 0.05,
+            ...options
+        };
+
+        let material;
+
+        if (texturePath && texturePath !== '') {
+            // Создаем материал с текстурой
+            material = new THREE.MeshStandardMaterial(materialOptions);
+
+            // Загружаем текстуру асинхронно
+            textureLoader.loadTexture(
+            texturePath,
+                (texture) => {
+                    material.map = texture;
+                    material.needsUpdate = true;
+                    this._registerTexture(texture);
+                },
+                (error) => {
+                    console.warn(`Не удалось загрузить текстуру ${texturePath}:`, error);
+                },
+                {
+                    repeat: { x: 1, y: 1 }
+                }
+            );
+        } else {
+            // Создаем материал без текстуры
+            material = new THREE.MeshStandardMaterial(materialOptions);
+        }
+
+        this._registerMaterial(material);
+        return material;
+    }
 
     createText(text, color = '#FFFFFF', font="Bold 60px Arial") {
       // Создаем canvas элемент

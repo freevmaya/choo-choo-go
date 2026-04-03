@@ -42,11 +42,11 @@ class RailGame extends BaseGame {
       },{
         type: SimpleTree
       },{
-        type: ChristmasTree
-      },{
         type: DeciduousTree
       },{
         type: Snow
+      },{
+        type: RailwayPlatform
       }
     ]);
 
@@ -68,8 +68,6 @@ class RailGame extends BaseGame {
     index = clamp(index, 0, this.editorStates.length - 1);
     if (this.editorStateIndex != index) {
       this.editorStateIndex = index;
-      if (this.ebtn)
-        this.ebtn.text(this.editorState());
       console.log(`Change editorState: ${this.editorState()}`);
       eventBus.emit('editor-state-change', this.editorState());
     }
@@ -108,31 +106,7 @@ class RailGame extends BaseGame {
   }
 
   initDevTools() {
-
-    /*
-    const geometry = new THREE.SphereGeometry(0.2, 32, 32);
-    const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-    const sphere = new THREE.Mesh(geometry, material);
-    this.scene.add(sphere);*/
-
-    $('#saveBtn').click(() => {
-      this.saveProject();
-    });
-
-    $('#resetBtn').click(() => {
-      this.resetGame();
-    });
-
-    $('#clearBtn').click(()=>{
-      this.clearItems();
-    });
-
-    this.ebtn = $('#editorStateBtn');
-
-    this.ebtn.click(() => {
-      this.setEditorState((this.editorStateIndex + 1) % this.editorStates.length);
-    });
-    this.ebtn.text(this.editorState());
+    new DevTools(this);
   }
 
   clearLights() {
@@ -246,12 +220,13 @@ class RailGame extends BaseGame {
     this.ground = (new Ground(env.GROUND_IMAGE_PATH, env.GROUND_COLOR)).init(this); //
 
     if (DEV) {
+      /*
       let levels = this.stateManager.get('levels');
       if (levels) {
         Object.keys(levels).forEach(k => {
           GAME_PARAMS[k] = levels[k];
         });
-      }
+      }*/
     }
 
     if (this.paramsIndex) {
@@ -262,6 +237,14 @@ class RailGame extends BaseGame {
         this.loadCells(cells);
       else this.createDefaultTrain();
     }
+  }
+
+  createNewLevel() {
+    let keys = Object.keys(GAME_PARAMS);
+
+    let newName = START_GAME + '-' + keys.length;
+    GAME_PARAMS[newName] = $.extend({}, DEFAULT_LEVEL, {NAME: newName});
+    this.GoToLevel(newName);
   }
 
   clearItems() {

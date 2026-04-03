@@ -1,9 +1,6 @@
 // scripts/models/SimpleTree.js
 
 class Snow extends BaseCellObject {
-  constructor(sellPosition = null, rotation = 0) {
-    super(sellPosition, rotation);
-  }
   
   createModel() {
     let group = new THREE.Group();
@@ -20,7 +17,9 @@ class Snow extends BaseCellObject {
     for (var i = 0; i < count; i++) {
       let radius = half * (0.3 + Math.random() * 0.7);
       let snow = this.createSphere(radius, 16, _material);
-      snow.position.set(Math.random() * half, -radius * 0.5, Math.random() * half);
+
+      let setRadius = half;
+      snow.position.set((0.5 - Math.random()) * setRadius, -radius * 0.8, (0.5 - Math.random()) * setRadius);
       group.add(snow);
     }
     

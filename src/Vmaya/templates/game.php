@@ -36,6 +36,8 @@
       'models/SimpleTree',
       'models/DeciduousTree',
       'models/Snow',
+      'models/RailwayPlatform',
+      'models/Human',
 
       'controls/RaycasterManager',
       'utils/EventEmitter',
@@ -48,6 +50,9 @@
       'UI/Library',
       'main'
     ];
+
+    if (DEV)
+      $scripts[] = 'utils/DevTools';
 ?>
   <div class="loader">
       <div class="spinner-border" role="status">
@@ -110,17 +115,6 @@
           </div>
         </div>
       </div>
-
-      <?if (DEV) {?>
-      <div class="dev-block">
-        <div class="container">
-          <button id="clearBtn">Clear</button>
-          <button id="resetBtn">Reset</button>
-          <button id="saveBtn">Save</button>
-          <button id="editorStateBtn">Editor state</button>
-        </div>
-      </div>
-      <?}?>
     </div>
     
     <div id="game-canvas-container">
@@ -266,6 +260,7 @@
       </div>
     </div>
   </div>
+  
 
   <!-- Подключаем Bootstrap JS глобально -->
   <script src="<?=SCRIPTURL?>bootstrap.bundle.min.js"></script>

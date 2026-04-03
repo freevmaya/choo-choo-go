@@ -228,9 +228,12 @@ class Cells {
 	   			}
 	   		} else if (this.game.editorState() == 'edit') {
 	   			this.doRotateTrack(ga.getCellPosition());
-	   		} else if (this.game.editorState() == 'play') {
-	   			if (ga instanceof BaseCellObject)
-		    		this.runTrainToCell(ga.getCellPosition());
+	   			if (ga instanceof BaseCellObject) {
+	   				ga.nextRotation();
+	   			} else if (ga instanceof BaseCart) {
+	   				ga.trackPos.forwardInTrack = !ga.trackPos.forwardInTrack;
+	   				ga.updatePosition();
+	   			}
 	   		} else if (this.game.editorState() == 'playAndEdit') {
 	   			if (ga instanceof BaseCellObject) {
 		    		if (!this.doRotateTrack(ga.getCellPosition()))
@@ -255,19 +258,19 @@ class Cells {
 	    });
 	}
 
-	addCart(cart) {
-    	let item = createObject(cart.type).init(this.game, cart);
+	addCart(data) {
+    	let item = createObject(data.type, data).init(this.game, data);
 		this.carts.push(item);
 	}
 
-	addTrackItem(trackItem) {
-		let item = createObject(trackItem.type, this, trackItem.location, trackItem.location[2]).init(this.game);
+	addTrackItem(data) {
+		let item = createObject(data.type, data).init(this.game);
 		this.items.push(item);
 		return item;
 	}
 
-	addObject(ga) {
-		let item = createObject(ga.type, ga.location, ga.location[2]).init(this.game);
+	addObject(data) {
+		let item = createObject(data.type, data).init(this.game);
 		this.objects.push(item);
 		return item;
 	}
@@ -282,7 +285,7 @@ class Cells {
 		let index = -1;
 		for (let i=0; i<this.objects.length; i++) {
 			let item = this.objects[i];
-            if (item.cellPosition.equals(cell)) {
+            if (item.isBusyCell(cell)) {
                     index = i;
                 	break;
                 }

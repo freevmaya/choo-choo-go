@@ -1,8 +1,8 @@
 // scripts/models/SimpleTree.js
 
 class SimpleTree extends BaseCellObject {
-  constructor(sellPosition = null, rotation = 0) {
-    super(sellPosition, rotation);
+  constructor(data = null) {
+    super(data);
     
     this.treeGroup = null;
     this.animationTime = 0;

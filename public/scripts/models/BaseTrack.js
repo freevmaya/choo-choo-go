@@ -1,9 +1,9 @@
 class BaseTrack extends BaseCellObject {
 	
-    constructor(trackItems, sellPosition = null, rotation = 0) {
-    	super(sellPosition, rotation);
-        this.trackItems = trackItems;
+    constructor(data = null) {
+    	super(data);
         this._currentPath = 0;
+        this.carts = [];
         
         this.railMaterial = new THREE.MeshStandardMaterial({ 
             color: 0xccccdd, 
@@ -24,8 +24,26 @@ class BaseTrack extends BaseCellObject {
     _afterSetCurrentPath() {
     }
 
+    runOut(positionCart) {
+        let idx = this.carts.indexOf(positionCart.cart);
+        if (idx > -1) {
+            this.carts.splice(idx, 1);
+            eventBus.emit('runOut', {
+                track: this,
+                positionCart: positionCart
+            });
+        }
+    }
+
     runOver(positionCart) {
-        this.setCurrentPath(positionCart.pathIndex);
+        if (this.carts.indexOf(positionCart.cart) == -1) {
+            this.carts.push(positionCart.cart);
+            this.setCurrentPath(positionCart.pathIndex);
+            eventBus.emit('runOver', {
+                track: this,
+                positionCart: positionCart
+            });
+        }
     }
 
     setCurrentPath(pathIndex) {
@@ -57,10 +75,6 @@ class BaseTrack extends BaseCellObject {
         }
     }
 
-    nextRotation() {
-        this.setCellRotation((this.rotation + 1) % 4);
-    }
-
     getPath(index) {
         return [0, 2];
     }
@@ -88,7 +102,7 @@ class BaseTrack extends BaseCellObject {
 
     getNearestTrackItem(pathIndex, forward) {
         let nextPos = this.getNearestCell(pathIndex, forward);
-        return this.trackItems.find(nextPos)
+        return this.game.items.find(nextPos)
     }
 
     getNearestCell(pathIndex, forward) {
@@ -107,9 +121,9 @@ class BaseTrack extends BaseCellObject {
 
     findConnections() {
         let result = [];
-        let list = this.trackItems.findNearest(this.cellPosition);
+        let list = this.game.items.findNearest(this.cellPosition);
         list.forEach((index)=>{
-            let path = this.getConnectPath(this.trackItems.get(index).getCellPosition());
+            let path = this.getConnectPath(this.game.items.get(index).getCellPosition());
             if (path)
                 result.push(index);
         });

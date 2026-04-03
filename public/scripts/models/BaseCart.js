@@ -13,7 +13,7 @@ class BaseCart extends BaseGameObject {
         super.init(game);
         let index = this.game.items.find(data.location[0], data.location[1]);
         if (index > -1) {
-            this.trackPos = new PositionCart(this.game, index);
+            this.trackPos = new PositionCart(this, index);
             if (data.trackPos)
                 this.trackPos.setCurrentChain(index, data.trackPos.pathIndex, data.trackPos.indexPosInChain, data.trackPos.forwardInTrack);
          
@@ -193,11 +193,6 @@ class BaseCart extends BaseGameObject {
 
         return group;
 	}
-
-    onClick(hit, eventData) {
-        if (this.game.editorState() == 'edit')
-            this.setForward(!this.forwardTrain);
-    }
 
     _afterChangeForward() {
         this.updatePosition();

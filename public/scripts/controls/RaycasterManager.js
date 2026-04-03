@@ -370,10 +370,7 @@ class RaycasterManager {
     
     return intersectionPoint;
   }
-  
-  /**
-   * Очищает все ресурсы
-   */
+
   dispose() {
     const containerElement = this.game.container[0];
     

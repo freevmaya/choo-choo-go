@@ -1,6 +1,7 @@
 class PositionCart {
-    constructor(game, trackIndex = 0, pathIndex = 0, indexPosInChain = 0, forwardInTrack = true) {
-        this.game = game;
+    constructor(cart, trackIndex = 0, pathIndex = 0, indexPosInChain = 0, forwardInTrack = true) {
+        this.game = cart.game;
+        this.cart = cart;
         this.setCurrentChain(trackIndex, pathIndex, indexPosInChain, forwardInTrack);
     }
 
@@ -13,16 +14,23 @@ class PositionCart {
     }
 
     setCurrentChain(trackIndex, pathIndex, indexPosInChain, forwardInTrack = true) {
-        this.trackIndex = trackIndex;
+        
         this.pathIndex = pathIndex;
         this.indexPosInChain = indexPosInChain;
         this.forwardInTrack  = forwardInTrack;
-        this.currentTrack = this.game.items.get(this.trackIndex);
-        this.currentTrack.runOver(this);
+
+        if (this.trackIndex != trackIndex) {
+            if (this.currentTrack)
+                this.currentTrack.runOut(this);
+
+            this.trackIndex = trackIndex;
+            this.currentTrack = this.game.items.get(this.trackIndex);
+            this.currentTrack.runOver(this);
+        }
     }
 
     clone() {
-        return new PositionCart(this.game, this.trackIndex, 
+        return new PositionCart(this.cart, this.trackIndex, 
                 this.pathIndex, this.indexPosInChain, 
                 this.forwardInTrack);
     }
@@ -54,8 +62,9 @@ class PositionCart {
                 }
 
                 let enterSector = nextTrack.getPath(index)[paths[index].forward ? 0 : 1];
+                /*
                 console.log(paths.map(path => path.pathIndex).join(', ') + 
-                    ', EnterSector = ' + enterSector);
+                    ', EnterSector = ' + enterSector);*/
 
                 let path = paths[index];
 
