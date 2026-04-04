@@ -8,6 +8,9 @@ class BaseGameObject {
             textures: new Set(),
             clickable: new Set()
         };
+
+        this.model = null;
+        this._worldPosition = new THREE.Vector3();
         
         if (game)
           this.init(game);
@@ -58,6 +61,21 @@ class BaseGameObject {
 
     getCellRotation() {
         return this.model ? Math.round(this.model.rotation.y / PI_HALF) : 0;
+    }
+
+    getWorldPosition() {
+        if (this.model) {
+            let pos = new THREE.Vector3();
+            this.model.getWorldPosition(pos);
+            return pos;
+        }
+        return this._worldPosition.clone();
+    }
+
+    setWorldPosition(pos) {
+        if (this.model) 
+            this.model.setWorldPosition(pos);
+        this._worldPosition = pos.clone();
     }
 
     getPosition() {
@@ -193,6 +211,9 @@ class BaseGameObject {
         if (this.model) {
             // Собираем все ресурсы из модели и её детей
             this._collectResourcesFromObject(this.model);
+            
+            if (this.model.parent)
+                this.model.parent.remove(this.model);
             
             // Удаляем модель из сцены
             this.game.scene.remove(this.model);

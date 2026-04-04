@@ -1,4 +1,4 @@
-class BaseCart extends BaseGameObject {
+class BaseCart extends BaseStateMashine {
 	constructor() {
 		super();
 
@@ -11,6 +11,7 @@ class BaseCart extends BaseGameObject {
 
     init(game, data) {
         super.init(game);
+        this.data = data;
         let index = this.game.items.find(data.location[0], data.location[1]);
         if (index > -1) {
             this.trackPos = new PositionCart(this, index);
@@ -240,6 +241,27 @@ class BaseCart extends BaseGameObject {
 
     isMoving() {
     	return Math.abs(this.velocity) > 0.02;
+    }
+
+    headTrain() {
+        return this.game.items.carts.find(c => {
+            return (c instanceof Train) && c.hasInChain(this);
+        });
+    }
+
+    addedToChain() {
+        let train = this.headTrain();
+        if (this.data.taskName && train)
+            train.completedTask(this.data.taskName);
+    }
+
+    deChain() {
+        let train = this.headTrain();
+        if (train) {
+            train.removeChain(this);
+            if (this.data.taskName)
+                train.deCompletedTask(this.data.taskName);
+        }
     }
 }
 

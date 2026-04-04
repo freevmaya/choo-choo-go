@@ -7,6 +7,11 @@ class Wagon extends BaseCart {
         this.trimColor = 0xFFD700;   // Золотая отделка
         this.roofColor = 0x8B4513;   // Коричневая крыша
         this.windowFrameColor = 0xDEB887; // Деревянные рамы
+        this.cargoCount = 0;
+    }
+
+    setCargoCount(value) {
+        this.cargoCount = value;
     }
 
     size() {
@@ -94,19 +99,6 @@ class Wagon extends BaseCart {
     onClick(hit, eventData) {
         super.onClick(hit, eventData);
         this.deChain();
-    }
-
-    headTrain() {
-        return this.game.items.carts.find(c => {
-            return (c instanceof Train) && c.hasInChain(this);
-        });
-    }
-
-    deChain() {
-        let train = this.headTrain();
-        if (train) {
-            train.removeChain(this);
-        }
     }
     
     update(dt) {

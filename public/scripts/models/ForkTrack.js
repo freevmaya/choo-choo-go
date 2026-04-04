@@ -115,7 +115,7 @@ class ForkTrack extends BaseCurveTrack {
     }
 
     isAwailableRotate() {
-        return (this.game.editorState() == 'edit');
+        return this.game.editorState() == 'edit';
     }
 }
 registerClass(ForkTrack);

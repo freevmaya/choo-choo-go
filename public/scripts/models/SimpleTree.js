@@ -8,9 +8,9 @@ class SimpleTree extends BaseCellObject {
     this.animationTime = 0;
     
     // Параметры ёлки
-    this.treeHeight = 5;
-    this.baseRadius = 1.2;
-    this.topRadius = 0.05;
+    this.treeHeight = 2 + Math.random() * 3;
+    this.baseRadius = Math.min(this.treeHeight * 0.3, GAME_SETTINGS.CELL_SIZE / 2);
+    this.topRadius = this.baseRadius * 0.15;
     this.segments = 12;
     this.tierCount = 4;
   }
@@ -36,8 +36,15 @@ class SimpleTree extends BaseCellObject {
     this._registerMaterial(trunkMaterial);
     
     // Создаем слои ёлки
-    const tierHeights = [1.2, 1.1, 1.0, 0.9];
-    const tierRadii = [1.2, 0.95, 0.7, 0.45];
+    let layers = Math.round(this.treeHeight / 1.2);
+    let tierHeights = [];
+    let tierRadii = [];
+    let h = this.treeHeight / layers;
+
+    for (let i=0; i<layers; i++) {
+      tierHeights.push(h);
+      tierRadii.push(this.baseRadius - i / layers * (this.baseRadius - this.topRadius));
+    }
     let yOffset = 0;
     
     for (let i = 0; i < this.tierCount; i++) {
@@ -59,6 +66,7 @@ class SimpleTree extends BaseCellObject {
       yOffset += height - 0.1;
     }
     
+    /*
     // Ствол
     const trunkGeometry = new THREE.CylinderGeometry(0.45, 0.55, 0.5, 6);
     const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
@@ -68,6 +76,9 @@ class SimpleTree extends BaseCellObject {
     this._registerGeometry(trunkGeometry);
     this.treeGroup.add(trunk);
     this.treeGroup.position.y = -0.5;
+    */
+
+    this.treeGroup.position.y = 0.3;
 
     let group = new THREE.Group();
     group.add(this.treeGroup);

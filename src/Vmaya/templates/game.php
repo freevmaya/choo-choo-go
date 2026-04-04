@@ -26,6 +26,8 @@
       'models/PointTrack',
       'models/FinishTrack',
       'models/Ground',
+      'models/BaseStateMashine',
+      'models/Queue',
 
       'models/BaseCart',
       'models/Train',
@@ -63,11 +65,9 @@
   <div id="game-container" class="start-blocking">
 
     <div class="game-ui">
-      <!--
       <div class="game-top">
         <div id="game-title" class="status"></div>
       </div>
-      -->
       <div class="game-bottom">
         <div class="left">
         </div>

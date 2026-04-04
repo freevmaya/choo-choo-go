@@ -18,6 +18,15 @@ class RailGame extends BaseGame {
   onChangeCells(cells) {
   }
 
+  preVictory(object) {
+    let pos = object.getPosition();
+    this.showMagicSwirl(pos.x, pos.y, pos.z);
+
+    setTimeout(()=>{
+        this.gameState.set(GAME_STATE.VICTORY);
+    }, 2000);
+  }
+
   initUI() {
 
     super.initUI();

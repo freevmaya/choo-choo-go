@@ -28,6 +28,7 @@ class BaseTrack extends BaseCellObject {
         let idx = this.carts.indexOf(positionCart.cart);
         if (idx > -1) {
             this.carts.splice(idx, 1);
+            this.afterRunOut();
             eventBus.emit('runOut', {
                 track: this,
                 positionCart: positionCart
@@ -39,11 +40,18 @@ class BaseTrack extends BaseCellObject {
         if (this.carts.indexOf(positionCart.cart) == -1) {
             this.carts.push(positionCart.cart);
             this.setCurrentPath(positionCart.pathIndex);
+            this.afterRunOver();
             eventBus.emit('runOver', {
                 track: this,
                 positionCart: positionCart
             });
         }
+    }
+
+    afterRunOver() {
+    }
+
+    afterRunOut() {
     }
 
     setCurrentPath(pathIndex) {

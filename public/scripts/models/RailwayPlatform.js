@@ -19,6 +19,8 @@ class RailwayPlatform extends BaseCellObject {
     this.stairsHeight = this.stepCount * this.stepHeight;
     this.platformMainLength = this.platformLength - this.stepDepth;
     this.people = [];
+    this.parked = null;
+    this.queue = null;
     
     // Высота платформы
     this.platformY = 0.2;
@@ -43,6 +45,18 @@ class RailwayPlatform extends BaseCellObject {
     this.peopleCount = data.peopleCount;
   }
 
+  getPeopleCount() {
+    return this.peopleCount;
+  }
+
+  disposePeople(human) {
+    let idx = this.people.indexOf(human);
+    if (idx > -1) {
+      this.people.splice(idx, 1);
+      human.dispose();
+    }
+  }
+
   toSaveData() {
       let cellPos = this.getCellPosition();
       return {
@@ -57,6 +71,7 @@ class RailwayPlatform extends BaseCellObject {
     this.injectPeople(this.peopleCount);
 
     eventBus.on('runOver', this._onRunOver = this.onRunOver.bind(this));
+    eventBus.on('change_cart_state', this._onChangeTrainState = this.onChangeTrainState.bind(this));
     return this;
   }
 
@@ -70,11 +85,81 @@ class RailwayPlatform extends BaseCellObject {
     let cell = this.getNearestCell(3);
 
     if (cellOver.equals(cell)) {
-      if (this.people.length > 0) {
-        data.positionCart.cart.State('braking');
-        console.log(cell);
+
+      let cart = data.positionCart.cart;
+
+      if (cart instanceof PassengerWagon) {
+        let train = cart.headTrain();
+        if (train && ['run', 'braking'].includes(train.State())) {
+
+          if (this.data.taskName) { // Тормозим если есть имя задания
+            this.parked = cart;
+            train.State('braking');
+          }
+        }
+      }
+      console.log(cell);
+    }
+  }
+
+  /*
+  onClick(e) {
+    if (this.game.isPlaying()) {
+      this.clearPeople();
+    }
+  }*/
+
+  finishQueue(queue) {
+    if (this.queue) {
+      this.clearPeople();
+      this.queue.dispose();
+      this.queue = null;
+
+      let train = this.parked.headTrain();
+      this.parked = null;
+      train.State('stop');
+
+      if (this.data.taskName)
+        train.completedTask(this.data.taskName);
+    }
+  }
+
+  onChangeTrainState(data) {
+    let train = data instanceof Train ? data : null;
+
+    if (train && this.parked &&
+
+      (train.State() == 'stop') && 
+      (this.parked.headTrain() == train)) {
+
+      if (this.getPeopleCount() > 0) { // Если забираем людей
+
+        this.parked.headTrain().State('boarding');
+        this.queue = new Queue(this.game, this);
+
+        let center = this.parked.getWorldPosition().add(this.getWorldPosition()).multiplyScalar(0.5);
+
+        this.queue.setWorldPosition(center);
+        this.parked.setCargoCount(this.getPeopleCount());
+
+        setTimeout(()=>{
+          this.finishQueue();
+        }, 10000);
+      } else if (this.parked.cargoCount > 0) {
+
+        this.injectPeople(this.parked.cargoCount);
+        this.parked.setCargoCount(0);
+        setTimeout(()=>{
+          this.finishUnloading(train);
+        }, 1000);
+
       }
     }
+  }
+
+  finishUnloading(train) {
+    if (this.data.taskName)
+      train.completedTask(this.data.taskName);
   }
 
   injectPeople(count) {
@@ -399,48 +484,55 @@ class RailwayPlatform extends BaseCellObject {
 
   checkNewPos(newPos, direct, object) {
 
-    let xlimit = (this.platformMainLength - this.edgeWidth * 2) / 2;
-    let zlimit = (this.platformWidth - this.edgeWidth * 2) / 2;
+    if (this.queue) 
+      return this.queue.checkNewPos(newPos, direct, object);
+    else {
+      if (Math.random() > 0.96)
+        object.rndDirect();
 
-    if (newPos.x < -xlimit) {
-      newPos.x = -xlimit + (Math.abs(newPos.x) - xlimit);
-      if (direct.x < 0) direct.x = -direct.x;
-    } else if (newPos.x > xlimit) {
-      newPos.x = xlimit - (newPos.x - xlimit);
-      if (direct.x > 0) direct.x = -direct.x;
-    }
+      let xlimit = (this.platformMainLength - this.edgeWidth * 2) / 2;
+      let zlimit = (this.platformWidth - this.edgeWidth * 2) / 2;
 
-    if (newPos.z < -zlimit) {
-      newPos.z = -zlimit + (Math.abs(newPos.z) - zlimit);
-      if (direct.z < 0) direct.z = -direct.z;
-    } else if (newPos.z > zlimit) {
-      newPos.z = zlimit - (newPos.z - zlimit);
-      if (direct.z > 0) direct.z = -direct.z;
-    }
-
-    this.people.forEach(p => {
-      if (p != object) {
-        let distance = p.getPosition().sub(object.getPosition());
-        if (distance.length() < HUMAN_HEIGHT) {
-
-          distance.multiplyScalar(direct.length());
-          newPos.add(distance.negate());
-          //direct.negate();
-          //newPos.add(direct);
-
-          /*
-          let lastState = object.state;
-          object.setState('wait');
-          setTimeout(()=>{
-            object.setState(lastState);
-          }, 1000);*/
-        }
+      if (newPos.x < -xlimit) {
+        newPos.x = -xlimit + (Math.abs(newPos.x) - xlimit);
+        if (direct.x < 0) direct.x = -direct.x;
+      } else if (newPos.x > xlimit) {
+        newPos.x = xlimit - (newPos.x - xlimit);
+        if (direct.x > 0) direct.x = -direct.x;
       }
-    });
 
-    return {
-      newPos: newPos,
-      direct: direct
+      if (newPos.z < -zlimit) {
+        newPos.z = -zlimit + (Math.abs(newPos.z) - zlimit);
+        if (direct.z < 0) direct.z = -direct.z;
+      } else if (newPos.z > zlimit) {
+        newPos.z = zlimit - (newPos.z - zlimit);
+        if (direct.z > 0) direct.z = -direct.z;
+      }
+
+      this.people.forEach(p => {
+        if (p != object) {
+          let distance = p.getPosition().sub(object.getPosition());
+          if (distance.length() < HUMAN_HEIGHT) {
+
+            distance.multiplyScalar(direct.length() * 1.2);
+            newPos.add(distance.negate());
+            //direct.negate();
+            //newPos.add(direct);
+
+            /*
+            let lastState = object.state;
+            object.setState('wait');
+            setTimeout(()=>{
+              object.setState(lastState);
+            }, 1000);*/
+          }
+        }
+      });
+
+      return {
+        newPos: newPos,
+        direct: direct
+      }
     }
   }
   
@@ -468,11 +560,16 @@ class RailwayPlatform extends BaseCellObject {
   
   dispose() {
     this.clearPeople();
+    if (this.queue) {
+      this.queue.dispose();
+      this.queue = null;
+    }
     super.dispose();
     this.platformGroup = null;
     this.materials = {};
 
     eventBus.off('runOver', this._onRunOver);
+    eventBus.off('change_cart_state', this._onChangeTrainState);
   }
 }
 

@@ -48,8 +48,6 @@ body {
 
 #game-title {
   width: 60%;
-  margin: 8% auto 0px auto;
-  padding-left: 10%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -141,11 +139,9 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: max(150px, 10dvw);
-  background-image: url(images/game-top.png);
+  height: 30px;
   pointer-events: none;
-  background-position-y: top;
-  background-repeat: no-repeat;
+  background: #0000004a;
 }
 
 /* Верхний блок с игрой (85%) */

@@ -14,16 +14,40 @@ class Train extends BaseCart {
         this.whistleInterval = 8;
 
         this.force = GAME_SETTINGS.TRAIN_POWER;
-        this.brack = this.force * 2;
-
-        this.states = ['run', 'stop', 'braking', 'boarding'];
-        this.stateIndex = 1;
+        this.brack = this.force;
         this.chain = [];
     }
 
+    getStates() {
+        return ['stop', 'run', 'braking', 'boarding'];
+    }
+
     addChain(cart) {
-        if (!this.chain.includes(cart))
+        if (!this.chain.includes(cart)) {
             this.chain.push(cart);
+            cart.addedToChain(this);
+        }
+    }
+
+    completedTask(task) {
+
+        let idx = this.taskCompleted.indexOf(task);
+        if (idx == -1)
+            this.taskCompleted.push(task);
+
+        let result = JSON.stringify(this.taskCompleted);
+        console.log(result);
+
+        if (result == JSON.stringify(this.task)) {
+            this.game.preVictory(this);
+            this.State('braking');
+        }
+    }
+
+    deCompletedTask(task) {
+        let idx = this.taskCompleted.indexOf(task);
+        if (idx > -1)
+            this.taskCompleted.splice(idx, 1);
     }
 
     removeChain(cart) {
@@ -63,6 +87,10 @@ class Train extends BaseCart {
             }, 100);
 
         this.initListeners();
+
+        this.task = this.data.task ? this.data.task : ['finish'];
+        this.taskCompleted = [];
+
         return this;
     }
 
@@ -119,15 +147,6 @@ class Train extends BaseCart {
         return this;
     }
 
-    State(value = null) {
-        if (value) {
-            let index = this.states.indexOf(value);
-            if (index > -1) 
-                this.setState(index);
-        }
-        return this.states[this.stateIndex];
-    }
-
     updatePS() {
         if (this.particles) {
              if (this.State() == 'run') {
@@ -140,14 +159,10 @@ class Train extends BaseCart {
         }
     }
 
-    setState(index) {
-        if (index != this.stateIndex) {
-            this.stateIndex = index;
-            if (this.State() == 'stop')
-                this.velocity = 0;
-
-            this.updatePS();
-        }
+    afterSetState() {
+        if (['stop', 'boarding'].includes(this.State()))
+            this.velocity = 0;
+        this.updatePS();
     }
 
     defaultWeight() {
@@ -453,7 +468,7 @@ class Train extends BaseCart {
     
     update(dt) {
 
-        if ((this.State() != 'stop') && this.trackPos.currentTrack) {
+        if ((['run', 'braking'].includes(this.State())) && this.trackPos.currentTrack) {
 
             let resistance = this.totalResistance();
 
@@ -487,7 +502,8 @@ class Train extends BaseCart {
     toggle() {
         if (this.State() == 'run')
             this.State('braking');
-        else this.State('run');
+        else if (['stop', 'braking'].includes(this.State())) 
+            this.State('run');
     }
 
     _afterChangeForward() {

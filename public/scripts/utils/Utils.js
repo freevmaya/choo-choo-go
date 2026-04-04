@@ -282,3 +282,21 @@ function getRandomColorWithIntensity(saturation = 0.8, lightness = 0.5) {
     const hue = Math.random();
     return new THREE.Color().setHSL(hue, saturation, lightness);
 }
+
+THREE.Object3D.prototype.setWorldPosition = function(worldPosition) {
+    if (!this.parent) {
+        this.position.copy(worldPosition);
+        return;
+    }
+    const parentMatrix = this.parent.matrixWorld;
+    const inverseMatrix = new THREE.Matrix4().copy(parentMatrix).invert();
+    const localPosition = worldPosition.clone().applyMatrix4(inverseMatrix);
+    this.position.copy(localPosition);
+    return this;
+};
+
+THREE.Object3D.prototype.worldToLocalDirection = function(globalDirection) {
+    const parentQuaternion = this.parent ? this.parent.quaternion : new THREE.Quaternion();
+    const inverseQuaternion = parentQuaternion.clone().conjugate();
+    return globalDirection.clone().applyQuaternion(inverseQuaternion);
+};

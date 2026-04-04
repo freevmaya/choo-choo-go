@@ -211,9 +211,7 @@ class Human extends BaseGameObject {
   }
   
   update(dt) {
-    if (this.state == 'walk') {
-      if (Math.random() > 0.96)
-        this.rndDirect();
+    if ((this.state == 'walk') && this.model) {
 
       let direct = this.direct.clone().multiplyScalar(dt * this.walkSpeed);
       let newPos = this.model.position.clone().add(direct);

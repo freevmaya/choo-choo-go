@@ -4,6 +4,7 @@ class BaseCellObject extends BaseGameObject {
 
     	super();
 
+        this.data = data;
         let sellPosition = data.location;
 
     	if (Array.isArray(sellPosition))

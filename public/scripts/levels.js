@@ -1,5 +1,5 @@
 
-// Параметры игры - ИНДЕКСЫ для локализации названий уровней
+// РџР°СЂР°РјРµС‚СЂС‹ РёРіСЂС‹ - РРќР”Р•РљРЎР« РґР»СЏ Р»РѕРєР°Р»РёР·Р°С†РёРё РЅР°Р·РІР°РЅРёР№ СѓСЂРѕРІРЅРµР№
 var GAME_PARAMS = {
     "TEST": {
         "NAME": "difficulty_test",
@@ -157,15 +157,18 @@ var GAME_PARAMS = {
                     -3,
                     0,
                     0
-                ]
+                ],
+                title: 'start'
             },
             {
-                "type": "FinishTrack",
+                "type": "PointTrack",
                 "location": [
                     1,
                     1,
                     0
-                ]
+                ],
+                title: 'finish',
+                taskName: 'finish'
             }
         ],
         "objects": [
@@ -207,7 +210,8 @@ var GAME_PARAMS = {
                     "indexPosInChain": 0,
                     "forwardInTrack": true
                 },
-                "chain": []
+                "chain": [],
+                task: ['connect1', 'connect2', 'finish']
             },
             {
                 "type": "Wagon",
@@ -220,7 +224,8 @@ var GAME_PARAMS = {
                     "pathIndex": 0,
                     "indexPosInChain": 0,
                     "forwardInTrack": true
-                }
+                },
+                taskName: 'connect2'
             },
             {
                 "type": "Wagon",
@@ -233,7 +238,8 @@ var GAME_PARAMS = {
                     "pathIndex": 0,
                     "indexPosInChain": 0,
                     "forwardInTrack": true
-                }
+                },
+                taskName: 'connect1'
             }
         ]
     },
@@ -555,7 +561,8 @@ var GAME_PARAMS = {
                     -2,
                     1
                 ],
-                "peopleCount": 5
+                "peopleCount": 5,
+                taskName: 'pickup'
             },
             {
                 "type": "RailwayPlatform",
@@ -564,7 +571,8 @@ var GAME_PARAMS = {
                     2,
                     3
                 ],
-                "peopleCount": 0
+                "peopleCount": 0,
+                taskName: 'unload'
             }
         ],
         "carts": [
@@ -580,7 +588,8 @@ var GAME_PARAMS = {
                     "indexPosInChain": 0,
                     "forwardInTrack": true
                 },
-                "chain": []
+                "chain": [],
+                task: ['pickup', 'unload']
             },
             {
                 "type": "PassengerWagon",
@@ -618,15 +627,18 @@ var GAME_PARAMS = {
                     -1,
                     -5,
                     0
-                ]
+                ],
+                title: 'start'
             },
             {
-                "type": "FinishTrack",
+                "type": "PointTrack",
                 "location": [
                     -1,
                     4,
                     0
-                ]
+                ],
+                title: 'finish',
+                taskName: 'finish'
             },
             {
                 "type": "StraightTrack",
@@ -760,7 +772,8 @@ var GAME_PARAMS = {
                     "indexPosInChain": 0,
                     "forwardInTrack": true
                 },
-                "chain": []
+                "chain": [],
+                "task": ['finish']
             }
         ]
     },
@@ -1087,15 +1100,18 @@ var GAME_PARAMS = {
                     0,
                     -5,
                     0
-                ]
+                ],
+                title: 'start'
             },
             {
-                "type": "FinishTrack",
+                "type": "PointTrack",
                 "location": [
                     -3,
                     4,
                     0
-                ]
+                ],
+                title: 'finish',
+                taskName: 'finish'
             },
             {
                 "type": "ForkTrack",
@@ -1240,7 +1256,8 @@ var GAME_PARAMS = {
                     "pathIndex": 0,
                     "indexPosInChain": 0,
                     "forwardInTrack": true
-                }
+                },
+                taskName: 'connect'
             },
             {
                 "type": "Train",
@@ -1254,7 +1271,8 @@ var GAME_PARAMS = {
                     "indexPosInChain": 0,
                     "forwardInTrack": true
                 },
-                "chain": []
+                "chain": [],
+                task: ['connect', 'finish']
             }
         ]
     },
@@ -1648,23 +1666,10 @@ var GAME_PARAMS = {
         ],
         "carts": [
             {
-                "type": "PassengerWagon",
-                "location": [
-                    -1,
-                    4,
-                    true
-                ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
-                }
-            },
-            {
                 "type": "Train",
                 "location": [
-                    -4,
-                    0,
+                    2,
+                    -5,
                     true
                 ],
                 "trackPos": {
@@ -1673,6 +1678,19 @@ var GAME_PARAMS = {
                     "forwardInTrack": true
                 },
                 "chain": []
+            },
+            {
+                "type": "PassengerWagon",
+                "location": [
+                    1,
+                    -5,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                }
             }
         ]
     }
