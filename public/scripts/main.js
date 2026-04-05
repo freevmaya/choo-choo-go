@@ -106,7 +106,7 @@ class RailGame extends BaseGame {
 
   clearGameUI() {
     this.gameUI.forEach(ui => {
-      ui.remove();
+      ui.dispose();
     });
     this.gameUI = [];
   }

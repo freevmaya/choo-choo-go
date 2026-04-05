@@ -49,13 +49,14 @@
       'effects/SparkEffect',
       'effects/ParticleSystem',
       'audio/SoundManager',
+      'UI/RailwaySpawner',
       'UI/Library',
       'main'
     ];
 
     if (DEV) {
       $scripts[] = 'utils/DevTools';
-      $scripts[] = 'controls/RGBColorControl';
+      $scripts[] = 'UI/RGBColorControl';
     }
 ?>
   <div class="loader">

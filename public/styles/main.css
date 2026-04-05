@@ -3,6 +3,7 @@
 :root {
   --game-bg: radial-gradient(circle at top left, #7ed4e3, #223100);
   --library-height: min(600px, 80vh);
+  --tools-bg-color: #715f00;
 }
 
 /*
@@ -616,7 +617,7 @@ body {
 .dev-block .container, 
 .library-block .container {
   position: relative;
-  background: #715f00;
+  background: var(--tools-bg-color);
   color: gold;
   padding: 10px;
   border-radius: 25px;
@@ -651,7 +652,7 @@ body {
 
 .library-block .title {
   position: absolute;
-  background: #715f00;
+  background: var(--tools-bg-color);
   width: calc(100% - 20px);
   box-shadow: 2px 2px 6px black;
   border-radius: 15px;
@@ -711,4 +712,46 @@ body {
   .library-block .container {
     width: 80px;
   }
+}
+
+/*___________________Railway spawner__________________*/
+
+.railway-spawner {
+  position: fixed;
+  top: 30px;
+  z-index: 100;
+}
+
+.railway-spawner .container {
+  position: relative;
+  background: var(--tools-bg-color);
+  color: gold;
+  padding: 10px;
+  border-radius: 0 0 25px 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  z-index: 100;
+  box-shadow: -2px 2px 6px black;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100px;
+  cursor: pointer;
+}
+
+.railway-spawner .spawner-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 15px;
+}
+
+.railway-spawner .item-preview {
+  width: 64px;
+  height: 64px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
