@@ -8,7 +8,7 @@ class DevTools {
 	          <button id="clearBtn">Clear</button>
 	          <button id="resetBtn">Reset</button>
 	          <button id="saveBtn">Save</button>
-	          <button id="editorStateBtn">Editor state</button>
+	          <button id="gameModeBtn">Editor state</button>
 	        </div>
 	      </div>`);
 
@@ -30,17 +30,57 @@ class DevTools {
 	      this.game.createNewLevel();
 	    })
 
-	    this.ebtn = this.toolsPanel.find('#editorStateBtn');
+	    this.ebtn = this.toolsPanel.find('#gameModeBtn');
 
 	    this.ebtn.click(() => {
-	      this.game.setEditorState((this.game.editorStateIndex + 1) % this.game.editorStates.length);
+	      this.game.gameMode((this.game.gameModeIndex + 1) % this.game.gameModes.length);
 	    });
-	    this.ebtn.text(this.game.editorState());
+	    this.ebtn.text(this.game.gameMode());
 
 	   	//eventBus.on('gameObject:click', this._handleObjectClick = this.handleObjectClick.bind(this));
-	   	eventBus.on('editor-state-change', this._onEditorState = ()=>{
-	      this.ebtn.text(this.game.editorState());
+	   	eventBus.on('game-mode-change', this._onEditorState = ()=>{
+	      this.ebtn.text(this.game.gameMode());
 	   	});
+    	
+    	/*
+	    this.rgbControl = new RGBColorControl({
+	      position: { top: 80, right: 10 },
+	      initialColor: { r: 100, g: 200, b: 100 }
+	    });
+
+	    eventBus.on('rgb-color-change', (color) => {
+	      console.log('Цвет изменен:', color.hex, color.rgb);
+	      if (this.ground) {
+	      }
+	    });*/
+
+	    new Library($('#game-container'), $('#canvas-container'), [
+	      {
+	        type: StraightTrack
+	      },{
+	        type: CurvedTrack
+	      },{
+	        type: ForkTrack
+	      },{
+	        type: PointTrack
+	      },{
+	        type: FinishTrack
+	      },{
+	        type: Train
+	      },{
+	        type: Wagon
+	      },{
+	        type: PassengerWagon
+	      },{
+	        type: SimpleTree
+	      },{
+	        type: DeciduousTree
+	      },{
+	        type: Snow
+	      },{
+	        type: RailwayPlatform
+	      }
+	    ]);
 	}
 
 	handleObjectClick(data) {
@@ -58,6 +98,6 @@ class DevTools {
 
 	dispose() {
 	   	//eventBus.off('gameObject:click', this._handleObjectClick);
-	   	eventBus.off('editor-state-change', this._onEditorState);
+	   	eventBus.off('game-mode-change', this._onEditorState);
 	}
 }

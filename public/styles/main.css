@@ -63,7 +63,7 @@ body {
 }
 
 .game-ui button {
-    padding: 12px 24px;
+    padding: 5px 12px;
     background: linear-gradient(178deg, #98b343 0%, #57350a 100%);
     color: white;
     border: none;
@@ -613,7 +613,8 @@ body {
   left: 10px;
 }
 
-.dev-block .container, .library-block .container {
+.dev-block .container, 
+.library-block .container {
   position: relative;
   background: #715f00;
   color: gold;
@@ -623,11 +624,29 @@ body {
   font-weight: bold;
   z-index: 100;
   box-shadow: 2px 2px 6px black;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dev-block .container {
+  height: 20px;
+  overflow: hidden;
+  transition: height 0.5s ease;
+}
+
+.dev-block .container:hover {
+  height: auto;
 }
 
 .library-block {
   top: 50%;
-  left: 20px;
+  left: -120px;
+  transition: left 0.5s ease;
+}
+
+.library-block:hover {
+  left: 0px;
 }
 
 .library-block .title {

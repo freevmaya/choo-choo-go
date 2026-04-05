@@ -7,12 +7,12 @@ class RailGame extends BaseGame {
     this.cameraController = new CameraController(this);
     this.levelLoader = new LevelLoader(this);
     this.lights = [];
-    this.createLights();
+    this.gameUI = [];
 
     eventBus.on('change-cells', this.onChangeCells.bind(this));
 
-    this.editorStates = ['play', 'edit', 'delete', 'playAndEdit'];
-    this.editorStateIndex = 0;
+    this.gameModes = ['play', 'edit', 'delete', 'playAndEdit', 'dropGame'];
+    this.gameModeIndex = 0;
   }
 
   onChangeCells(cells) {
@@ -31,59 +31,35 @@ class RailGame extends BaseGame {
 
     super.initUI();
 
-    new Library($('#library'), $('#canvas-container'), [
-      {
-        type: StraightTrack
-      },{
-        type: CurvedTrack
-      },{
-        type: ForkTrack
-      },{
-        type: PointTrack
-      },{
-        type: FinishTrack
-      },{
-        type: Train
-      },{
-        type: Wagon
-      },{
-        type: PassengerWagon
-      },{
-        type: SimpleTree
-      },{
-        type: DeciduousTree
-      },{
-        type: Snow
-      },{
-        type: RailwayPlatform
-      }
-    ]);
-
     if (DEV)
       this.initDevTools();
   }
 
   isPlaying() {
-    return this.gameState.isPlaying() && ((this.editorState() == 'play') || (this.editorState() == 'playAndEdit'))
+    return this.gameState.isPlaying() && ((this.gameMode() == 'play') || (this.gameMode() == 'playAndEdit'))
   }
 
-  setEditorState(state) {
+  gameMode(state = null) {
+
+    if (state == null)
+      return this.gameModes[this.gameModeIndex];
 
     let index = 0;
-    if (typeof state == 'string')
-      index = this.editorStates.indexOf(state);
+    if (typeof state == 'string') {
+      index = this.gameModes.indexOf(state);
+      if (index == -1) {
+        console.error(`Game mode "${state}" not found`);
+        return;
+      }
+    }
     else index = state;
 
-    index = clamp(index, 0, this.editorStates.length - 1);
-    if (this.editorStateIndex != index) {
-      this.editorStateIndex = index;
-      console.log(`Change editorState: ${this.editorState()}`);
-      eventBus.emit('editor-state-change', this.editorState());
+    index = clamp(index, 0, this.gameModes.length - 1);
+    if (this.gameModeIndex != index) {
+      this.gameModeIndex = index;
+      console.log(`Change gameMode: ${this.gameMode()}`);
+      eventBus.emit('game-mode-change', this.gameMode());
     }
-  }
-
-  editorState() {
-    return this.editorStates[this.editorStateIndex];
   }
 
   saveProject() {
@@ -115,7 +91,7 @@ class RailGame extends BaseGame {
   }
 
   initDevTools() {
-    new DevTools(this);
+    let devTools = new DevTools(this);
   }
 
   clearLights() {
@@ -127,21 +103,40 @@ class RailGame extends BaseGame {
     });
     this.lights = [];
   }
+
+  clearGameUI() {
+    this.gameUI.forEach(ui => {
+      ui.remove();
+    });
+    this.gameUI = [];
+  }
+
+  createGameUI() {
+    this.clearGameUI();
+
+    let ui = GAME_PARAMS[this.paramsIndex].UI;
+    if (ui)
+      Object.keys(ui).forEach(key => {
+        let obj = createObject(key, ui[key]);
+        if (obj)
+          this.gameUI.push(obj);
+      });
+  }
   
   createLights() {
 
     this.clearLights();
     let env = GAME_PARAMS[this.paramsIndex].ENV;
 
-    this.scene.background = new THREE.Color(env.BACKGROUND_COLOR);
+    this.scene.background = toThreeColor(env.BACKGROUND_COLOR);
     let distance = CAMERA_HEIGHT_OFFSET * 1.5;
-    this.scene.fog = new THREE.Fog(env.BACKGROUND_COLOR, distance, distance * 2);
+    this.scene.fog = new THREE.Fog(this.scene.background, distance, distance * 1.2);
     
-    const ambient = new THREE.AmbientLight(env.AMBIENT_LIGHT_COLOR, env.AMBIENT_LIGHT_INTENSITY);
+    const ambient = new THREE.AmbientLight(toThreeColor(env.AMBIENT_LIGHT_COLOR), env.AMBIENT_LIGHT_INTENSITY);
     this.scene.add(ambient);
     this.lights.push(ambient);
     
-    const keyLight = new THREE.DirectionalLight(env.KEY_LIGHT_COLOR, env.KEY_LIGHT_INTENSITY);
+    const keyLight = new THREE.DirectionalLight(toThreeColor(env.KEY_LIGHT_COLOR), env.KEY_LIGHT_INTENSITY);
     keyLight.position.set(20, 20, 20);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
@@ -155,12 +150,12 @@ class RailGame extends BaseGame {
     this.scene.add(keyLight);
     this.lights.push(keyLight);
     
-    const fillLight = new THREE.DirectionalLight(env.FILL_LIGHT_COLOR, env.FILL_LIGHT_INTENSITY);
+    const fillLight = new THREE.DirectionalLight(toThreeColor(env.FILL_LIGHT_COLOR), env.FILL_LIGHT_INTENSITY);
     fillLight.position.set(-3, 2, 3);
     this.scene.add(fillLight);
     this.lights.push(fillLight);
     
-    const rimLight = new THREE.PointLight(env.RIM_LIGHT_COLOR, env.RIM_LIGHT_INTENSITY, RIM_LIGHT_DISTANCE);
+    const rimLight = new THREE.PointLight(toThreeColor(env.RIM_LIGHT_COLOR), env.RIM_LIGHT_INTENSITY, RIM_LIGHT_DISTANCE);
     rimLight.position.set(-2, -1, 4);
     this.scene.add(rimLight);
     this.lights.push(rimLight);
@@ -224,6 +219,10 @@ class RailGame extends BaseGame {
   createGameObjects() {
     let env = this.getEnv();
 
+    this.gameMode(env.GAME_MODE || 'play');
+
+    this.createLights();
+    this.createGameUI();
     super.createGameObjects();
     this.cameraController.reset();
     this.ground = (new Ground(env.GROUND_IMAGE_PATH, env.GROUND_COLOR)).init(this); //

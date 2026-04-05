@@ -15,5 +15,6 @@ function createObject(name, ...args) {
     if (ClassRef) {
         return new ClassRef(...args);
     }
+    console.error(`Class "${name}" not found`);
     return null;
 }

@@ -1,6 +1,16 @@
 class Library {
-	constructor(elem, dropZone, classes) {
-		this.elem = elem;
+	constructor(parent, dropZone, classes) {
+		this.elem = $(`<div class="library-block">
+	        <div class="container">
+	          <div class="title"><?=Lang('Library')?></div>
+	          <div class="container-items">
+	            <div id="library" class="items">
+	            </div>
+	          </div>
+	        </div>
+	      </div>`);
+
+		parent.append(this.elem);
 		this.dropZone = dropZone;
 		this.dropZoneOver = false;
 		this.loadClasses(classes);
@@ -88,6 +98,6 @@ class Library {
             }
         });
 
-		this.elem.append(itemCtrl);
+		this.elem.find('#library').append(itemCtrl);
 	}
 }

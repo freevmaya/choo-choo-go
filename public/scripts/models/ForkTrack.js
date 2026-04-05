@@ -79,7 +79,7 @@ class ForkTrack extends BaseCurveTrack {
     }
 
     onClick(hit, eventData) {
-        if ((this.game.editorState() == 'play') || (this.game.editorState() == 'playAndEdit')) {
+        if ((this.game.gameMode() == 'play') || (this.game.gameMode() == 'playAndEdit')) {
             if (this.currenCart() == null)
                 this.setCurrentPath((this._currentPath + 1) % this.getPathCount());
             else this.doBusy();
@@ -115,7 +115,7 @@ class ForkTrack extends BaseCurveTrack {
     }
 
     isAwailableRotate() {
-        return this.game.editorState() == 'edit';
+        return this.game.gameMode() == 'edit';
     }
 }
 registerClass(ForkTrack);

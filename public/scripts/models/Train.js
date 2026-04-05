@@ -247,11 +247,16 @@ class Train extends BaseCart {
         const cab_group = new THREE.Group();
         
         // Кабина машиниста (сзади)
-        const cabGeo = new THREE.BoxGeometry(0.8, 0.7, 0.9);
-        const cab = new THREE.Mesh(cabGeo, darkMaterial);
-        cab.position.set(0, 0, 0);
-        cab.castShadow = true;
-        this._registerGeometry(cabGeo);
+        let cab = this.createBox(0.4, 0.7, 0.1, darkMaterial);
+        cab.position.set(0.2, 0, 0.4);
+        cab_group.add(cab);
+
+        cab = this.createBox(0.4, 0.7, 0.1, darkMaterial);
+        cab.position.set(0.2, 0, -0.4);
+        cab_group.add(cab);
+
+        cab = this.createBox(0.1, 0.3, 0.7, darkMaterial);
+        cab.position.set(0.3, -0.2, 0);
         cab_group.add(cab);
         
         // Крыша кабины

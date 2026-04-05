@@ -618,7 +618,8 @@ var GAME_PARAMS = {
             "AMBIENT_LIGHT_INTENSITY": 1,
             "KEY_LIGHT_INTENSITY": 3,
             "FILL_LIGHT_INTENSITY": 2,
-            "RIM_LIGHT_INTENSITY": 0.6
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": 'playAndEdit'
         },
         "items": [
             {
@@ -1693,5 +1694,150 @@ var GAME_PARAMS = {
                 }
             }
         ]
+    },
+
+    "TEST-5" :{
+        "NAME": "TEST-5",
+        "UI": {
+            "RailwaySpawner": {}
+        },
+        "ENV": {
+            "BACKGROUND_COLOR": "#4469AA",
+            "GROUND_COLOR": "#4469AA",
+            "KEY_LIGHT_COLOR": "#EEEEEE",
+            "RIM_LIGHT_COLOR": "#000000",
+            "FILL_LIGHT_COLOR": "#000000",
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 3,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": "dropGame"
+        },
+        "items": [
+            {
+                "type": "StraightTrack",
+                "location": [
+                    2,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    2,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "FinishTrack",
+                "location": [
+                    -3,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -3,
+                    3,
+                    0
+                ]
+            }
+        ],
+        "tracks": [],
+        "objects": [
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -1,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    4,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    4,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -5,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -5,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -5,
+                    -2,
+                    0
+                ]
+            }
+        ],
+        "carts": []
     }
 }

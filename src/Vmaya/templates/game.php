@@ -53,8 +53,10 @@
       'main'
     ];
 
-    if (DEV)
+    if (DEV) {
       $scripts[] = 'utils/DevTools';
+      $scripts[] = 'controls/RGBColorControl';
+    }
 ?>
   <div class="loader">
       <div class="spinner-border" role="status">
@@ -104,16 +106,6 @@
       <!-- Индикатор очков (только при победе) -->
       <div class="score-indicator" id="score-indicator">
         <i class="bi bi-trophy-fill"></i> <span data-lang="score_indicator">Счет:</span> <span id="current-score">0</span>
-      </div>
-
-      <div class="library-block">
-        <div class="container">
-          <div class="title"><?=Lang('Library')?></div>
-          <div class="container-items">
-            <div id="library" class="items">
-            </div>
-          </div>
-        </div>
       </div>
     </div>
     

@@ -76,7 +76,7 @@ class Cells {
 		if (trackIndex > -1) {
 	        let track = this.get(trackIndex);
 
-	        if (this.game.editorState() == 'playAndEdit') {
+	        if (this.game.gameMode() == 'playAndEdit') {
 	        	if (track.isAwailableRotate()) {
 	        		track.nextRotation();
 		        	this.doAfterChange();
@@ -109,7 +109,7 @@ class Cells {
 			this.showOrientation(cell);
 			return;
 		}
-		if (this.game.editorState() == 'edit') {
+		if (this.game.gameMode() == 'edit') {
 			this.doRotateTrack(cell);
 		} else {
 
@@ -117,7 +117,7 @@ class Cells {
 		    if (trackIndex > -1) {
 		        let track = this.get(trackIndex);
 
-		        if (this.game.editorState() == 'delete') {
+		        if (this.game.gameMode() == 'delete') {
 		        	let idx = this.items.indexOf(track);
 	   				if (idx > -1) {
 	   					this.items.splice(idx, 1);
@@ -126,9 +126,9 @@ class Cells {
 		        }
 		    }
 
-		    if (this.game.editorState() == 'play') 
+		    if (this.game.gameMode() == 'play') 
 		    	this.runTrainToCell(cell);
-		    else if (this.game.editorState() == 'playAndEdit')  {
+		    else if (this.game.gameMode() == 'playAndEdit')  {
 				if (!this.doRotateTrack(cell))
 		    		this.runTrainToCell(cell);
 		    }
@@ -206,7 +206,7 @@ class Cells {
    			if (!ga) 
    				return;
 
-   			if (this.game.editorState() == 'delete') {
+   			if (this.game.gameMode() == 'delete') {
 	   			if (ga instanceof BaseCart) {
 	   				let idx = this.carts.indexOf(ga);
 	   				if (idx > -1) {
@@ -226,7 +226,7 @@ class Cells {
 	   					ga.dispose();
 	   				}
 	   			}
-	   		} else if (this.game.editorState() == 'edit') {
+	   		} else if (this.game.gameMode() == 'edit') {
 	   			this.doRotateTrack(ga.getCellPosition());
 	   			if (ga instanceof BaseCellObject) {
 	   				ga.nextRotation();
@@ -234,7 +234,7 @@ class Cells {
 	   				ga.trackPos.forwardInTrack = !ga.trackPos.forwardInTrack;
 	   				ga.updatePosition();
 	   			}
-	   		} else if (this.game.editorState() == 'playAndEdit') {
+	   		} else if (this.game.gameMode() == 'playAndEdit') {
 	   			if (ga instanceof BaseCellObject) {
 		    		if (!this.doRotateTrack(ga.getCellPosition()))
 		    			this.runTrainToCell(ga.getCellPosition());
@@ -245,17 +245,20 @@ class Cells {
 
 	init(railway, carts, objects) {
 
-	    railway.forEach((trackItem)=>{
-	      this.addTrackItem(trackItem);
-	    });
+		if (railway)
+		    railway.forEach((trackItem)=>{
+		      this.addTrackItem(trackItem);
+		    });
 
-	    carts.forEach((item)=>{
-	      this.addCart(item);
-	    });
+	    if (carts)
+		    carts.forEach((item)=>{
+		      this.addCart(item);
+		    });
 
-	    objects.forEach((item)=>{
-	      this.addObject(item);
-	    });
+	    if (objects)
+		    objects.forEach((item)=>{
+		      this.addObject(item);
+		    });
 	}
 
 	addCart(data) {
