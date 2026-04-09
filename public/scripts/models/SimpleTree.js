@@ -6,16 +6,17 @@ class SimpleTree extends BaseCellObject {
     
     this.treeGroup = null;
     this.animationTime = 0;
+  }
+  
+  createModel() {
     
     // Параметры ёлки
-    this.treeHeight = 2 + Math.random() * 3;
+    this.treeHeight = lerp(this.getConst('MIN_TREE_HEIGHT'), this.getConst('MAX_TREE_HEIGHT'), Math.random());
     this.baseRadius = Math.min(this.treeHeight * 0.3, GAME_SETTINGS.CELL_SIZE / 2);
     this.topRadius = this.baseRadius * 0.15;
     this.segments = 12;
     this.tierCount = 4;
-  }
-  
-  createModel() {
+
     this.treeGroup = new THREE.Group();
     
     // Материал для ёлки (зеленый)
@@ -61,7 +62,7 @@ class SimpleTree extends BaseCellObject {
       this._registerGeometry(coneGeometry);
       this.treeGroup.add(cone);
 
-      this._registerClickable(cone);
+      //this._registerClickable(cone);
       
       yOffset += height - 0.1;
     }

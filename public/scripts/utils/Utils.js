@@ -300,3 +300,53 @@ THREE.Object3D.prototype.worldToLocalDirection = function(globalDirection) {
     const inverseQuaternion = parentQuaternion.clone().conjugate();
     return globalDirection.clone().applyQuaternion(inverseQuaternion);
 };
+
+THREE.Object3D.prototype.contains = function(child) {
+    if (this === child) return true;
+    return this.children.some(c => c === child || c.contains(child));
+};
+
+class Bounds {
+    constructor(x = 0, y = 0, w = 0, h = 0) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+
+    // Создать Bounds из DOM элемента
+    static fromElement(el) {
+        const rect = el.getBoundingClientRect();
+        return new Bounds(rect.left, rect.top, rect.width, rect.height);
+    }
+
+    // Проверка, содержит ли область точку
+    containsPoint(px, py) {
+        return px >= this.x && px <= this.x + this.w &&
+               py >= this.y && py <= this.y + this.h;
+    }
+
+    // Расширить область на величину (равномерно со всех сторон)
+    expand(amount) {
+        this.x -= amount;
+        this.y -= amount;
+        this.w += amount * 2;
+        this.h += amount * 2;
+        return this;
+    }
+
+    // Клонирование
+    clone() {
+        return new Bounds(this.x, this.y, this.w, this.h);
+    }
+
+    // Геттеры для удобства
+    get left()   { return this.x; }
+    get top()    { return this.y; }
+    get right()  { return this.x + this.w; }
+    get bottom() { return this.y + this.h; }
+}
+
+function addIgnoreSign(a, b) {
+  return (Math.abs(a) + b) * Math.sign(a);
+}

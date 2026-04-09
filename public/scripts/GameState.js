@@ -32,6 +32,14 @@ class GameState {
 
     this._listeners[state].push(callback);
   }
+
+  off(state, callback) {
+    if (this._listeners[state]) {
+      let idx = this._listeners[state].indexOf(callback);
+      if (idx > -1)
+        this._listeners[state].splice(idx, 1);
+    }
+  }
   
   isPlaying() {
     return this.state === GAME_STATE.PLAYING;

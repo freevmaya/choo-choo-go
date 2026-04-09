@@ -84,12 +84,14 @@ class BaseGame {
     }
   }
 
-  registerClickableObject(object, gameObject = null) {
+  registerClickableObject(object, gameObject = null, onClick = null) {
     if (this.raycasterManager) {
       this.raycasterManager.addClickableObject(object);
       if (gameObject) {
         object.userData = object.userData || {};
         object.userData.gameObject = gameObject;
+        if (onClick)
+          object.userData.onClick = onClick;
       }
     }
   }
@@ -526,14 +528,6 @@ class BaseGame {
   }
   
   showGameOverModal() {
-    // Обновляем статистику в модальном окне
-    const finalBounceElement = $('#finalBounceCount');
-    
-    if (finalBounceElement && this.ball) {
-      finalBounceElement.text(this.ball.getBounceCount());
-    }
-    
-    // Показываем модальное окно
 
     let restartButton = $('#restartButton')[0];
 
@@ -616,7 +610,7 @@ class BaseGame {
   }
   
   updateGameDisplay() {
-    $('#game-title').text(lang.get(GAME_PARAMS[this.paramsIndex].NAME));
+    $('#game-title').text(lang.get(this.paramsIndex));
   }
   
   showKillerIndicator() {

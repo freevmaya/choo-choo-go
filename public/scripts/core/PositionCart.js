@@ -10,7 +10,7 @@ class PositionCart {
             pathIndex: this.pathIndex,
             indexPosInChain: this.indexPosInChain,
             forwardInTrack: this.forwardInTrack
-        }
+        };
     }
 
     setCurrentChain(trackIndex, pathIndex, indexPosInChain, forwardInTrack = true) {
@@ -69,8 +69,13 @@ class PositionCart {
                 let path = paths[index];
 
                 let indexPosInChain = 2 - Math.abs(this.indexPosInChain);
-                this.setCurrentChain(nextIndex, path.pathIndex, 
-                    path.forward ? -indexPosInChain : indexPosInChain, path.forward);
+                indexPosInChain = path.forward ? -indexPosInChain : indexPosInChain
+
+                let edge = nextTrack.checkEdge(this.cart, indexPosInChain);
+                if (edge)
+                    return false;
+
+                this.setCurrentChain(nextIndex, path.pathIndex, indexPosInChain, path.forward);
                 return true;
             }
         } 
@@ -93,7 +98,14 @@ class PositionCart {
 
         this.indexPosInChain += velocity * dt * (this.forwardInTrack ? 1 : -1);
 
-        if ((this.indexPosInChain > 1) || (this.indexPosInChain < -1))
+        let limits = [-1, 1];
+
+        if (this.currentTrack && this.cart) {
+            let edge = this.currentTrack.checkEdge(this.cart, this.indexPosInChain);
+            if (edge) return edge;
+        }
+
+        if ((this.indexPosInChain > limits[1]) || (this.indexPosInChain < limits[0]))
             if (!this.swithToNextTrack())
                 return {
                     edgeTrack: true

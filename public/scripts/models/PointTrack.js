@@ -61,18 +61,6 @@ class PointTrack extends StraightTrack {
 
     	return group;
     }
-
-    afterRunOver() {
-        super.afterRunOver();
-
-        let cart = this.currenCart();
-        if (cart) {
-            if (!this.finished && cart.headTrain() && this.data.taskName) {
-                this.finished = true;
-                cart.headTrain().completedTask(this.data.taskName);
-            }
-        }
-    }
 	
 }
 

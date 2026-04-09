@@ -1,12 +1,15 @@
-class BaseStateMashine extends BaseGameObject {
-	constructor(game) {
-		super(game);
+class BaseStateMashine {
+	constructor() {
         this.states = this.getStates();
         this.stateIndex = 0;
 	}
 
     getStates() {
         return ['default'];
+    }
+
+    getName() {
+        return this.name ? this.name : this.constructor.name;
     }
 
     State(value = null) {
@@ -24,6 +27,8 @@ class BaseStateMashine extends BaseGameObject {
         if (index != this.stateIndex) {
             this.stateIndex = index;
             this.afterSetState();
+            
+            tracer.log(`State ${this.getName()} changed: ${this.State()}`);
 
             eventBus.emit('change_cart_state', this);
         }

@@ -21,6 +21,10 @@ class BaseTrack extends BaseCellObject {
 
     }
 
+    checkEdge(cart, posTrain) {
+        return null;
+    }
+
     _afterSetCurrentPath() {
     }
 
@@ -48,7 +52,13 @@ class BaseTrack extends BaseCellObject {
         }
     }
 
+    isBusy() {
+        return this.carts.length > 0;
+    }
+
     afterRunOver() {
+        if (this.data.taskName)
+            this.game.completedTask(this.data.taskName);
     }
 
     afterRunOut() {
@@ -191,15 +201,6 @@ class BaseTrack extends BaseCellObject {
         return null;
     }
 
-    currenCart() {
-        let idx = this.game.items.findCart(this.getCellPosition());
-        return idx > -1 ? this.game.items.carts[idx] : null;
-    }
-
-    getConnections() {
-        return [];
-    }
-
     calcPathPoint(relPathPos, path = 0) {
     	let result = this.getPosition();
     	result.rotation = 0;
@@ -211,6 +212,6 @@ class BaseTrack extends BaseCellObject {
     }
 
     isAwailableRotate() {
-        return this.currenCart() == null;
+        return this.carts.length == 0;
     }
 }

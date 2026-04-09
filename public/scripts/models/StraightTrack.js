@@ -8,15 +8,15 @@ class StraightTrack extends BaseTrack {
         
         const railWidth = GAME_SETTINGS.RAIL_WIDTH;
         const railHeight = GAME_SETTINGS.RAIL_HEIGHT;
-        const railY = GAME_SETTINGS.RAIL_HEIGHT / 2 + GAME_SETTINGS.SLEEPER_HEIGHT / 2;
+        this.railY = this.getConst('RAIL_HEIGHT') / 2 + this.getConst('SLEEPER_HEIGHT') / 2;
         
         const leftRail = this.createBox(railWidth, railHeight, trackLength, this.railMaterial);
-        leftRail.position.set(-railSpacing / 2, railY, 0);
+        leftRail.position.set(-railSpacing / 2, this.railY, 0);
         group.add(leftRail);
         
         // Правая рельса
         const rightRail = this.createBox(railWidth, railHeight, trackLength, this.railMaterial);
-        rightRail.position.set(railSpacing / 2, railY, 0);
+        rightRail.position.set(railSpacing / 2, this.railY, 0);
         group.add(rightRail);
         
         // Шпалы

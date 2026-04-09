@@ -44,7 +44,6 @@
       'controls/BaseCameraController',
       'controls/CameraController',
       'controls/DropGameCamera',
-      'controls/HandTouch',
       'utils/EventEmitter',
       'utils/TextureLoader',
       'utils/MathUtils',

@@ -12,14 +12,27 @@ class Train extends BaseCart {
         this.smokeInterval = 0.5;
         this.whistleTimer = 0;
         this.whistleInterval = 8;
-
-        this.force = GAME_SETTINGS.TRAIN_POWER;
-        this.brack = this.force;
         this.chain = [];
     }
 
+    init(game, data) {
+        super.init(game, data);
+
+        this.force = this.getConst('TRAIN_FORCE');
+        this.brack = this.force;
+
+        if (data.chain)
+            setTimeout(()=>{
+                this._resetChain(data.chain);
+            }, 100);
+
+        this.initListeners();
+
+        return this;
+    }
+
     getStates() {
-        return ['stop', 'run', 'braking', 'boarding'];
+        return ['stop', 'run', 'braking', 'boarding', 'wait', 'prepare'];
     }
 
     addChain(cart) {
@@ -27,27 +40,6 @@ class Train extends BaseCart {
             this.chain.push(cart);
             cart.addedToChain(this);
         }
-    }
-
-    completedTask(task) {
-
-        let idx = this.taskCompleted.indexOf(task);
-        if (idx == -1)
-            this.taskCompleted.push(task);
-
-        let result = JSON.stringify(this.taskCompleted);
-        console.log(result);
-
-        if (result == JSON.stringify(this.task)) {
-            this.game.preVictory(this);
-            this.State('braking');
-        }
-    }
-
-    deCompletedTask(task) {
-        let idx = this.taskCompleted.indexOf(task);
-        if (idx > -1)
-            this.taskCompleted.splice(idx, 1);
     }
 
     removeChain(cart) {
@@ -78,43 +70,34 @@ class Train extends BaseCart {
         });
     }
 
-    init(game, data) {
-        super.init(game, data);
+    onGaDown(data) {
+        if ((data.intersects.length > 0) && (data.intersects[0].object.userData.gameObject == this)) 
+            this.beginDrag(data.pos);
+    }
 
-        if (data.chain)
-            setTimeout(()=>{
-                this._resetChain(data.chain);
-            }, 100);
+    onGaUp(data) {
+        if (this.isDrag) 
+            this.endDrag(data.pos);
+    }
 
-        this.initListeners();
+    onMouseLeave(data) {
+        if (this.isDrag) 
+            this.endDrag(data.pos);
+    }
 
-        this.task = this.data.task ? this.data.task : ['finish'];
-        this.taskCompleted = [];
-
-        return this;
+    onPreVictory(data) {
+        this.State('braking');
     }
 
     initListeners() {
-        eventBus.on('gameObject:down', (data)=>{
 
-            if ((data.intersects.length > 0) && (data.intersects[0].object.userData.gameObject == this)) 
-                this.beginDrag(data.pos);
-        });
-
-        eventBus.on('gameObject:up', (data)=>{
-            if (this.isDrag) 
-                this.endDrag(data.pos);
-        });
-
-        this.game.container.on('mouseleave', (data)=>{
-            if (this.isDrag) 
-                this.endDrag(data.pos);
-        });
-
-        $(window).on('blur', (data)=>{
-            if (this.isDrag) 
-                this.endDrag(data.pos);
-        });
+        if (!this.data.noDrag) {
+            eventBus.on('gameObject:down', this._onGaDown = this.onGaDown.bind(this));
+            eventBus.on('gameObject:up', this._onGaUp = this.onGaUp.bind(this));
+            eventBus.on('pre-victory', this._onPreVictory = this.onPreVictory.bind(this));
+            this.game.container.on('mouseleave', this._onMouseLeave = this.onMouseLeave.bind(this));
+            $(window).on('blur', this._onMouseLeave);
+        }
     }
 
     beginDrag(pos) {
@@ -134,11 +117,14 @@ class Train extends BaseCart {
             let direct = endDragPoint.clone().sub(this.startDragPoint);
 
             if (this.State() != 'boarding') {
-                let forward = new THREE.Vector3();
-                this.model.getWorldDirection(forward);
+                if (direct.length() > 0.1) {
+                    let forward = new THREE.Vector3();
+                    this.model.getWorldDirection(forward);
 
-                this.setForward(direct.dot(forward) < 0);
-                this.State('run'); 
+                    this.setForward(direct.dot(forward) < 0);
+                    this.State('run');
+                    this.game.completedTask('user-drag-train');
+                }
             } else eventBus.emit('toast', 'wrong_boarding');
         }
     }
@@ -162,11 +148,26 @@ class Train extends BaseCart {
     afterSetState() {
         if (['stop', 'boarding'].includes(this.State()))
             this.velocity = 0;
+        else if (this.State() == 'prepare')
+            this.Prepare();
         this.updatePS();
     }
 
+    Prepare() {
+
+        if (this.State() == 'prepare') {
+            if (this.prepareTimer)
+                clearTimeout(this.prepareTimer);
+
+            this.prepareTimer = setTimeout(()=>{
+                this.prepareTimer = null;
+                this.State('run');
+            }, 2000);
+        } else this.State('prepare');
+    }
+
     defaultWeight() {
-        return GAME_SETTINGS.TRAIN_WEIGHT;
+        return this.getConst('TRAIN_WEIGHT');
     }
 
     size() {
@@ -217,7 +218,7 @@ class Train extends BaseCart {
         let width2 = width / 2;
         
         // Цвета
-        const darkColor = 0xCC3333;
+        const darkColor = this.data.color ? this.data.color : 0xCC3333;
         const eyeColor = 0xFFFFFF;
         const pupilColor = 0x000000;
         const pipeColor = 0x666666;
@@ -237,9 +238,9 @@ class Train extends BaseCart {
         
         // Основной корпус (цилиндр, расположенный горизонтально)
         const bodyGeo = new THREE.CylinderGeometry(width2, width2, length * 0.8, 16);
-        const body = new THREE.Mesh(bodyGeo, this.mainMaterial);
+        const body = new THREE.Mesh(bodyGeo, darkMaterial);
         body.rotation.z = PI_HALF;
-        body.position.set((length - length * 0.7) / 2, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 0.55, 0);
+        body.position.set((length - length * 0.7) / 2, this.getConst('TRAIN_WHEEL_RADIUS') + 0.55, 0);
         body.castShadow = true;
         this._registerGeometry(bodyGeo);
         this.base.add(body);
@@ -267,7 +268,7 @@ class Train extends BaseCart {
         this._registerGeometry(roofGeo);
         cab_group.add(roof);
 
-        cab_group.position.set(-0.6, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 1, 0);
+        cab_group.position.set(-0.6, this.getConst('TRAIN_WHEEL_RADIUS') + 1, 0);
 
         this.base.add(cab_group);
         
@@ -296,7 +297,7 @@ class Train extends BaseCart {
         this._registerGeometry(pipeTopGeo);
         pipe_group.add(pipeTop);
 
-        pipe_group.position.set(length / 2 - 0.1, GAME_SETTINGS.TRAIN_WHEEL_RADIUS + 1.15);
+        pipe_group.position.set(length / 2 - 0.1, this.getConst('TRAIN_WHEEL_RADIUS') + 1.15);
 
         this.base.add(pipe_group);
         
@@ -342,6 +343,11 @@ class Train extends BaseCart {
     onClick(hit, eventData) {
         if (this.game.isPlaying())
             this.toggle();
+
+        if (this.State() == 'run')
+            this.game.completedTask('user-run');
+        else if (this.State() == 'braking')
+            this.game.completedTask('user-stop');
     }
     
     createSmokeSystem(parentGroup) {
@@ -373,15 +379,6 @@ class Train extends BaseCart {
             this.animatedParts.eyes.forEach((eye)=>{
                 eye.Pupil.scale.y = Math.max(0.05, scaleY);
             });
-        } else {
-            /*
-            this.animatedParts.eyes.left.scale.y = 1;
-            this.animatedParts.eyes.right.scale.y = 1;
-            
-            const wiggle = Math.sin(Date.now() * 0.003) * 0.02;
-            this.animatedParts.eyes.left.position.x = 0.35 + wiggle * 0.5;
-            this.animatedParts.eyes.right.position.x = 0.35 + wiggle * 0.5;
-            */
         }
     }
 
@@ -431,7 +428,7 @@ class Train extends BaseCart {
         let newPos = [];
         let collisions = [];
 
-        let max_velocity = this.game.getEnv().MAX_VELOCITY ? this.game.getEnv().MAX_VELOCITY : GAME_SETTINGS.MAX_VELOCITY;
+        let max_velocity = this.getConst('MAX_VELOCITY');
 
         let vel = Math.min(newVelocity, max_velocity);
 
@@ -446,13 +443,24 @@ class Train extends BaseCart {
         });
 
         if (collisions.length > 0) {
-            if (collisions.find(collision => collision.edgeTrack)) {
-                allChain.forEach((cart, i)=>{
-                    cart.forwardTrain = !cart.forwardTrain;
-                    cart.trackPos.toggleDirect();
-                    cart.velocity = newVelocity;
-                });
+            let edgeCollision = collisions.find(collision => collision.edgeTrack);
+            if (edgeCollision) {
+                if (this.State() != 'wait') {
+                    if (this.data.wait)
+                        this.State('wait');
+                    else {
+
+                        if (edgeCollision.reflect) {
+                            allChain.forEach((cart, i)=>{
+                                cart.forwardTrain = !cart.forwardTrain;
+                                cart.trackPos.toggleDirect();
+                                cart.velocity = newVelocity;
+                            });
+                        }
+                    }
+                }
             } else {
+
                 let collistion = collisions[0];
 
                 let sameDirect = collistion.dot > 0;
@@ -464,10 +472,16 @@ class Train extends BaseCart {
                 this.State('braking');
             }
         } else {
-            allChain.forEach((cart, i)=>{
-                cart.trackPos.copy(newPos[i]);
-                cart.velocity = newVelocity;
-            });
+
+            if (this.State() == 'wait')
+                this.State('prepare');
+
+            if (['run', 'braking'].includes(this.State())) {
+                allChain.forEach((cart, i)=>{
+                    cart.trackPos.copy(newPos[i]);
+                    cart.velocity = newVelocity;
+                });
+            }
         }
     }
     
@@ -507,7 +521,7 @@ class Train extends BaseCart {
     toggle() {
         if (this.State() == 'run')
             this.State('braking');
-        else if (['stop', 'braking'].includes(this.State())) 
+        else if (this.State() == 'stop') 
             this.State('run');
     }
 
@@ -519,8 +533,21 @@ class Train extends BaseCart {
         });
     }
 
+    isMoving() {
+        return super.isMoving() && (this.State() != 'wait');
+    }
+
     dispose() {
         super.dispose();
+
+        if (!this.data.noDrag) {
+            eventBus.off('gameObject:down', this._onGaDown);
+            eventBus.off('gameObject:up', this._onGaUp);
+            eventBus.off('pre-victory', this._onPreVictory);
+            this.game.container.off('mouseleave', this._onMouseLeave);
+            $(window).off('blur', this._onMouseLeave);
+        }
+
         if (this.particles) {
             this.particles.dispose();
             this.particles = null;

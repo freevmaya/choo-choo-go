@@ -1,36 +1,12 @@
 // scripts/core/CameraController.js
 
-class CameraController {
+class CameraController extends BaseCameraController {
 
   constructor(game, options = null) {
 
-    this.options = {...options, ...{
-      followSpeed: CAMERA_FOLLOW_SPEED,
-      dragSensitivity: 0.001,
-
-    // Параметры масштабирования
-      minScale: 0.5,        // Минимальное приближение (дальше)
-      maxScale: 2.0,        // Максимальное приближение (ближе)
-      zoomSpeed: 0.05,      // Скорость масштабирования (мышь)
-      pinchSpeed: 0.005,    // Скорость масштабирования (щипок)
-      
-      // Параметры вращения
-      rotationSpeed: 0.01,   // Скорость вращения камеры
-      rotationSensitivity: 0.5 // Чувствительность вращения
-    }};
+    super(game, options);
 
     this.game = game;
-    this.enabled = true;
-    this.scaleFocus = 1;
-    this.targetFocus = this.calcTargetFocus();
-    this.folowGrid = false;
-
-    this.camera = new THREE.PerspectiveCamera(this.targetFocus, this.game.rendererManager.getAspectRatio(), 0.1, 100);
-    this.targetY = 0;
-
-    this.heightOffset = CAMERA_HEIGHT_OFFSET;
-    this.lookPoint = new THREE.Vector2();
-    this.targetPoint = new THREE.Vector2();
 
     // Параметры перетаскивания камеры (левая кнопка)
     this.isDraggingCamera = false;
@@ -64,8 +40,6 @@ class CameraController {
     this.onTouchEnd = this.onTouchEnd.bind(this);
     this.onWheel = this.onWheel.bind(this);
 
-    this.angle = Math.PI / 4; // Начальный угол камеры
-
     // Инициализируем обработчики
     this.initCameraDrag();
     this.initZoom();
@@ -82,44 +56,6 @@ class CameraController {
               break;
       }
     });
-  }
-
-  calcTargetFocus() {
-    let minsize = Math.min(this.game.container.width(), this.game.container.height());
-    let k = Math.min(minsize / MAXSCREENSIZE, 1);
-    let baseFocus = lerp(CAMERA_FOCUS[0], CAMERA_FOCUS[1], k);
-    // Применяем масштабирование: чем больше scaleFocus, тем меньше FOV (приближение)
-    // scaleFocus = 1 - норма, <1 - отдаление, >1 - приближение
-    let newFocus = baseFocus / this.scaleFocus;
-    return Math.max(10, Math.min(80, newFocus));
-  }
-
-  getLookCell() {
-    return this.targetPoint.clone();
-  }
-
-  setLookCell(value) {
-    this.targetPoint = value;
-    tracer.log(value);
-  }
-
-  setFocus(f) {
-    this.camera.fov = f;
-    this.camera.updateProjectionMatrix();
-  }
-
-  begin() {
-    this.targetFocus = this.calcTargetFocus();
-  }
-
-  reset() {
-    this.camera.position.set(0, 0, 12);
-    this.camera.lookAt(0, this.camera.position.y, 0);
-    this.targetPoint.set(0, 0);
-    this.lookPoint.set(0, 0);
-    this.scaleFocus = 1;
-    this.targetFocus = this.calcTargetFocus();
-    this.angle = Math.PI / 4;
   }
 
   getLookDirection() {
@@ -152,19 +88,6 @@ class CameraController {
       this.scaleFocus = newScale;
       this.targetFocus = this.calcTargetFocus();
     }
-  }
-
-  setZoom(scale) {
-    let newScale = Math.max(this.options.minScale, Math.min(this.options.maxScale, scale));
-    
-    if (newScale !== this.scaleFocus) {
-      this.scaleFocus = newScale;
-      this.targetFocus = this.calcTargetFocus();
-    }
-  }
-
-  getZoom() {
-    return this.scaleFocus;
   }
 
   initCameraDrag() {
@@ -202,8 +125,6 @@ class CameraController {
 
   /**
    * Получает среднюю точку между двумя касаниями
-   * @param {TouchList} touches - список касаний
-   * @returns {THREE.Vector2} средняя точка в экранных координатах
    */
   getCenterPoint(touches) {
     if (touches.length < 2) return null;
@@ -212,35 +133,9 @@ class CameraController {
     return new THREE.Vector2(centerX, centerY);
   }
 
-  /**
-   * Преобразует экранные координаты в мировую точку на плоскости Y=0
-   * @param {number} screenX - X координата на экране
-   * @param {number} screenY - Y координата на экране
-   * @returns {THREE.Vector3|null} мировая точка или null
-   */
-  screenToWorldPoint(screenX, screenY) {
-    const rect = this.game.container[0].getBoundingClientRect();
-    const mouseX = ((screenX - rect.left) / rect.width) * 2 - 1;
-    const mouseY = -((screenY - rect.top) / rect.height) * 2 + 1;
-    
-    const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), this.camera);
-    
-    // Находим пересечение с плоскостью Y = 0
-    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    const intersectionPoint = new THREE.Vector3();
-    
-    if (raycaster.ray.intersectPlane(plane, intersectionPoint)) {
-      return intersectionPoint;
-    }
-    return null;
-  }
-
   setEnable(value) {
-    if (this.enabled != value) {
-      this.enabled = value;
-      this.isDraggingCamera = false;
-    }
+    super.setEnable(value);
+    this.isDraggingCamera = false;
   }
 
   onMouseDown(event) {
@@ -453,7 +348,7 @@ class CameraController {
     // Применяем поворот
     delta.applyQuaternion(quaternion);
     
-    if (this.folowGrid) {
+    if (this.options.folowGrid) {
       // Если включено следование по сетке, используем привязку к ячейкам
       const cellSize = GAME_SETTINGS.CELL_SIZE;
 
@@ -491,6 +386,21 @@ class CameraController {
       
       this.targetPoint.set(newTargetX, newTargetY);
     }
+
+    if (this.userDraggedTimer) {
+      clearTimeout(this.userDraggedTimer);
+      this.userDraggedTimer = false;
+    }
+    
+    this.userDraggedTimer = setTimeout(()=>{
+      this.userDraggedTimer = false;
+    }, 1000);
+  }
+
+  update(dt) {
+    super.update(dt);
+    if (!this.userDraggedTimer && this.isTrainOutside())
+      this.trainToVisibility();
   }
 
   stopCameraDrag() {
@@ -508,7 +418,7 @@ class CameraController {
   }
 
   centerOnPosition(position, immediate = false) {
-    if (this.folowGrid) {
+    if (this.options.folowGrid) {
       const cellX = Math.floor(position.x / GAME_SETTINGS.CELL_SIZE);
       const cellZ = Math.floor(position.z / GAME_SETTINGS.CELL_SIZE);
       this.setLookPoint(cellX, cellZ, immediate);
@@ -540,30 +450,6 @@ class CameraController {
   getAngle() {
     return this.angle;
   }
-
-  update(dt) {
-    this.lookPoint.x = this.lookPoint.x + (this.targetPoint.x - this.lookPoint.x) * this.options.followSpeed * dt;
-    this.lookPoint.y = this.lookPoint.y + (this.targetPoint.y - this.lookPoint.y) * this.options.followSpeed * dt;
-
-    let lookAt;
-    if (this.folowGrid) {
-
-      let center = GAME_SETTINGS.CELL_SIZE / 2;
-
-      lookAt = new THREE.Vector3(this.lookPoint.x * GAME_SETTINGS.CELL_SIZE + center, 0, 
-          this.lookPoint.y * GAME_SETTINGS.CELL_SIZE + center);
-    } else {
-      lookAt = new THREE.Vector3(this.lookPoint.x, -this.heightOffset * 0.1, this.lookPoint.y);
-    }
-
-    let camPos = new THREE.Vector3(-this.heightOffset, this.heightOffset, 0);
-    const euler = new THREE.Euler(0, this.angle, 0);
-    camPos.applyEuler(euler);
-
-    this.camera.position.set(lookAt.x + camPos.x, lookAt.y + camPos.y, lookAt.z + camPos.z);
-    this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
-    this.setFocus(this.camera.fov + (this.targetFocus - this.camera.fov) * dt * this.options.followSpeed);
-  }
   
   setPosition(x, y, z) {
     this.camera.position.set(x, y, z);
@@ -575,12 +461,6 @@ class CameraController {
   
   getCamera() {
     return this.camera;
-  }
-  
-  resize(aspectRatio) {
-    this.camera.aspect = aspectRatio;
-    this.targetFocus = this.calcTargetFocus();
-    this.camera.updateProjectionMatrix();
   }
   
   dispose() {

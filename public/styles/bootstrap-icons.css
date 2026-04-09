@@ -11,6 +11,14 @@
     font-style: normal;
 }
 
+.bi-arrow-up-short::before {
+    content: "\F145";
+}
+
+.bi-arrow-counterclockwise::before {
+    content: "\F117";
+}
+
 .bi-volume-down::before {
     content: "\F60B";
 }

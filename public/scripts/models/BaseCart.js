@@ -1,27 +1,33 @@
-class BaseCart extends BaseStateMashine {
+class BaseCart extends BaseGameObject {
 	constructor() {
 		super();
 
         this.velocity = 0;
-        this.weight = this.defaultWeight();
         this.forwardTrain = true;
-
         this.moveDelta = 0;
 	}
 
     init(game, data) {
-        super.init(game);
         this.data = data;
-        let index = this.game.items.find(data.location[0], data.location[1]);
+
+        let size = this.size();
+        this.baseLength = size.length - size.captureLenght * 2;
+        super.init(game);
+        this.weight = this.defaultWeight();
+        this.resetTrackPos();
+        return this;
+    }
+
+    resetTrackPos() {
+        let index = this.game.items.find(this.data.location[0], this.data.location[1]);
         if (index > -1) {
             this.trackPos = new PositionCart(this, index);
-            if (data.trackPos)
-                this.trackPos.setCurrentChain(index, data.trackPos.pathIndex, data.trackPos.indexPosInChain, data.trackPos.forwardInTrack);
+            if (this.data.trackPos)
+                this.trackPos.setCurrentChain(index, this.data.trackPos.pathIndex, this.data.trackPos.indexPosInChain, this.data.trackPos.forwardInTrack);
          
-            this.forwardTrain = typeof data.location[2] == 'boolean' ? data.location[2] : true;
+            this.forwardTrain = typeof this.data.location[2] == 'boolean' ? this.data.location[2] : true;
             this.updatePosition();
         }
-        return this;
     }
 
     index() {
@@ -34,11 +40,11 @@ class BaseCart extends BaseStateMashine {
 
     toSaveData() {
         let cellPos = this.getCellPosition();
-        return {
+        return {...this.data, ...{
             type: this.constructor.name,
             location: [cellPos.x, cellPos.y, this.forwardTrain],
             trackPos: this.trackPos.toSaveData()
-        }
+        }};
     }
 
     getCellPosition() {
@@ -92,7 +98,6 @@ class BaseCart extends BaseStateMashine {
 	createModel() {
 
         let size = this.size();
-        this.baseLength = size.length - size.captureLenght * 2;
 
         this.base = new THREE.Group();
         const group = new THREE.Group();
@@ -101,7 +106,7 @@ class BaseCart extends BaseStateMashine {
 
         group.add(this.base);
 
-        const mainColor = 0xFF4444;
+        const mainColor = this.data.color ? this.data.color : 0xFF4444;
         const wheelColor = 0x333333;
         const rimColor = 0xCCCC33;
 
@@ -237,6 +242,16 @@ class BaseCart extends BaseStateMashine {
     update(dt) {
         this.updateWheels(dt);
         this.updatePosition();
+        
+        // Легкое покачивание вагона при движении
+        if (this.isMoving()) {
+            const sway = Math.sin(Date.now() * 0.008) * 0.01;
+            this.base.rotation.z = sway;
+            this.base.rotation.x = sway * 0.5;
+        } else {
+            this.base.rotation.z *= 0.95;
+            this.base.rotation.x *= 0.95;
+        }
     }
 
     isMoving() {
@@ -250,9 +265,8 @@ class BaseCart extends BaseStateMashine {
     }
 
     addedToChain() {
-        let train = this.headTrain();
-        if (this.data.taskName && train)
-            train.completedTask(this.data.taskName);
+        if (this.data.taskName)
+            this.game.completedTask(this.data.taskName);
     }
 
     deChain() {
@@ -260,7 +274,7 @@ class BaseCart extends BaseStateMashine {
         if (train) {
             train.removeChain(this);
             if (this.data.taskName)
-                train.deCompletedTask(this.data.taskName);
+                this.game.deCompletedTask(this.data.taskName);
         }
     }
 }

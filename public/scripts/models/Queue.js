@@ -1,4 +1,4 @@
-class Queue extends BaseStateMashine {
+class Queue extends BaseGameObject {
 	constructor(game, peopleSpace) {
 		super(game);
 		this.peopleSpace = peopleSpace;
@@ -15,11 +15,10 @@ class Queue extends BaseStateMashine {
 			direct.set(0, 0, 0);
 
 			setTimeout(()=>{
-				this.peopleSpace.disposePeople(object);				
+				this.peopleSpace.disposePeople(object);
+				if (this.peopleSpace.getPeopleCount() == 0)
+					this.peopleSpace.finishQueue(this);			
 			}, 0);
-
-			if (this.peopleSpace.getPeopleCount() == 0)
-				this.peopleSpace.finishQueue(this);
 		}
 
 		return {

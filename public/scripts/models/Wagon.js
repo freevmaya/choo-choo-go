@@ -32,7 +32,7 @@ class Wagon extends BaseCart {
     getWheelPositions() {
         let size = this.size();
         let fc = size.width / 2 + size.wheel.width / 2;
-        let d = this.baseLength / 2.5;
+        let d = this.baseLength / 4;
         return [
             { x: -d, z: -fc, radius: size.wheel.radius },
             { x: -d, z: fc, radius: size.wheel.radius },
@@ -97,22 +97,7 @@ class Wagon extends BaseCart {
     }
 
     onClick(hit, eventData) {
-        super.onClick(hit, eventData);
         this.deChain();
-    }
-    
-    update(dt) {
-        super.update(dt);
-        
-        // Легкое покачивание вагона при движении
-        if (this.isMoving()) {
-            const sway = Math.sin(Date.now() * 0.008) * 0.01;
-            this.base.rotation.z = sway;
-            this.base.rotation.x = sway * 0.5;
-        } else {
-            this.base.rotation.z *= 0.95;
-            this.base.rotation.x *= 0.95;
-        }
     }
 
     defaultWeight() {

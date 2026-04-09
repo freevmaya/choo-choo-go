@@ -90,7 +90,7 @@ class RaycasterManager {
     this.mouse.copy(this.getMousePosition(clientX, clientY));
     
     // Устанавливаем луч из камеры
-    const camera = this.game.cameraController.getCamera();
+    const camera = this.game.camera;
     this.raycaster.setFromCamera(this.mouse, camera);
     
     // Определяем объекты для проверки
@@ -137,14 +137,22 @@ class RaycasterManager {
     if (pos.clone().sub(this.down).length() > 2)
       return;
     
-    this.doRaycast(pos);
+    this.doRaycastClick(pos);
   }
 
-  doRaycast(pos) {
+  doRaycastClick(pos) {
     // Выполняем рейкастинг
-    const intersects = this.raycast(pos.x, pos.y);
+    let intersects = this.raycast(pos.x, pos.y);
     
     if (intersects.length > 0) {
+
+      let haveHandle = intersects.filter(item => item.object.userData?.onClick);
+
+      if (haveHandle.length > 0) {
+        haveHandle.forEach(h => h.object.userData.onClick(h.object));
+        return;
+      }
+
       // Генерируем событие клика
       this.dispatchEvent('gameObject:click', {
         type: 'click',
@@ -237,7 +245,7 @@ class RaycasterManager {
     if (pos.clone().sub(this.down).length() > 2)
       return;
     
-    this.doRaycast(pos);
+    this.doRaycastClick(pos);
   }
   
   /**
@@ -295,7 +303,7 @@ class RaycasterManager {
     this.debugLines = [];
     
     // Создаем новую линию
-    const cameraPos = this.game.cameraController.getCamera().position.clone();
+    const cameraPos = this.game.camera.position.clone();
     const points = [cameraPos, point.clone()];
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     const line = new THREE.Line(geometry, this.debugMaterial);
@@ -347,7 +355,7 @@ class RaycasterManager {
       planeNormal = new THREE.Vector3(0, 1, 0);
 
     const mousePos = this.getMousePosition(clientX, clientY);
-    const camera = this.game.cameraController.getCamera();
+    const camera = this.game.camera;
     this.raycaster.setFromCamera(mousePos, camera);
     const rayDirection = this.raycaster.ray.direction.clone().normalize();
     const rayOrigin = this.raycaster.ray.origin.clone();

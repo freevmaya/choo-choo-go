@@ -1,6 +1,7 @@
-class BaseGameObject {
+class BaseGameObject extends BaseStateMashine {
     constructor(game) {
         
+        super();
         // Для хранения ресурсов, которые нужно освободить
         this._resourcesToDispose = {
             geometries: new Set(),
@@ -18,10 +19,11 @@ class BaseGameObject {
 
     toSaveData() {
         let cellPos = this.getCellPosition();
-        return {
+        let data = {...this.data, ...{
             type: this.constructor.name,
             location: [cellPos.x, cellPos.y, this.getCellRotation()]
-        }
+        }};
+        return data;
     }
 
     init(game) {
@@ -43,6 +45,10 @@ class BaseGameObject {
         if (DEV)
             console.log(`Init object '${this.constructor.name}'`);
         return this;
+    }
+
+    getConst(name, defaultValue=null) {
+        return this.game.getConst(name, defaultValue);
     }
 
     getRotation() {
@@ -163,12 +169,12 @@ class BaseGameObject {
             this._resourcesToDispose.textures.add(texture);
     }
 
-    _registerClickable(mesh) {
+    _registerClickable(mesh, onClick = null) {
         if (mesh) {
 
             When(() => this.game && this.game.raycasterManager)
                 .then(() => {
-                    this.game.registerClickableObject(mesh, this);
+                    this.game.registerClickableObject(mesh, this, onClick);
                     this._resourcesToDispose.clickable.add(mesh);
                 });
         }

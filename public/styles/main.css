@@ -45,10 +45,10 @@ body {
   width: 100dvw;
   margin: auto;
   position: relative;
+  overflow: hidden;
 }
 
 #game-title {
-  width: 60%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -510,6 +510,7 @@ canvas {
 
 .score-indicator {
   position: absolute;
+  display: none;
   background-image: url(dialog/button.png);
   background-position: center;
   background-repeat: no-repeat;
@@ -602,16 +603,65 @@ body {
   }
 }
 
+.toast-message {
+  background: var(--tools-bg-color);
+  padding: 10px;
+  border-radius: 20px;
+  box-shadow: 2px 2px 6px black;
+  z-index: 101;
+  top: 40px;
+  transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast-message .footer {
+  text-align: center;
+}
+
+.toast-message .footer button {
+  margin-top: 10px;
+}
+
+.toast-message.show {
+  transform: translateX(calc(100vw - 100% - 10px));
+}
+
+.toast-message.hide {
+  transform: translateX(calc(100vw + 100%));
+}
+
+.toast-message .content {
+  padding: 10px;
+  border-radius: 15px;
+  background: white;
+}
+
+.toast-message .head {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  justify-content: space-between;
+}
+
+
 /*______________library____________*/
 
 
-.dev-block, .library-block {
+.dev-block, .library-block, .toast-message, .train-pointer {
   position: absolute;
 }
 
 .dev-block {
   bottom: 30px;
+  transition: left 0.5s ease;
+  z-index: 101;
+}
+
+.dev-block.show {
   left: 10px;
+}
+
+.dev-block.hide {
+  left: -120px;
 }
 
 .dev-block .container, 
@@ -631,9 +681,19 @@ body {
 }
 
 .dev-block .container {
-  height: 20px;
+  height: 50px;
   overflow: hidden;
   transition: height 0.5s ease;
+}
+
+@media (pointer: coarse) {
+  .dev-block .container {
+    height: auto;
+  }
+
+  .library-block {
+    left: 0px !important;
+  }
 }
 
 .dev-block .container:hover {
@@ -642,11 +702,7 @@ body {
 
 .library-block {
   top: 50%;
-  left: -120px;
   transition: left 0.5s ease;
-}
-
-.library-block:hover {
   left: 0px;
 }
 
@@ -704,8 +760,15 @@ body {
   pointer-events: none;
 }
 
+.ui-draggable-dragging img {
+  max-width: 120px;
+  max-height: 120px;
+  height: auto;
+  width: auto;
+}
+
 @media (max-width: 500px) {
-  .library-block {
+  .library-block:hover {
     left: 0px;
   }
 
@@ -718,8 +781,46 @@ body {
 
 .railway-spawner {
   position: fixed;
+  left: 50%;
   top: 30px;
-  z-index: 100;
+  z-index: 0;
+  transition: left 0.5s ease;
+}
+
+.rotate-block {
+  position: absolute;
+  padding: 5px;
+  border-radius: 25px;
+  display: none;
+  background: var(--tools-bg-color);
+  z-index: 101;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-left: -20px;
+  transition: left 0.1s ease, right 0.1s ease;
+  opacity: 0.6;
+}
+
+.rotate-block .bi {
+  color: white;
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  box-shadow: -2px 2px 6px black;
+  animation: gentleSwing 2s ease-in-out infinite;
+}
+
+@keyframes gentleSwing {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(45deg);
+  }
 }
 
 .railway-spawner .container {
@@ -728,6 +829,7 @@ body {
   color: gold;
   padding: 10px;
   border-radius: 0 0 25px 25px;
+  border: 2px solid rgba(0, 0, 0, 0);
   font-size: 1.2rem;
   font-weight: bold;
   z-index: 100;
@@ -735,11 +837,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  width: 100px;
+  margin-left: -50px;
   cursor: pointer;
 }
 
-.railway-spawner .spawner-item {
+.spawner-item {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -749,9 +851,141 @@ body {
 }
 
 .railway-spawner .item-preview {
-  width: 64px;
-  height: 64px;
+  width: 120px;
+  height: 50px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  animation: itemSwing 2s ease-in-out infinite;
+  border-radius: 10px;
+}
+
+@keyframes itemSwing {
+  0%, 100% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+@media (max-width: 500px) {
+  .railway-spawner .item-preview {
+    width: 80px;
+    height: 40px;
+  }
+
+  .spawner-item {
+    padding: 5px;
+    border-radius: 8px;
+  }
+
+  .railway-spawner .container {
+    padding: 5px;
+    border-radius: 0 0 14px 14px;
+    margin-left: -40px;
+  }
+
+  .toast-message {
+    padding: 5px;
+  }
+
+  .toast-message .content {
+    padding: 5px;
+    border-radius: 15px;
+    background: white;
+    font-size: 12px;
+  }
+}
+
+.train-pointer {
+}
+
+.train-pointer > div {
+  margin-left: -25px;
+  margin-top: -25px;
+  background: var(--tools-bg-color);
+  padding: 5px;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  z-index: 1;
+  display: flex;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.train-pointer .bi {
+  color: gold;
+  text-align: center;
+  font-size: 24px;
+  line-height: 24px;
+}
+
+/*______________________HAND-TOUCH___________________*/
+
+.hand-touch.hide {
+  display: none;
+}
+
+.hand-touch.show {
+  display: block;
+}
+
+.hand-touch {
+  position: absolute;
+  z-index: 102;
+  pointer-events: none;
+  margin-left: -10px;
+  margin-top: -64px;
+}
+
+.hand-touch .img {
+  width: 64px;
+  height: 64px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url(images/hand-touch.png);
+}
+
+.hand-touch.up {
+  background-position: 0px 0px;
+}
+
+.hand-touch.down {
+  background-position: 64px 0px;
+}
+
+.hand-touch.pushAnim .img {
+  animation: downUp1 1.2s ease-in-out infinite,
+            shiftSprite1 1.2s steps(1) infinite;
+}
+
+.hand-touch.rightMoveAnim .img {
+  animation: downUp2 1.2s ease-in-out infinite,
+            shiftSprite2 1.2s steps(1) infinite;
+}
+
+@keyframes downUp1 {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
+}
+
+@keyframes shiftSprite1 {
+    0%, 60% { background-position: 0 0; }
+    15%, 50%  { background-position: -64px 0; }
+}
+
+@keyframes shiftSprite2 {
+    0%, 50% { background-position: 0 0; }
+    15%, 40% { background-position: -64px 0; }
+}
+
+@keyframes downUp2 {
+    0%, 100% { 
+      transform: translate(0, 0); 
+    }
+    50% { 
+      transform: translate(15px, 8px); 
+    }
 }

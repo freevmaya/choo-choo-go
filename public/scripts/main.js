@@ -4,6 +4,9 @@ class RailGame extends BaseGame {
     this.scene = new THREE.Scene();
     this.rendererManager = new RendererManager(this.container);
     this.rendererManager.init();
+
+
+    this.camera = new THREE.PerspectiveCamera(40, this.rendererManager.getAspectRatio(), 0.1, 100);
     this.cameraController = new CameraController(this);
     this.levelLoader = new LevelLoader(this);
     this.lights = [];
@@ -11,8 +14,8 @@ class RailGame extends BaseGame {
 
     eventBus.on('change-cells', this.onChangeCells.bind(this));
 
-    this.gameModes = ['play', 'edit', 'delete', 'playAndEdit', 'dropGame'];
-    this.gameModeIndex = 0;
+    this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame'];
+    this.gameMode('Play');
   }
 
   onChangeCells(cells) {
@@ -21,6 +24,8 @@ class RailGame extends BaseGame {
   preVictory(object) {
     let pos = object.getPosition();
     this.showMagicSwirl(pos.x, pos.y, pos.z);
+
+    eventBus.emit('pre-victory');
 
     setTimeout(()=>{
         this.gameState.set(GAME_STATE.VICTORY);
@@ -31,20 +36,38 @@ class RailGame extends BaseGame {
 
     super.initUI();
 
+    this.toast = new ToastMessage(this);
+    this.handTouch = new HandTouch(this);
+
     if (DEV)
       this.initDevTools();
   }
 
+  getConst(name, defaultValue = null) {
+      return this.getEnv()[name] ? this.getEnv()[name] : 
+            (typeof GAME_SETTINGS[name] != 'undefined' ? GAME_SETTINGS[name] : defaultValue);
+  }
+
   isPlaying() {
-    return this.gameState.isPlaying() && ((this.gameMode() == 'play') || (this.gameMode() == 'playAndEdit'))
+    return this.gameState.isPlaying() && !['Editor', 'Delete'].includes(this.gameMode());
+  }
+
+  resetGame() {
+    super.resetGame();
+    this._resetGameModeModule();
   }
 
   gameMode(state = null) {
 
-    if (state == null)
-      return this.gameModes[this.gameModeIndex];
-
     let index = 0;
+
+    if (state == null) {
+      if (typeof this.gameModeIndex == 'undefined')
+        return this.gameMode(index);
+
+      return this.gameModes[this.gameModeIndex];
+    }
+
     if (typeof state == 'string') {
       index = this.gameModes.indexOf(state);
       if (index == -1) {
@@ -57,9 +80,64 @@ class RailGame extends BaseGame {
     index = clamp(index, 0, this.gameModes.length - 1);
     if (this.gameModeIndex != index) {
       this.gameModeIndex = index;
+      this._resetGameModeModule();
+
       console.log(`Change gameMode: ${this.gameMode()}`);
       eventBus.emit('game-mode-change', this.gameMode());
     }
+
+    return this.gameModes[this.gameModeIndex];
+  }
+
+  setGameIndex(value) {
+    let result = super.setGameIndex(value);
+    this._resetTask();
+    return result;
+  }
+
+  _resetTask() {
+    let env = this.getEnv();
+    this.task = env.task ? env.task : ['finish'];
+    this.taskCompleted = [];
+  }
+
+  _resetGameModeModule() {
+    if (this.modeModule) {
+      this.modeModule.dispose();
+      this.modeModule = null;
+    }
+
+    this.modeModule = createObject(this.gameModes[this.gameModeIndex], this);
+  }
+
+  isCompletedTask(task) {
+      return this.taskCompleted.includes(task);
+  }
+
+  completedTask(task) {
+
+    if (!this.isCompletedTask(task)) {
+      this.taskCompleted.push(task);
+      console.log('Tasks completed: ' + JSON.stringify(this.taskCompleted));
+      eventBus.emit('complete-task', task);
+    }
+
+    if (this.task) {
+      let count = this.task.length;
+      this.taskCompleted.forEach(t=>{
+          if (this.task.includes(t))
+              count--;
+      })
+      if (count <= 0) {
+          this.preVictory(this.items.findAsTask(task));
+      }
+    }
+  }
+
+  deCompletedTask(task) {
+    let idx = this.taskCompleted.indexOf(task);
+    if (idx > -1)
+      this.taskCompleted.splice(idx, 1);
   }
 
   saveProject() {
@@ -219,12 +297,13 @@ class RailGame extends BaseGame {
   createGameObjects() {
     let env = this.getEnv();
 
-    this.gameMode(env.GAME_MODE || 'play');
+    this.gameMode(env.GAME_MODE || 'Play');
 
     this.createLights();
     this.createGameUI();
     super.createGameObjects();
-    this.cameraController.reset();
+    if (this.cameraController)
+      this.cameraController.reset();
     this.ground = (new Ground(env.GROUND_IMAGE_PATH, env.GROUND_COLOR)).init(this); //
 
     if (DEV) {
@@ -270,15 +349,20 @@ class RailGame extends BaseGame {
   
   onResize() {
     this.rendererManager.resize();
-    this.cameraController.resize(this.rendererManager.getAspectRatio());
+    if (this.cameraController)
+      this.cameraController.resize(this.rendererManager.getAspectRatio());
   }
 
   update(dt) {
     if (this.isPlaying())
       super.update(dt);
 
-    this.cameraController.update(dt);
-    this.rendererManager.render(this.scene, this.cameraController.getCamera());
+    if (this.handTouch)
+      this.handTouch.update(dt);
+
+    if (this.cameraController)
+      this.cameraController.update(dt);
+    this.rendererManager.render(this.scene, this.camera);
   }
 }
 

@@ -662,7 +662,7 @@ class MagicSwirlParticles extends ParticleSystemObject {
           speedMax: 2,
           colorStart: 0xffdd88,
           colorEnd: 0xff6600,
-          sizeStart: 0.5,
+          sizeStart: 0.2,
           sizeEnd: 0.1,
           emitDirection: new THREE.Vector3(0, 1, 0),
           emissionRate: 80,

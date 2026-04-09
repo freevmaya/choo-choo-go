@@ -1,5 +1,6 @@
 class Library {
-	constructor(parent, dropZone, classes) {
+	constructor(game, parent, dropZone, classes) {
+		this.game = game;
 		this.elem = $(`<div class="library-block">
 	        <div class="container">
 	          <div class="title"><?=Lang('Library')?></div>
@@ -19,8 +20,9 @@ class Library {
 			tolerance: 'intersect',
 
 		    drop: (event, ui) => {
-		    	if (this.item && this.access && this.dropZoneOver)
-		        	eventBus.emit('item-drop', this);
+		    	if (this.item && this.access && this.dropZoneOver) {
+		    		this.doDrop(this.game.ground.getCurrentCell());
+		    	}
 		    }
 		});
 	}
@@ -38,13 +40,20 @@ class Library {
 
 		let path = `images/library/${item.type.name}.png`;
 		let itemCtrl = $(`<div class="item draggable"><img src="${path}"></img></div>`);
-		let cell = null;
 		let _this = this;
 
 		itemCtrl.data('item', item);
 
 		itemCtrl.draggable({
-			helper: 'clone',
+			helper: function() {
+		        let clone = $(this).clone();
+		        clone.css({
+		            'position': 'absolute',
+		            'z-index': 10000
+		        });
+		        $('body').append(clone);
+		        return clone;
+		    },
 			cursor: 'grabbing',
             opacity: 0.7,
             zIndex: 1000,
@@ -84,20 +93,60 @@ class Library {
 			    // Обновляем состояние
 			    if (isOver !== this.dropZoneOver)
 			        this.dropZoneOver = isOver;
-			    
-	            e.item = item;
 
-            	if (this.dropZoneOver) {
-	            	e.callback = (access, a_cell) => {
-	            		this.cell = a_cell;
-	            		this.access = access;
-	            	};
+			    console.log('drag');
 
-	            	eventBus.emit('item-drag', e);
-	            } else eventBus.emit('item-drag', e);
+			    this.access = this.checkDrop(this.game.ground.getCurrentCell());
+			    this.game.ground.hoverShow(true, this.access);
             }
         });
 
 		this.elem.find('#library').append(itemCtrl);
+	}
+
+	checkDrop(cell) {
+		if (cell) {
+
+	        let index = this.game.items.find(cell);
+	        if (index == -1) {
+
+	          if (this.game.items.findObject(cell) > -1) {
+	            return false;
+	          }
+
+	          if (isSubClass(this.item.type, BaseCart))
+	          	return false;
+	        } else
+	        	if (isSubClass(this.item.type, BaseCellObject))
+	          		return false;
+	    }
+	    return true;
+	}
+
+	doDrop(cell) {
+		if (cell && this.access) {
+
+	      	if (isSubClass(this.item.type, BaseTrack)) {
+		        let dropItem = this.game.items.addTrackItem({
+		          type: this.item.type,
+		          location: [cell.x, cell.y, 0]
+		        });
+		        dropItem.connectToNearest();
+		    } else if (isSubClass(this.item.type, BaseCellObject)) {
+		    	let dropItem = this.game.items.addObject({
+		          type: this.item.type,
+		          location: [cell.x, cell.y, 0]
+		        });
+		    } else if (isSubClass(this.item.type, BaseCart)) {
+		    	let dropItem = this.game.items.addCart({
+		          type: this.item.type,
+		          location: [cell.x, cell.y, 0]
+		        });
+		    }
+		}
+	}
+
+	dispose() {
+		this.elem.remove();
 	}
 }

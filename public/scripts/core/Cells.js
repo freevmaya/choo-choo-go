@@ -20,142 +20,37 @@ class Cells {
 		eventBus.emit('change-cells', this);
 	}
 
-	onAfterDrop(data) {
-		if (data.access) {
-
-	      	if (isSubClass(data.item.type, BaseTrack)) {
-		        let dropItem = this.addTrackItem({
-		          type: data.item.type,
-		          location: [data.cell.x, data.cell.y, 0]
-		        });
-		        dropItem.connectToNearest();
-		        this.doAfterChange();
-		    } else if (isSubClass(data.item.type, BaseCellObject)) {
-		    	let dropItem = this.addObject({
-		          type: data.item.type,
-		          location: [data.cell.x, data.cell.y, 0]
-		        });
-		        this.doAfterChange();
-		    } else if (isSubClass(data.item.type, BaseCart)) {
-		    	let dropItem = this.addCart({
-		          type: data.item.type,
-		          location: [data.cell.x, data.cell.y, 0]
-		        });
-		        this.doAfterChange();
-		    }
+	delete(ga) {
+		if (ga) {
+			if (ga instanceof BaseCart) {
+				let idx = this.carts.indexOf(ga);
+				if (idx > -1) {
+					this.carts.splice(idx, 1);
+					ga.dispose();
+				}
+			} else if (ga instanceof BaseTrack) {
+				let idx = this.items.indexOf(ga);
+				if (idx > -1) {
+					this.items.splice(idx, 1);
+					ga.dispose();
+				}
+			} else {
+				let idx = this.objects.indexOf(ga);
+				if (idx > -1) {
+					this.objects.splice(idx, 1);
+					ga.dispose();
+				}
+			}
 		}
 	}
 
-	onCheckCell(data) {
-	    if (data.cell) {
-
-	        let index = this.find(data.cell);
-	        if (index == -1) {
-
-	          if (this.findObject(data.cell) > -1) {
-	            data.callback(false);
-	            return;
-	          }
-
-	          //let neares_list = this.findNearest(data.cell);
-	          if (isSubClass(data.item.type, BaseCart))
-	          	data.callback(false);
-	          else data.callback(true);
-
-	        } else {
-
-	        	if (isSubClass(data.item.type, BaseCellObject))
-	          		data.callback(false);
-	          	else data.callback(true);
-	        }
-	    }
-	}
-
-	doRotateTrack(cell) {
-		let trackIndex = this.find(cell);
-		if (trackIndex > -1) {
-	        let track = this.get(trackIndex);
-
-	        if (this.game.gameMode() == 'playAndEdit') {
-	        	if (track.isAwailableRotate()) {
-	        		track.nextRotation();
-		        	this.doAfterChange();
-	        		return true;
-	        	}
-	        } else if (!track.isRotationComplete()) {
-	          	track.nextRotation();
-	          	track.connectToNearest();
-	          	let carts = this.carts.filter(cart => cart.getCellPosition().equals(cell));
-	          	carts.forEach((cart)=>{
-	          		cart.updatePosition();
-	          	});
-	        	this.doAfterChange();
-	        	return true;
-	        }
-	    }
-	    return false;
-	}
-
-	showOrientation(cell) {
-		let trackIndex = this.find(cell);
-	    if (trackIndex > -1) {
-	        let track = this.get(trackIndex);
-	        track.showOrientation();
-	    }
-	}
-
-	onGroundClick(cell) {
-		if (DEV && (this.key == 'Shift')) {
-			this.showOrientation(cell);
-			return;
-		}
-		if (this.game.gameMode() == 'edit') {
-			this.doRotateTrack(cell);
-		} else {
-
-		    let trackIndex = this.find(cell);
-		    if (trackIndex > -1) {
-		        let track = this.get(trackIndex);
-
-		        if (this.game.gameMode() == 'delete') {
-		        	let idx = this.items.indexOf(track);
-	   				if (idx > -1) {
-	   					this.items.splice(idx, 1);
-	   					track.dispose();
-	   				}
-		        }
-		    }
-
-		    if (this.game.gameMode() == 'play') 
-		    	this.runTrainToCell(cell);
-		    else if (this.game.gameMode() == 'playAndEdit')  {
-				if (!this.doRotateTrack(cell))
-		    		this.runTrainToCell(cell);
-		    }
-		    
-		}
-	}
-
-	runTrainToCell(cell) {
-		/*
-		let trainRec = this.findNearestCart(cell, Train);
-    	if (trainRec) {
-
-    		let direct = trainRec.cart.trackPos.currentTrack.calcDirect();
-    		let sameDirect = direct.dot(trainRec.direct) > 0
-
-    		if (trainRec.cart.forwardTrain != trainRec.cart.trackPos.forwardInTrack)
-    			sameDirect = !sameDirect;
-
-    		console.log(`sameDirect: ${sameDirect}`);
-    		if (trainRec.cart.State() != 'run') {
-	    		trainRec.cart.setForward(
-	    			sameDirect
-	    		);
-    			trainRec.cart.State('run');
-    		}
-
-    	}*/
+	findAsTask(taskName, field='taskName') {
+		let ga = this.carts.find(c=>c.data[field] === taskName);
+		if (!ga)
+			ga = this.objects.find(o=>o.data[field] === taskName);
+		if (!ga)
+			ga = this.items.find(i=>i.data[field] === taskName);
+		return ga;
 	}
 
 	findNearestCart(cell, classCart) {
@@ -174,12 +69,6 @@ class Cells {
 	}
 
 	initListeners() {
-
-	    eventBus.on('check-cell', this._onCheckSell = this.onCheckCell.bind(this));
-	    eventBus.on('item-drop', this._onItemDrop = this.onAfterDrop.bind(this));
-	    eventBus.on('ground-click', this._onGroundClick = this.onGroundClick.bind(this));
-	   	eventBus.on('gameObject:click', this._handleObjectClick = this.handleObjectClick.bind(this));
-
 	   	$(window).on('keydown', (e)=>{
 	   		this.key = e.key;
 	   	});
@@ -191,56 +80,6 @@ class Cells {
 	   	$(window).on('blur', (e)=>{
 	   		this.key = null;
 	   	});
-	}
-
-	handleObjectClick(data) {
-	    // Проверяем структуру данных
-	    let hit = null;
-	    
-	    if (data.intersects && data.intersects[0]) {
-	      	hit = data.intersects[0];
-
-	      	const object = hit.object;
-   			let ga = object.userData?.gameObject;
-
-   			if (!ga) 
-   				return;
-
-   			if (this.game.gameMode() == 'delete') {
-	   			if (ga instanceof BaseCart) {
-	   				let idx = this.carts.indexOf(ga);
-	   				if (idx > -1) {
-	   					this.carts.splice(idx, 1);
-	   					ga.dispose();
-	   				}
-	   			} else if (ga instanceof BaseTrack) {
-	   				let idx = this.items.indexOf(ga);
-	   				if (idx > -1) {
-	   					this.items.splice(idx, 1);
-	   					ga.dispose();
-	   				}
-	   			} else {
-	   				let idx = this.objects.indexOf(ga);
-	   				if (idx > -1) {
-	   					this.objects.splice(idx, 1);
-	   					ga.dispose();
-	   				}
-	   			}
-	   		} else if (this.game.gameMode() == 'edit') {
-	   			this.doRotateTrack(ga.getCellPosition());
-	   			if (ga instanceof BaseCellObject) {
-	   				ga.nextRotation();
-	   			} else if (ga instanceof BaseCart) {
-	   				ga.trackPos.forwardInTrack = !ga.trackPos.forwardInTrack;
-	   				ga.updatePosition();
-	   			}
-	   		} else if (this.game.gameMode() == 'playAndEdit') {
-	   			if (ga instanceof BaseCellObject) {
-		    		if (!this.doRotateTrack(ga.getCellPosition()))
-		    			this.runTrainToCell(ga.getCellPosition());
-	   			}
-	   		}
-	    }
 	}
 
 	init(railway, carts, objects) {
@@ -261,20 +100,46 @@ class Cells {
 		    });
 	}
 
+	getObjectsCell(cell) {
+		let result = [];
+		this.items.forEach(tk => {
+			if (tk.getCellPosition().equals(cell))
+				result.push(tk);
+		});
+
+		this.carts.forEach(cart => {
+			if (cart.getCellPosition().equals(cell))
+				result.push(cart);
+		});
+
+		this.objects.forEach(obj => {
+			if (obj.getCellPosition().equals(cell))
+				result.push(obj);
+		});
+
+		return result;
+	}
+
 	addCart(data) {
     	let item = createObject(data.type, data).init(this.game, data);
 		this.carts.push(item);
+
+		this.doAfterChange();
 	}
 
 	addTrackItem(data) {
 		let item = createObject(data.type, data).init(this.game);
 		this.items.push(item);
+
+		this.doAfterChange();
 		return item;
 	}
 
 	addObject(data) {
 		let item = createObject(data.type, data).init(this.game);
 		this.objects.push(item);
+
+		this.doAfterChange();
 		return item;
 	}
 
@@ -283,7 +148,7 @@ class Cells {
 	}
 
 	findObject(cellX, cellY) {
-		let cell = typeof cellX == 'object' ? cellX : new Vector2Int(cellX, cellY);
+		let cell = typeof cellX == 'object' ? cellX.clone() : new Vector2Int(cellX, cellY);
 
 		let index = -1;
 		for (let i=0; i<this.objects.length; i++) {
@@ -307,6 +172,10 @@ class Cells {
                 }
         }
         return index;
+	}
+
+	findTrains() {
+		return this.carts.filter(c => c instanceof Train);
 	}
 
 	find(cellX, cellY) {		
@@ -345,6 +214,101 @@ class Cells {
         return result;
 	}
 
+	/**
+	 * Находит все пути от начального трека до конечного
+	 */
+	findPathsTo(startTrack, endTrack, possible = true) {
+	    const paths = [];
+	    const visited = new Set();
+	    
+	    const dfs = (current, path) => {
+	        if (current === endTrack) {
+	            paths.push([...path]);
+	            return;
+	        }
+	        
+	        const connections = possible ? this.findNearest(current.getCellPosition()) : current.findConnections();
+	        for (const idx of connections) {
+	            const next = this.items[idx];
+	            if (!visited.has(next)) {
+	                visited.add(next);
+	                dfs(next, [...path, next]);
+	                visited.delete(next);
+	            }
+	        }
+	    };
+	    
+	    dfs(startTrack, [startTrack]);
+	    return paths;
+	}
+
+	/**
+	 * Находит кратчайший путь от начального трека до конечного (BFS)
+	 */
+	findShortestPath(startTrack, endTrack, possible = true) {
+	    if (startTrack === endTrack) return [startTrack];
+	    
+	    const queue = [[startTrack]];
+	    const visited = new Set([startTrack]);
+	    
+	    while (queue.length > 0) {
+	        const path = queue.shift();
+	        const current = path[path.length - 1];
+	        
+	        const connections = possible ? this.findNearest(current.getCellPosition()) : current.findConnections();
+	        for (const idx of connections) {
+	            const next = this.items[idx];
+	            if (!visited.has(next)) {
+	                if (next === endTrack) {
+	                    return [...path, next];
+	                }
+	                visited.add(next);
+	                queue.push([...path, next]);
+	            }
+	        }
+	    }
+	    
+	    return null;
+	}
+
+	/**
+	 * Получает всю цепочку треков от стартовой точки до конечной (один путь)
+	 */
+	getTrackChain(startTrack, endTrack) {
+	    return this.findShortestPath(startTrack, endTrack);
+	}
+
+	/**
+	 * Проверяет, существует ли путь между треками
+	 */
+	isConnected(trackA, trackB) {
+	    return this.findShortestPath(trackA, trackB) !== null;
+	}
+
+	//Получает все треки, достижимые от заданного
+	getReachableTracks(startTrack, possible = true) {
+	    const reachable = [];
+	    const visited = new Set();
+	    const queue = [startTrack];
+	    visited.add(startTrack);
+	    
+	    while (queue.length > 0) {
+	        const current = queue.shift();
+	        reachable.push(current);
+	        
+	        const connections = possible ? this.findNearest(current.getCellPosition()) : current.findConnections();
+	        for (const idx of connections) {
+	            const next = this.items[idx];
+	            if (!visited.has(next)) {
+	                visited.add(next);
+	                queue.push(next);
+	            }
+	        }
+	    }
+	    
+	    return reachable;
+	}
+
 	clear() {
 		this.items.forEach(ga => ga.dispose());
 		this.objects.forEach(ga => ga.dispose());
@@ -356,9 +320,5 @@ class Cells {
 	}
 
 	dispose() {
-	    eventBus.off('check-cell', this._onCheckSell);
-	    eventBus.off('item-drop', this._onItemDrop);
-	    eventBus.off('ground-click', this._onGroundClick);
-	   	eventBus.off('gameObject:click', this._handleObjectClick);
 	}
 }

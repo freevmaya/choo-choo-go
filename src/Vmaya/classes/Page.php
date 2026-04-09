@@ -132,7 +132,6 @@ class Page {
 					$request['id'] = $value;
 				else {
 					$subpage = $value;
-					$classFileName = dirname(__FILE__).'/'.$page.'/'.$subpage.'.php';
 				}
 			}
 		}

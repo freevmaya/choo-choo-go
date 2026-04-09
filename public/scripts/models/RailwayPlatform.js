@@ -42,11 +42,10 @@ class RailwayPlatform extends BaseCellObject {
     
     // Материалы
     this.materials = {};
-    this.peopleCount = data.peopleCount;
   }
 
   getPeopleCount() {
-    return this.peopleCount;
+    return this.people.length;
   }
 
   disposePeople(human) {
@@ -59,16 +58,16 @@ class RailwayPlatform extends BaseCellObject {
 
   toSaveData() {
       let cellPos = this.getCellPosition();
-      return {
+      return {...this.data, ...{
           type: this.constructor.name,
           location: [cellPos.x, cellPos.y, this.getCellRotation()],
           peopleCount: this.people.length
-      }
+      }};
   }
 
   init(game) {
     super.init(game);
-    this.injectPeople(this.peopleCount);
+    this.injectPeople(this.data.peopleCount);
 
     eventBus.on('runOver', this._onRunOver = this.onRunOver.bind(this));
     eventBus.on('change_cart_state', this._onChangeTrainState = this.onChangeTrainState.bind(this));
@@ -92,7 +91,8 @@ class RailwayPlatform extends BaseCellObject {
         let train = cart.headTrain();
         if (train && ['run', 'braking'].includes(train.State())) {
 
-          if (this.data.taskName) { // Тормозим если есть имя задания
+          if (this.data.taskName && !this.game.isCompletedTask(this.data.taskName)) { 
+            // Тормозим если есть имя задания и оно еще не выполнено
             this.parked = cart;
             train.State('braking');
           }
@@ -117,10 +117,11 @@ class RailwayPlatform extends BaseCellObject {
 
       let train = this.parked.headTrain();
       this.parked = null;
-      train.State('stop');
+      
+      train.State('run');
 
       if (this.data.taskName)
-        train.completedTask(this.data.taskName);
+        this.game.completedTask(this.data.taskName);
     }
   }
 
@@ -159,7 +160,7 @@ class RailwayPlatform extends BaseCellObject {
 
   finishUnloading(train) {
     if (this.data.taskName)
-      train.completedTask(this.data.taskName);
+      this.game.completedTask(this.data.taskName);
   }
 
   injectPeople(count) {

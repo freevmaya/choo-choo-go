@@ -220,15 +220,17 @@ class DeciduousTree extends BaseCellObject {
     }
 
     let size = this.crownHeight + this.trunkHeight;
+    
+    let group = new THREE.Group();
+    group.add(this.treeGroup);
+    
+    /*
     let collider = this.createColliderBox(this.crownRadius * 2, size, this.crownRadius * 2);
 
     collider.position.y = size / 2;
     this._registerClickable(collider);
-    
-    let group = new THREE.Group();
-    group.add(this.treeGroup);
     group.add(collider);
-    
+    */
     return group;
   }
   

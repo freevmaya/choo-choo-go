@@ -1,16 +1,25 @@
-class DevTools {
+class DevTools extends Swipeable {
 	constructor(game) {
-		this.game = game;
 
-		this.toolsPanel = $(`<div class="dev-block">
+		let element = $(`<div class="dev-block">
 	        <div class="container">
-	          <button id="newBtn">New</button>
-	          <button id="clearBtn">Clear</button>
 	          <button id="resetBtn">Reset</button>
+	          <button id="clearBtn">Clear</button>
+	          <button id="newBtn">New</button>
 	          <button id="saveBtn">Save</button>
+	          <button id="nextBtn">Next</button>
 	          <button id="gameModeBtn">Editor state</button>
 	        </div>
 	      </div>`);
+
+		super(element, {
+	      threshold: 10,
+	      direction: 'left',
+	      onComplete: () => this.hide()
+	    });
+
+	    this.toolsPanel = element;
+		this.game = game;
 
 		$('.game-ui').append(this.toolsPanel);
 
@@ -28,6 +37,10 @@ class DevTools {
 
 	    this.toolsPanel.find('#newBtn').click(()=>{
 	      this.game.createNewLevel();
+	    })
+
+	    this.toolsPanel.find('#nextBtn').click(()=>{
+	      this.game.doNextLevel();
 	    })
 
 	    this.ebtn = this.toolsPanel.find('#gameModeBtn');
@@ -53,34 +66,16 @@ class DevTools {
 	      if (this.ground) {
 	      }
 	    });*/
+	}
 
-	    new Library($('#game-container'), $('#canvas-container'), [
-	      {
-	        type: StraightTrack
-	      },{
-	        type: CurvedTrack
-	      },{
-	        type: ForkTrack
-	      },{
-	        type: PointTrack
-	      },{
-	        type: FinishTrack
-	      },{
-	        type: Train
-	      },{
-	        type: Wagon
-	      },{
-	        type: PassengerWagon
-	      },{
-	        type: SimpleTree
-	      },{
-	        type: DeciduousTree
-	      },{
-	        type: Snow
-	      },{
-	        type: RailwayPlatform
-	      }
-	    ]);
+	hide() {
+		this.toolsPanel.removeClass(['hide', 'show']);
+		this.toolsPanel.addClass('hide');
+	}
+
+	show() {
+		this.toolsPanel.removeClass(['hide', 'show']);
+		this.toolsPanel.addClass('show');
 	}
 
 	handleObjectClick(data) {

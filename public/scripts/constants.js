@@ -40,14 +40,6 @@ const PLATFORM_DISTANCE = 1.3;
 // Базовая платформа
 const BASE_PLATFORM_TOP_Y = -CYLINDER_HALF_HEIGHT;
 
-// Шарик
-const BALL_RADIUS = 0.15;
-
-// Физика шарика
-const GRAVITY = -7.5;
-const BOUNCE_SPEED = 7;
-const MAX_VELOCITY = 5.2;
-
 // Управление мышью
 const ROTATION_SPEED = 0.025;
 const ROTATION_SMOOTH = 0.5;
@@ -77,13 +69,6 @@ const KILLER_PLATFORM_TEXTURE_PATH = 'textures/killer_platform.jpg';
 const BACKGROUND_IMAGE_PATH = 'images/bk1.jpg';
 const GRASS_IMAGE_PATH = 'textures/grass-s.png';
 const GROUND_IMAGE_PATH = 'textures/ground.jpg';
-
-// Игровые параметры
-const GAME_OVER_Y_OFFSET = -7; // Смещение относительно камеры для конца игры
-const RESET_POSITION_X = 0;
-const RESET_POSITION_Z = MAIN_RADIUS * 1.3;
-const RESET_POSITION_Y = BASE_PLATFORM_TOP_Y + BALL_RADIUS;
-const RESET_VELOCITY_Y = BOUNCE_SPEED;
 
 // Цвета для платформ
 const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем существующий TREE_COLOR для обычных платформ
@@ -128,22 +113,22 @@ const DEFAULT_LEVEL = {
     objects: []
 };
 
-const START_GAME = 'TEST';
+const START_GAME = 'PICKUP';
 const PI_HALF = Math.PI / 2;
 
 // Камера
 const CAMERA_FOLLOW_SPEED = 6;
 const CAMERA_HEIGHT_OFFSET = 40;
-const CAMERA_FOCUS = [50, 20];
+const CAMERA_FOCUS = [30, 20];
 const MAXSCREENSIZE = 1024;
 
 // Настройки игры
 const GAME_SETTINGS = {
-    TRAIN_POWER: 3,               // Мощность паровозика 
+    TRAIN_FORCE: 3,               // Мощность паровозика 
     TRAIN_WEIGHT: 0.5,
     TRAIN_WHEEL_RADIUS : 0.18,
     TRAIN_LEIGHT: 1.5,
-    MAX_VELOCITY: 2,
+    MAX_VELOCITY: 1.5,
 
     WAGON_WEIGHT: 0.1,
 
@@ -157,6 +142,9 @@ const GAME_SETTINGS = {
     SLEEPER_HEIGHT: 0.06,
     SLEEPER_LENGTH: 1.2,
     SLEEPER_STEP: 0.4,
+
+    MIN_TREE_HEIGHT: 3,
+    MAX_TREE_HEIGHT: 5,
 
     RAIL_WIDTH: 0.08,
     RAIL_HEIGHT: 0.12,

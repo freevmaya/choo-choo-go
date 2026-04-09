@@ -72,18 +72,17 @@ class ForkTrack extends BaseCurveTrack {
 
     	this.handleGroup.add(lever);
 
-    	this._registerClickable(collider);
+    	this._registerClickable(collider, this.onHandleClick.bind(this));
 
     	group.add(this.handleGroup);
 	    this._updateHandle();
     }
 
-    onClick(hit, eventData) {
-        if ((this.game.gameMode() == 'play') || (this.game.gameMode() == 'playAndEdit')) {
-            if (this.currenCart() == null)
-                this.setCurrentPath((this._currentPath + 1) % this.getPathCount());
-            else this.doBusy();
-        }
+    onHandleClick(collider) {
+        console.log(collider);
+        if (this.carts.length == 0)
+            this.setCurrentPath((this._currentPath + 1) % this.getPathCount());
+        else this.doBusy();
     }
 
     doBusy() {
@@ -112,10 +111,6 @@ class ForkTrack extends BaseCurveTrack {
 
     _afterSetCurrentPath() {
         this._updateHandle();
-    }
-
-    isAwailableRotate() {
-        return this.game.gameMode() == 'edit';
     }
 }
 registerClass(ForkTrack);

@@ -1,3 +1,7 @@
+// ============================================================
+// FILE: ./public\scripts\models\Ground.js
+// ============================================================
+
 // scripts/models/Ground.js
 
 class Ground extends BaseGameObject {
@@ -13,16 +17,10 @@ class Ground extends BaseGameObject {
     
     // Отступ от края экрана в пикселях (можно настраивать)
     this.viewMargin = 200;
-
-    this._onDrag = this.onDrag.bind(this);
-    this._onDrop = this.onDrop.bind(this);
   }
 
-  init(game) {
-    super.init(game);
-    eventBus.on('item-drag', this._onDrag);
-    eventBus.on('item-drop', this._onDrop);
-    return this;
+  getCurrentCell() {
+    return this._lastHoverCell;
   }
   
   createModel() {
@@ -79,21 +77,22 @@ class Ground extends BaseGameObject {
     // Позиционируем сетку так, чтобы она лежала на поверхности земли
     this.gridHelper.position.set(0, 0.01, 0); // небольшое смещение вверх, чтобы избежать z-fighting
     this.gridHelper.material.transparent = true;
-    this.gridHelper.material.opacity = 0.7; // делаем линии полупрозрачными для лучшей видимости
+    this.gridHelper.material.opacity = 0.3; // делаем линии полупрозрачными для лучшей видимости
     
     // Создаем плоскость подсветки
-    this._createHoverPlane();
+    this._createHoverPlane(group);
     
     group.add(this.mesh);
     group.add(this.gridHelper);
-    group.add(this._hoverPlane);
+
+    this._setupHoverTracking();
     return group;
   }
 
   /**
    * Создает черную полупрозрачную плоскость для подсветки ячейки под курсором
    */
-  _createHoverPlane() {
+  _createHoverPlane(group) {
     const size = GAME_SETTINGS.CELL_SIZE;
     const geometry = new THREE.PlaneGeometry(size, size);
     this._materialHover = new THREE.MeshStandardMaterial({
@@ -118,6 +117,7 @@ class Ground extends BaseGameObject {
     
     // Сохраняем размеры для расчетов
     this._hoverPlane.userData = { size: size };
+    group.add(this._hoverPlane);
   }
 
   loadModel(scene) {
@@ -125,32 +125,25 @@ class Ground extends BaseGameObject {
     this._registerClickable(this.mesh);
   }
 
-  /**
-   * Настраивает отслеживание движения курсора для подсветки ячеек
-   */
   _setupHoverTracking() {
     const container = this.game.container[0];
-    
-    // Обработчик движения мыши
+
     container.addEventListener('mousemove', this._onMouseMove.bind(this));
     container.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
-    
-    // Скрываем подсветку при выходе курсора за пределы
-    container.addEventListener('mouseleave', this._hideHoverPlane.bind(this));
-    container.addEventListener('touchend', this._hideHoverPlane.bind(this));
-    container.addEventListener('touchcancel', this._hideHoverPlane.bind(this));
   }
 
-  /**
-   * Обработчик движения мыши
-   */
+  _closeHoverTraking() {
+    const container = this.game?.container[0];
+    if (container) {
+      container.removeEventListener('mousemove', this._onMouseMove);
+      container.removeEventListener('touchmove', this._onTouchMove);
+    }
+  }
+
   _onMouseMove(event) {
     this._updateHoverPlane(event.clientX, event.clientY);
   }
 
-  /**
-   * Обработчик касания
-   */
   _onTouchMove(event) {
     event.preventDefault();
     const touch = event.touches[0];
@@ -159,33 +152,7 @@ class Ground extends BaseGameObject {
     }
   }
 
-  onDrop(e) {
-    this._hideHoverPlane();
-  }
-
-  onDrag(e) {
-    let event = e.originalEvent.originalEvent;
-    let cell = this._updateHoverPlane(event.clientX, event.clientY);
-
-    if (e.callback) {
-      let checkResult = null;
-      eventBus.emit('check-cell', {
-        cell: cell,
-        item: e.item,
-        callback: (result)=>{
-          checkResult = result;
-        }
-      });
-
-      this._materialHover.color.setHex(checkResult ? 0x00FF00 : 0xFF0000);
-      e.callback(checkResult, cell);
-    } else this._hideHoverPlane();
-  }
-
-  /**
-   * Обновляет позицию плоскости подсветки в зависимости от положения курсора
-   */
-  _updateHoverPlane(clientX, clientY) {
+  clientToCell(clientX, clientY) {
     if (!this.game.raycasterManager) return;
     
     // Выполняем рейкастинг для определения позиции на плоскости земли
@@ -194,46 +161,55 @@ class Ground extends BaseGameObject {
     if (intersects.length > 0) {
       const hit = intersects[0];
       const point = hit.point;
-      
-      // Вычисляем координаты ячейки
-      const center = GAME_SETTINGS.CELL_SIZE / 2;
-      const cellX = Math.floor(point.x / GAME_SETTINGS.CELL_SIZE);
-      const cellZ = Math.floor(point.z / GAME_SETTINGS.CELL_SIZE);
-      
-      const cellKey = `${cellX},${cellZ}`;
-      const maxCell = GAME_SETTINGS.BASE_PLATFORM_SIZE / 2;
 
-      if (((cellX >= -maxCell) && (cellX < maxCell)) &&
-          ((cellZ >= -maxCell) && (cellZ < maxCell))) {
-      
-        // Если ячейка изменилась, обновляем позицию
-        if (this._lastHoverCell !== cellKey) {
-          this._lastHoverCell = cellKey;
-          
-          // Вычисляем позицию центра ячейки
-          const posX = cellX * GAME_SETTINGS.CELL_SIZE + center;
-          const posZ = cellZ * GAME_SETTINGS.CELL_SIZE + center;
-          
-          // Обновляем позицию плоскости подсветки
-          this._hoverPlane.position.x = posX;
-          this._hoverPlane.position.z = posZ;
-          this._hoverPlane.visible = true;
-        }
-
-        return new Vector2Int(cellX, cellZ);
-      }
+      return new Vector2Int(Math.floor(point.x / GAME_SETTINGS.CELL_SIZE), 
+                            Math.floor(point.z / GAME_SETTINGS.CELL_SIZE));
     }
-
-    this._hideHoverPlane();
     return null;
   }
 
   /**
-   * Скрывает плоскость подсветки
+   * Обновляет позицию плоскости подсветки в зависимости от положения курсора
    */
-  _hideHoverPlane() {
-    this._lastHoverCell = null;
-    this._hoverPlane.visible = false;
+  _updateHoverPlane(clientX, clientY) {
+    if (!this.game.raycasterManager || !this._hoverPlane.visible) return;
+    
+    
+    let cell = this.clientToCell(clientX, clientY);
+    
+    if (cell) {
+      const maxCell = GAME_SETTINGS.BASE_PLATFORM_SIZE / 2;
+
+      if (((cell.x >= -maxCell) && (cell.x < maxCell)) &&
+          ((cell.y >= -maxCell) && (cell.y < maxCell))) {
+      
+        // Если ячейка изменилась, обновляем позицию
+        if (!this._lastHoverCell || !cell.equals(this._lastHoverCell)) {
+
+          this._lastHoverCell = cell.clone();
+          
+          const center = GAME_SETTINGS.CELL_SIZE / 2;
+          // Вычисляем позицию центра ячейки
+          const posX = cell.x * GAME_SETTINGS.CELL_SIZE + center;
+          const posZ = cell.y * GAME_SETTINGS.CELL_SIZE + center;
+          
+          // Обновляем позицию плоскости подсветки
+          this._hoverPlane.position.x = posX;
+          this._hoverPlane.position.z = posZ;
+          eventBus.emit('change-ground-cell', cell);
+        }
+
+        return cell;
+      }
+
+      return null;
+    }
+  }
+
+  hoverShow(visible, accessVis, colors = ['#00FF00', '#FF0000']) {
+    let is_mobile = window.matchMedia("(pointer: coarse)").matches;
+    this._hoverPlane.visible = visible && !is_mobile;
+    this._materialHover.color.setStyle(accessVis ? colors[0] : colors[1]);
   }
 
   onClick(hit, eventData) {
@@ -243,7 +219,7 @@ class Ground extends BaseGameObject {
     
     //if (DEV) 
       //this.game.cameraController.setLookCell(p);
-    console.log(p);
+    tracer.log(p);
     eventBus.emit('ground-click', p);
 
     //this.game.showMagicSwirl(hit.point.x, 0, hit.point.z);
@@ -254,10 +230,14 @@ class Ground extends BaseGameObject {
    * @param {Vector2Int} cell - координаты ячейки
    * @returns {THREE.Vector2|null} экранные координаты (x, y) в пикселях, или null если точка за камерой
    */
-  getScreenPosition(cell) {
-    if (!this.game || !this.game.cameraController) return null;
+  getScreenPosition(cell = null) {
+
+    if (cell == null)
+      cell = this._lastHoverCell;
+
+    if (!this.game || !this.game.camera || !cell) return null;
     
-    const camera = this.game.cameraController.getCamera();
+    const camera = this.game.camera;
     const center = GAME_SETTINGS.CELL_SIZE / 2;
     
     // Получаем мировые координаты центра ячейки
@@ -314,9 +294,9 @@ class Ground extends BaseGameObject {
    * @returns {boolean} true, если ячейка находится в пирамиде видимости
    */
   isCellInView(cell) {
-    if (!this.game || !this.game.cameraController) return true;
+    if (!this.game || !this.game.camera) return true;
     
-    const camera = this.game.cameraController.getCamera();
+    const camera = this.game.camera;
     const frustum = new THREE.Frustum();
     const projScreenMatrix = new THREE.Matrix4();
     
@@ -368,6 +348,56 @@ class Ground extends BaseGameObject {
    */
   getViewMargin() {
     return this.viewMargin;
+  }
+
+  /**
+   * Возвращает абсолютные координаты текущей позиции ячейки под курсором
+   * в системе координат плоскости Ground (в мировых координатах)
+   * @returns {THREE.Vector3|null} абсолютные координаты (x, y, z) или null, если ячейка не подсвечена
+   */
+  getCurrentCellWorldPosition() {
+    // Проверяем, активна ли подсветка и есть ли ячейка
+    if (!this._hoverPlane || !this._hoverPlane.visible || this._lastHoverCell === null) {
+      return null;
+    }
+    
+    // Получаем позицию плоскости подсветки (это центр ячейки в мировых координатах)
+    const worldPos = this._hoverPlane.position.clone();
+    
+    // Добавляем небольшое смещение по Y, чтобы точка была на поверхности грунта
+    worldPos.y = 0.02;
+    
+    return worldPos;
+  }
+
+  /**
+   * Возвращает абсолютные координаты для указанных координат ячейки
+   * @param {number} cellX - координата X ячейки
+   * @param {number} cellZ - координата Z ячейки
+   * @returns {THREE.Vector3} абсолютные координаты центра ячейки
+   */
+  getCellWorldPosition(cellX, cellZ) {
+    const center = GAME_SETTINGS.CELL_SIZE / 2;
+    return new THREE.Vector3(
+      cellX * GAME_SETTINGS.CELL_SIZE + center,
+      0.02,
+      cellZ * GAME_SETTINGS.CELL_SIZE + center
+    );
+  }
+
+  /**
+   * Возвращает текущие координаты ячейки под курсором
+   * @returns {Object|null} объект с полями cellX и cellZ, или null если ячейка не подсвечена
+   */
+  getCurrentCellCoordinates() {
+    if (!this._hoverPlane || !this._hoverPlane.visible || this._lastHoverCell === null) {
+      return null;
+    }
+    
+    return {
+      cellX: this._lastHoverCell.x,
+      cellZ: this._lastHoverCell.y
+    };
   }
   
   loadTexture() {
@@ -516,20 +546,8 @@ class Ground extends BaseGameObject {
    * Очищает ресурсы при уничтожении объекта
    */
   dispose() {
-    // Удаляем обработчики событий
-    const container = this.game?.container[0];
-    if (container) {
-      container.removeEventListener('mousemove', this._onMouseMove);
-      container.removeEventListener('touchmove', this._onTouchMove);
-      container.removeEventListener('mouseleave', this._hideHoverPlane);
-      container.removeEventListener('touchend', this._hideHoverPlane);
-      container.removeEventListener('touchcancel', this._hideHoverPlane);
-    }
 
-    eventBus.off('item-drag', this._onDrag);
-    eventBus.off('item-drop', this._onDrop);
-    
-    // Вызываем родительский метод
+    this._closeHoverTraking();
     super.dispose();
   }
 }
