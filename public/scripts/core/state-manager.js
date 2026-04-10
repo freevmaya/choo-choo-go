@@ -6,7 +6,7 @@ class StateManager {
         this.lastHash = '';
         this.config = { ...{use_server: typeof user_id != 'undefined'}, ...config};
 
-        this.STORAGE_KEY = 'tree_jump_state';
+        this.STORAGE_KEY = 'chuchugo_state';
         this.DEFAULT_STATE = {
         };
         
@@ -126,6 +126,11 @@ class StateManager {
     saveStateLocale() {
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
         this.lastHash = this.getHash();
+    }
+
+    clear() {
+        this.state = {};
+        this.saveState();
     }
     
     loadState() {

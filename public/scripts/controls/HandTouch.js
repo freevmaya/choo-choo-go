@@ -69,6 +69,7 @@ class HandTouch {
 	}
 
 	onUserActionEvent(data) {
+		this.game.showAchievEffect(this.focus.getHandle(this.userActionEvent).getWorldPosition(new THREE.Vector3()));
 		this.closeWaitAction();
 	}
 

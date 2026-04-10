@@ -33,6 +33,7 @@ class ParticleSystem {
       // Визуальные настройки
       colorStart: 0xffaa44,
       colorEnd: 0xff4400,
+      shapeColor: 0xFFFFFF,
       sizeStart: 0.3,
       sizeEnd: 0.05,
       opacity: 1,
@@ -53,6 +54,9 @@ class ParticleSystem {
       // Позиционирование
       position: new THREE.Vector3(0, 0, 0),
       spreadRadius: 0.5,
+      
+      // Отображение поверх всех объектов
+      forceTopLayer: true,
       
       // Колбэки
       onParticleUpdate: null,
@@ -121,6 +125,12 @@ class ParticleSystem {
     return particle;
   }
 
+  getShapeColor(idx=0) {
+    if (typeof this.options.shapeColor == 'function')
+      return this.options.shapeColor(idx);
+    return new THREE.Color(this.options.shapeColor);
+  }
+
   /**
    * Создает частицу в виде звезды (спрайт)
    */
@@ -132,7 +142,9 @@ class ParticleSystem {
         map: this.options.spriteTexture,
         color: 0xffffff,
         blending: this.options.blending,
-        transparent: true
+        transparent: true,
+        depthTest: !this.options.forceTopLayer,
+        depthWrite: !this.options.forceTopLayer
       });
     } else {
       const canvas = document.createElement('canvas');
@@ -148,7 +160,8 @@ class ParticleSystem {
       const innerRadius = 24;
       const points = 5;
       
-      // Рисуем звезду
+      const color = this.getShapeColor();
+      
       ctx.beginPath();
       
       for (let i = 0; i < points * 2; i++) {
@@ -166,54 +179,26 @@ class ParticleSystem {
       
       ctx.closePath();
       
-      // Создаем градиент для заливки
-      const gradient = ctx.createLinearGradient(centerX - outerRadius, centerY - outerRadius, centerX + outerRadius, centerY + outerRadius);
-      gradient.addColorStop(0, 'rgba(255, 255, 200, 1)');
-      gradient.addColorStop(0.4, 'rgba(255, 200, 100, 0.9)');
-      gradient.addColorStop(0.7, 'rgba(255, 100, 50, 0.7)');
-      gradient.addColorStop(1, 'rgba(255, 50, 0, 0)');
-      
-      ctx.fillStyle = gradient;
+      // Заливка одним монотонным цветом
+      ctx.fillStyle = '#' + color.getHexString();
       ctx.fill();
-      
-      // Добавляем свечение вокруг звезды
-      ctx.shadowBlur = 15;
-      ctx.shadowColor = 'rgba(255, 200, 100, 0.8)';
-      
-      // Рисуем внутреннее свечение
-      ctx.beginPath();
-      const glowRadius = outerRadius * 0.8;
-      const glowGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, glowRadius);
-      glowGradient.addColorStop(0, 'rgba(255, 255, 200, 0.9)');
-      glowGradient.addColorStop(0.5, 'rgba(255, 200, 100, 0.5)');
-      glowGradient.addColorStop(1, 'rgba(255, 100, 50, 0)');
-      
-      ctx.fillStyle = glowGradient;
-      ctx.arc(centerX, centerY, glowRadius, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // Добавляем блики на кончиках звезды
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      for (let i = 0; i < points; i++) {
-        const angle = (Math.PI * 2 * i) / points - Math.PI / 2;
-        const tipX = centerX + outerRadius * Math.cos(angle);
-        const tipY = centerY + outerRadius * Math.sin(angle);
-        
-        ctx.beginPath();
-        ctx.arc(tipX, tipY, outerRadius * 0.15, 0, Math.PI * 2);
-        ctx.fill();
-      }
       
       const texture = new THREE.CanvasTexture(canvas);
       material = new THREE.SpriteMaterial({
         map: texture,
         blending: this.options.blending,
         transparent: true,
-        opacity: 1
+        opacity: 1,
+        depthTest: !this.options.forceTopLayer,
+        depthWrite: !this.options.forceTopLayer
       });
     }
     
-    return new THREE.Sprite(material);
+    const sprite = new THREE.Sprite(material);
+    if (this.options.forceTopLayer) {
+      sprite.renderOrder = 999;
+    }
+    return sprite;
   }
   
   createSpriteParticle() {
@@ -224,7 +209,9 @@ class ParticleSystem {
         map: this.options.spriteTexture,
         color: 0xffffff,
         blending: this.options.blending,
-        transparent: true
+        transparent: true,
+        depthTest: !this.options.forceTopLayer,
+        depthWrite: !this.options.forceTopLayer
       });
     } else {
       const canvas = document.createElement('canvas');
@@ -232,13 +219,13 @@ class ParticleSystem {
       canvas.height = 64;
       const ctx = canvas.getContext('2d');
 
-      let color = new THREE.Color(this.options.colorStart);
+      let color = this.getShapeColor();
       
       const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
       gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
       gradient.addColorStop(0.3, 'rgba(255, 200, 100, 0.8)');
       gradient.addColorStop(0.6, 'rgba(255, 100, 50, 0.4)');
-      gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
+      gradient.addColorStop(1, `rgba(${color.r * 255}, ${color.g * 255}, ${color.b * 255}, 0)`);
       
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, 64, 64);
@@ -247,11 +234,17 @@ class ParticleSystem {
       material = new THREE.SpriteMaterial({
         map: texture,
         blending: this.options.blending,
-        transparent: true
+        transparent: true,
+        depthTest: !this.options.forceTopLayer,
+        depthWrite: !this.options.forceTopLayer
       });
     }
     
-    return new THREE.Sprite(material);
+    const sprite = new THREE.Sprite(material);
+    if (this.options.forceTopLayer) {
+      sprite.renderOrder = 999;
+    }
+    return sprite;
   }
   
   createSphereParticle() {
@@ -267,12 +260,17 @@ class ParticleSystem {
       emissiveIntensity: 0.5,
       roughness: 0.3,
       metalness: 0.1,
-      transparent: true
+      transparent: true,
+      depthTest: !this.options.forceTopLayer,
+      depthWrite: !this.options.forceTopLayer
     });
     
     const sphere = new THREE.Mesh(geometry, material);
     sphere.castShadow = false;
     sphere.receiveShadow = false;
+    if (this.options.forceTopLayer) {
+      sphere.renderOrder = 999;
+    }
     
     return sphere;
   }
@@ -288,46 +286,49 @@ class ParticleSystem {
       color: this.options.colorStart,
       emissive: this.options.colorStart,
       emissiveIntensity: 0.5,
-      transparent: true
+      transparent: true,
+      depthTest: !this.options.forceTopLayer,
+      depthWrite: !this.options.forceTopLayer
     });
     
     const cube = new THREE.Mesh(geometry, material);
     cube.castShadow = false;
     cube.receiveShadow = false;
+    if (this.options.forceTopLayer) {
+      cube.renderOrder = 999;
+    }
     
     return cube;
   }
   
-  /**
-   * Получает случайную скорость в пределах конуса (ИСПРАВЛЕНО)
-   */
   getRandomVelocity() {
-    const direction = this.options.emitDirection.clone().normalize();
-    
-    // Случайный угол в конусе
-    const angle = Math.random() * Math.PI * 2;
-    const coneAngle = Math.acos(1 - Math.random() * (1 - Math.cos(this.options.emitConeAngle)));
-    
-    // Базовый вектор в конусе (ось Y вверх)
-    const x = Math.sin(coneAngle) * Math.cos(angle);
-    const y = Math.cos(coneAngle);
-    const z = Math.sin(coneAngle) * Math.sin(angle);
-    
-    let randomDir = new THREE.Vector3(x, y, z);
-    
-    // Поворачиваем базовый вектор к направлению эмиссии
-    if (direction.y !== 1) {
-      const quaternion = new THREE.Quaternion().setFromUnitVectors(
-        new THREE.Vector3(0, 1, 0),
-        direction
+      const direction = this.options.emitDirection.clone().normalize();
+
+      if (this.options.emitConeAngle <= 0 || direction.length() === 0) {
+          const speed = this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin);
+          return direction.clone().multiplyScalar(speed);
+      }
+
+      const theta = Math.random() * Math.PI * 2; // Азимутальный угол (0-360°)
+      const phi = Math.acos(1 - Math.random() * (1 - Math.cos(this.options.emitConeAngle))); // Полярный угол (0-coneAngle)
+      
+      const localDir = new THREE.Vector3(
+          Math.sin(phi) * Math.cos(theta),  // X
+          Math.sin(phi) * Math.sin(theta),  // Y
+          Math.cos(phi)                      // Z (ось направления)
       );
-      randomDir.applyQuaternion(quaternion);
-    }
-    
-    // Случайная скорость в заданном диапазоне
-    const speed = this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin);
-    
-    return randomDir.multiplyScalar(speed);
+
+      const quaternion = new THREE.Quaternion().setFromUnitVectors(
+          new THREE.Vector3(0, 0, 1),
+          direction
+      );
+      
+      const randomDir = localDir.applyQuaternion(quaternion);
+      
+      // Случайная скорость в заданном диапазоне
+      const speed = this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin);
+      
+      return randomDir.multiplyScalar(speed);
   }
   
   /**
@@ -418,7 +419,7 @@ class ParticleSystem {
     
     switch (this.options.particleType) {
       case 'sprite':
-      case 'star': // Добавляем звезду как разновидность спрайта
+      case 'star':
         particle.material.color.set(color);
         particle.scale.set(size, size, 1);
         particle.material.opacity = opacity;
@@ -574,8 +575,6 @@ class ParticleSystem {
   }
 }
 
-// scripts/effects/MagicSwirlParticles.js
-
 class ParticleSystemObject extends BaseGameObject {
   constructor(game = null, options = {}) {
     super(game);
@@ -593,7 +592,12 @@ class ParticleSystemObject extends BaseGameObject {
     return this.position.clone();
   }
 
-  setPosition(x, y, z) {
+  setPosition(x, y=0, z=0) {
+    if (typeof x == 'object') {
+      y = x.y;
+      z = x.z;
+      x = x.x;
+    }
     this.position.set(x, y, z);
     if (this.isActive()) {
       this.psList.forEach(p => p.options.position = this.position);
@@ -645,6 +649,45 @@ class ParticleSystemObject extends BaseGameObject {
     if (this.isActive())
       this.psList.forEach(ps => ps.update(dt));
   }
+
+  dispose() {
+    this.psList.forEach(pt => pt.dispose());
+    super.dispose();
+  }
+}
+
+class TaskAchievParticles extends ParticleSystemObject {
+  
+  createPS() {
+    return [
+        new ParticleSystem(this.game.scene, {
+          particleType: 'star',
+          particleCount: 20,
+          lifetime: 1.3,
+          fade: true,
+          gravity: 1.5,
+          airResistance: 0.96,
+          speedMin: 8,
+          speedMax: 10,
+          colorStart: 0xffdd88,
+          colorEnd: 0x0000FF,
+          shapeColor: () => {
+            return getRandomColorWithIntensity(1, 0.2);
+          },
+          sizeStart: 0.4,
+          sizeEnd: 0.1,
+          emissionRate: 80,
+          duration: 3000,
+          emissionDuration: 600,
+          emitConeAngle: Math.PI * 0.3,
+          spreadRadius: 0.5,
+          position: this.getPosition(),
+          blending: THREE.AdditiveBlending,
+          twinkleSpeed: 30,
+          rotationSpeed: 2
+        })
+    ];
+  }
 }
 
 class MagicSwirlParticles extends ParticleSystemObject {
@@ -663,7 +706,10 @@ class MagicSwirlParticles extends ParticleSystemObject {
           colorStart: 0xffdd88,
           colorEnd: 0xff6600,
           sizeStart: 0.2,
-          sizeEnd: 0.1,
+          sizeEnd: 0.8,
+          shapeColor: () => {
+            return getRandomColorWithIntensity(1, 0.2);
+          },
           emitDirection: new THREE.Vector3(0, 1, 0),
           emissionRate: 80,
           duration: 3000,
@@ -678,14 +724,14 @@ class MagicSwirlParticles extends ParticleSystemObject {
 
         new ParticleSystem(this.game.scene, {
           particleType: 'sprite',
-          particleCount: 20,
+          particleCount: 5,
           lifetime: 1.2,
           fade: true,
           airResistance: 0.96,
           speedMin: 0,
           speedMax: 2,
           colorStart: 0xffdd88,
-          colorEnd: 0x000000,
+          colorEnd: 0xffdd88,
           sizeStart: 0.5,
           sizeEnd: 2,
           emitDirection: new THREE.Vector3(0, 1, 0),
@@ -718,13 +764,7 @@ class MagicSwirlParticles extends ParticleSystemObject {
     }
     super.update(dt);
   }
-
-  dispose() {
-    this.psList.forEach(pt => pt.dispose());
-    super.dispose();
-  }
 }
-
 
 
 class SmokeParticles extends ParticleSystemObject {

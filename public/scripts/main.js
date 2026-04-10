@@ -12,6 +12,8 @@ class RailGame extends BaseGame {
     this.lights = [];
     this.gameUI = [];
 
+    this._resetTask();
+
     eventBus.on('change-cells', this.onChangeCells.bind(this));
 
     this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame'];
@@ -92,12 +94,12 @@ class RailGame extends BaseGame {
   setGameIndex(value) {
     let result = super.setGameIndex(value);
     this._resetTask();
-    this.cameraController.setLookCell(this.getConst("START_CELL", GAME_SETTINGS.START_CELL));
     return result;
   }
 
   _resetTask() {
     let env = this.getEnv();
+
     this.task = env.task ? env.task : ['finish'];
     this.taskCompleted = [];
   }
@@ -161,6 +163,12 @@ class RailGame extends BaseGame {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  showAchievEffect(x, y, z) {
+    let effect = new TaskAchievParticles(this);
+    effect.setPosition(x, y, z);
+    effect.play();
   }
 
   showMagicSwirl(x, y, z) {
@@ -292,7 +300,7 @@ class RailGame extends BaseGame {
   }
 
   getEnv() {
-    return GAME_PARAMS[this.paramsIndex].ENV;
+    return GAME_PARAMS[this.paramsIndex] ? GAME_PARAMS[this.paramsIndex].ENV : DEFAULT_LEVEL.ENV;
   }
 
   createGameObjects() {
@@ -305,7 +313,7 @@ class RailGame extends BaseGame {
     super.createGameObjects();
     if (this.cameraController)
       this.cameraController.reset();
-    this.ground = (new Ground(env.GROUND_IMAGE_PATH, env.GROUND_COLOR)).init(this); //
+    this.ground = (new Ground(env.GROUND_IMAGE_PATH, env.GROUND_COLOR)).init(this);
 
     if (DEV) {
       /*
@@ -329,6 +337,8 @@ class RailGame extends BaseGame {
     this.doAfterFrame(()=>{
       eventBus.emit('created-game-objects', this);
     });
+
+    this.cameraController.setLookCell(this.getConst("START_CELL", GAME_SETTINGS.START_CELL));
   }
 
   createNewLevel() {

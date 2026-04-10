@@ -222,7 +222,7 @@ class Ground extends BaseGameObject {
     tracer.log(p);
     eventBus.emit('ground-click', p);
 
-    //this.game.showMagicSwirl(hit.point.x, 0, hit.point.z);
+    //this.game.showAchievEffect(hit.point.x, 0, hit.point.z);
   }
 
   /**

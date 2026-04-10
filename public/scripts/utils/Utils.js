@@ -350,3 +350,8 @@ class Bounds {
 function addIgnoreSign(a, b) {
   return (Math.abs(a) + b) * Math.sign(a);
 }
+
+function hasParam(paramName) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has(paramName);
+}

@@ -937,7 +937,7 @@ body {
   z-index: 102;
   pointer-events: none;
   margin-left: -10px;
-  margin-top: -64px;
+  margin-top: -72px;
 }
 
 .hand-touch .img {
@@ -962,8 +962,7 @@ body {
 }
 
 .hand-touch.rightMoveAnim .img {
-  animation: downUp2 1.2s ease-in-out infinite,
-            shiftSprite2 1.2s steps(1) infinite;
+  animation: downUp2 1.2s ease-in-out infinite;
 }
 
 @keyframes downUp1 {
@@ -985,7 +984,13 @@ body {
     0%, 100% { 
       transform: translate(0, 0); 
     }
-    50% { 
+    5% { 
+      transform: translate(0px, 4px); 
+    }
+    30% { 
+      transform: translate(15px, 12px); 
+    }
+    35% { 
       transform: translate(15px, 8px); 
     }
 }

@@ -34,7 +34,11 @@ class BaseGame {
     this.initScene();
     this.initUI();
 
-    this.stateManager.loadState()
+    if (hasParam('clear-state')) {
+      this.stateManager.clear();
+      this.init();
+    }
+    else this.stateManager.loadState()
       .then(()=>{
         this.setGameIndex(this.stateManager.get('paramsIndex', START_GAME))
           .then(()=>{

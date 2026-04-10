@@ -47,9 +47,10 @@ class Cells {
 	checkTaskRectord(taskName, value) {
         if (!value) return false;
         if (Array.isArray(value)) 
-        	return value.some(v => v?.startsWith?.(taskName));
-        
-        return value.startsWith?.(taskName) || false;
+        	return value.some(v => this.checkTaskRectord(taskName, v));
+
+        let s = value.split(':');
+        return s[0] === taskName;
     };
 
 	findAsTask(taskName, field = 'taskName') {

@@ -134,7 +134,7 @@ class BaseCameraController {
 	reset() {
 		this.camera.position.set(0, 0, 12);
 		this.camera.lookAt(0, this.camera.position.y, 0);
-		
+
 		this.scaleFocus = 1;
 		this.targetFocus = this.calcTargetFocus();
 		this.angle = Math.PI / 4;
@@ -153,7 +153,8 @@ class BaseCameraController {
 	calcTargetFocus() {
 		let minsize = Math.min(this.game.container.width(), this.game.container.height());
 		let k = Math.min(minsize / MAXSCREENSIZE, 1);
-		let baseFocus = lerp(CAMERA_FOCUS[0], CAMERA_FOCUS[1], k);
+		let focusLimit = this.game.getConst('CAMERA_FOCUS');
+		let baseFocus = lerp(focusLimit[0], focusLimit[1], k);
 
 		let newFocus = baseFocus / this.scaleFocus;
 		return Math.max(10, Math.min(80, newFocus));

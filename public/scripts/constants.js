@@ -118,7 +118,6 @@ const PI_HALF = Math.PI / 2;
 // Камера
 const CAMERA_FOLLOW_SPEED = 6;
 const CAMERA_HEIGHT_OFFSET = 40;
-const CAMERA_FOCUS = [30, 20];
 const MAXSCREENSIZE = 1024;
 
 // Настройки игры
@@ -154,5 +153,6 @@ const GAME_SETTINGS = {
 
     GROUND_COLOR: 0x336633,
 
-    START_CELL: {x: 0, y: 0}
+    START_CELL: {x: 0, y: 0},
+    CAMERA_FOCUS: [25, 15]
 };

@@ -57,8 +57,11 @@ class BaseTrack extends BaseCellObject {
     }
 
     afterRunOver() {
-        if (this.data.taskName)
-            this.game.completedTask(this.data.taskName);
+        if (this.data.taskName) {
+            let train = this.carts.find(c => c.headTrain());
+            if (train)
+                this.game.completedTask(this.data.taskName);
+        }
     }
 
     afterRunOut() {

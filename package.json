@@ -1,5 +1,7 @@
 {
-  "dependencies": {
-    "javascript-obfuscator": "^5.4.1"
+  "devDependencies": {
+    "javascript-obfuscator": "^5.4.1",
+    "webpack": "^5.106.0",
+    "webpack-obfuscator": "^3.6.1"
   }
 }

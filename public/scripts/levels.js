@@ -1,6 +1,290 @@
 
 // РџР°СЂР°РјРµС‚СЂС‹ РёРіСЂС‹ - РРќР”Р•РљРЎР« РґР»СЏ Р»РѕРєР°Р»РёР·Р°С†РёРё РЅР°Р·РІР°РЅРёР№ СѓСЂРѕРІРЅРµР№
 var GAME_PARAMS = {
+    "PICKUP": {
+        "ENV": {
+            "MAX_VELOCITY": 1,
+            "BACKGROUND_COLOR": 3390463,
+            "GROUND_COLOR": 8947848,
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 3,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": "Play",
+            "task": ["connect", "finish"],
+            "START_CELL": {x: -3, y: -4}
+        },
+        "items": [
+            {
+                "type": "PointTrack",
+                "location": [
+                    -1,
+                    -5,
+                    0
+                ],
+                "title": "start",
+                "fixed": true
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    -2,
+                    2
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -2,
+                    -1,
+                    1
+                ],
+                "expect": "connect"
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -3,
+                    -1,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    0,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    0,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    1,
+                    2
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -1,
+                    -3,
+                    3
+                ],
+                "expect": "end-track"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -3,
+                    1
+                ],
+                "taskName": "end-track"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -4,
+                    -1,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    2,
+                    1
+                ]
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    -3,
+                    2,
+                    1
+                ],
+                "title": "finish",
+                "taskName": "finish"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -4,
+                    2,
+                    3
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "Snow",
+                "location": [
+                    0,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -2,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    0,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -2,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -4,
+                    1,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Train",
+                "location": [
+                    -1,
+                    -5,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "chain": [],
+                "expect": ["created-game-objects:0:rightMoveAnim",
+                            "user-set-current-path:1:pushAnim"]
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -4,
+                    -1,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "taskName": "connect"
+            }
+        ]
+    },
     "TEST": {
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
@@ -651,289 +935,6 @@ var GAME_PARAMS = {
                     "forwardInTrack": false
                 },
                 "chain": []
-            }
-        ]
-    },
-    "PICKUP": {
-        "ENV": {
-            "MAX_VELOCITY": 1,
-            "BACKGROUND_COLOR": 3390463,
-            "GROUND_COLOR": 8947848,
-            "KEY_LIGHT_COLOR": 16777215,
-            "RIM_LIGHT_COLOR": 8490232,
-            "FILL_LIGHT_COLOR": 6529416,
-            "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
-            "FILL_LIGHT_INTENSITY": 2,
-            "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "Play",
-            "task": ["connect", "finish"],
-            "START_CELL": {x: -5, y: -1}
-        },
-        "items": [
-            {
-                "type": "PointTrack",
-                "location": [
-                    -1,
-                    -5,
-                    0
-                ],
-                "title": "start",
-                "fixed": true
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -1,
-                    -4,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -1,
-                    -2,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    -2,
-                    2
-                ]
-            },
-            {
-                "type": "ForkTrack",
-                "location": [
-                    -2,
-                    -1,
-                    1
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -3,
-                    -1,
-                    3
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    0,
-                    3
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -1,
-                    0,
-                    1
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -1,
-                    1,
-                    2
-                ]
-            },
-            {
-                "type": "ForkTrack",
-                "location": [
-                    -1,
-                    -3,
-                    3
-                ],
-                "expect": "end-track"
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    0,
-                    -3,
-                    1
-                ],
-                "taskName": "end-track"
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    -4,
-                    -1,
-                    3
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -1,
-                    2,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -2,
-                    2,
-                    1
-                ]
-            },
-            {
-                "type": "PointTrack",
-                "location": [
-                    -3,
-                    2,
-                    1
-                ],
-                "title": "finish",
-                "taskName": "finish"
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    -4,
-                    2,
-                    3
-                ]
-            }
-        ],
-        "objects": [
-            {
-                "type": "Snow",
-                "location": [
-                    0,
-                    -2,
-                    0
-                ]
-            },
-            {
-                "type": "Snow",
-                "location": [
-                    -2,
-                    -3,
-                    0
-                ]
-            },
-            {
-                "type": "Snow",
-                "location": [
-                    0,
-                    -1,
-                    0
-                ]
-            },
-            {
-                "type": "Snow",
-                "location": [
-                    0,
-                    0,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    1,
-                    -2,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    0,
-                    -4,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -2,
-                    -5,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -3,
-                    -5,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -3,
-                    -4,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    0,
-                    2,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    0,
-                    3,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -4,
-                    1,
-                    0
-                ]
-            }
-        ],
-        "carts": [
-            {
-                "type": "Train",
-                "location": [
-                    -1,
-                    -5,
-                    true
-                ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
-                },
-                "chain": [],
-                "expect": ["created-game-objects:0:rightMoveAnim",
-                            "user-set-current-path:1:pushAnim"]
-            },
-            {
-                "type": "Wagon",
-                "location": [
-                    -4,
-                    -1,
-                    true
-                ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
-                },
-                "taskName": "connect"
             }
         ]
     },
