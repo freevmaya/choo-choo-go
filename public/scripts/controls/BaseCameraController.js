@@ -134,8 +134,7 @@ class BaseCameraController {
 	reset() {
 		this.camera.position.set(0, 0, 12);
 		this.camera.lookAt(0, this.camera.position.y, 0);
-		this.targetPoint.set(0, 0);
-		this.lookPoint.set(0, 0);
+		
 		this.scaleFocus = 1;
 		this.targetFocus = this.calcTargetFocus();
 		this.angle = Math.PI / 4;
@@ -178,7 +177,7 @@ class BaseCameraController {
 	}
 
 	setLookCell(value) {
-		this.targetPoint = value;
+		this.targetPoint = value instanceof THREE.Vector2 ? value : new THREE.Vector2(value.x, value.y);
 	}
 
 	setFocus(f) {
@@ -214,6 +213,24 @@ class BaseCameraController {
 		this.camera.position.set(lookAt.x + camPos.x, lookAt.y + camPos.y, lookAt.z + camPos.z);
 		this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
 		this.setFocus(this.camera.fov + (this.targetFocus - this.camera.fov) * dt * this.options.followSpeed);
+	}
+
+	getScreenPosition(object,  targetDomElement = null) {
+
+	    const objectPosition = object.getWorldPosition(new THREE.Vector3());
+	    const ndcPosition = objectPosition.clone().project(this.camera);
+	    const isVisible = ndcPosition.z >= 0 && ndcPosition.z <= 1 &&
+	                      Math.abs(ndcPosition.x) <= 1 && 
+	                      Math.abs(ndcPosition.y) <= 1;
+	    
+	    // Определяем целевой DOM элемент
+	    const targetElement = targetDomElement || this.game.game_container[0];
+	    const rect = targetElement.getBoundingClientRect();
+
+	    const x = ((ndcPosition.x + 1) / 2) * rect.width;
+	    const y = ((1 - ndcPosition.y) / 2) * rect.height;
+	    
+	    return new THREE.Vector2(x, y);
 	}
 
 	/*

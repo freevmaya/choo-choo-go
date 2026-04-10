@@ -44,13 +44,21 @@ class Cells {
 		}
 	}
 
-	findAsTask(taskName, field='taskName') {
-		let ga = this.carts.find(c=>c.data[field] === taskName);
-		if (!ga)
-			ga = this.objects.find(o=>o.data[field] === taskName);
-		if (!ga)
-			ga = this.items.find(i=>i.data[field] === taskName);
-		return ga;
+	checkTaskRectord(taskName, value) {
+        if (!value) return false;
+        if (Array.isArray(value)) 
+        	return value.some(v => v?.startsWith?.(taskName));
+        
+        return value.startsWith?.(taskName) || false;
+    };
+
+	findAsTask(taskName, field = 'taskName') {
+	    
+	    let ga = this.carts.find(c => this.checkTaskRectord(taskName, c.data[field]));
+	    if (!ga) ga = this.objects.find(o => this.checkTaskRectord(taskName, o.data[field]));
+	    if (!ga) ga = this.items.find(i => this.checkTaskRectord(taskName, i.data[field]));
+	    
+	    return ga;
 	}
 
 	findNearestCart(cell, classCart) {

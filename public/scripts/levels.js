@@ -2,7 +2,6 @@
 // РџР°СЂР°РјРµС‚СЂС‹ РёРіСЂС‹ - РРќР”Р•РљРЎР« РґР»СЏ Р»РѕРєР°Р»РёР·Р°С†РёРё РЅР°Р·РІР°РЅРёР№ СѓСЂРѕРІРЅРµР№
 var GAME_PARAMS = {
     "TEST": {
-        "NAME": "difficulty_test",
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
             "GROUND_COLOR": 8930389,
@@ -318,7 +317,6 @@ var GAME_PARAMS = {
         ]
     },
     "PICKUP-BASE": {
-        "NAME": "PICKUP-BASE",
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
             "KEY_LIGHT_COLOR": 16777215,
@@ -657,7 +655,6 @@ var GAME_PARAMS = {
         ]
     },
     "PICKUP": {
-        "NAME": "PICKUP",
         "ENV": {
             "MAX_VELOCITY": 1,
             "BACKGROUND_COLOR": 3390463,
@@ -670,7 +667,8 @@ var GAME_PARAMS = {
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "Play",
-            "task": ["connect", "finish"]
+            "task": ["connect", "finish"],
+            "START_CELL": {x: -5, y: -1}
         },
         "items": [
             {
@@ -919,7 +917,9 @@ var GAME_PARAMS = {
                     "indexPosInChain": 0,
                     "forwardInTrack": true
                 },
-                "chain": []
+                "chain": [],
+                "expect": ["created-game-objects:0:rightMoveAnim",
+                            "user-set-current-path:1:pushAnim"]
             },
             {
                 "type": "Wagon",
@@ -938,7 +938,6 @@ var GAME_PARAMS = {
         ]
     },
     "PATH": {
-        "NAME": "PATH",
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
             "KEY_LIGHT_COLOR": 16777215,
@@ -1441,7 +1440,6 @@ var GAME_PARAMS = {
         ]
     },
     "PICKUP-PASSENGERS": {
-        "NAME": "PICKUP-PASSENGERS",
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
             "GROUND_COLOR": 8930389,
@@ -1865,7 +1863,6 @@ var GAME_PARAMS = {
     },
 
     "DROP-GAME-1" :{
-        "NAME": "DROP-GAME-1",
         "ENV": {
             "BACKGROUND_COLOR": "#4469AA",
             "TRAIN_FORCE": 1,
@@ -2120,7 +2117,6 @@ var GAME_PARAMS = {
         ]
     },
     "DROP-AND-WAGON": {
-        "NAME": "DROP-AND-WAGON",
         "ENV": {
             "GROUND_COLOR": '#EEAA00',
             "KEY_LIGHT_COLOR": 16777215,
@@ -2426,7 +2422,6 @@ var GAME_PARAMS = {
         ]
     },
     "TEST-7": {
-        "NAME": "TEST-7",
         "ENV": {
             "BACKGROUND_COLOR": '#4444AA',
             "GROUND_COLOR": 8930389,

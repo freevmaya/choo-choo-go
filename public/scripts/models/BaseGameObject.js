@@ -129,6 +129,14 @@ class BaseGameObject extends BaseStateMashine {
         return this.model;
     }
 
+    getHandle(userActionEvent='') {
+        return this.model;
+    }
+
+    getUserActionEvent(index) {
+        return '';
+    }
+
     /**
      * Регистрирует ресурс для последующего освобождения
      * @param {THREE.Geometry|THREE.BufferGeometry} geometry - геометрия для освобождения
@@ -278,6 +286,7 @@ class BaseGameObject extends BaseStateMashine {
         this._resourcesToDispose.geometries.clear();
         this._resourcesToDispose.materials.clear();
         this._resourcesToDispose.textures.clear();
+        eventBus.emit('disposed', this);
     }
   
     _createMaterial(color, options = {}, texturePath = null) {

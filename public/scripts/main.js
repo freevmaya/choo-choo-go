@@ -92,6 +92,7 @@ class RailGame extends BaseGame {
   setGameIndex(value) {
     let result = super.setGameIndex(value);
     this._resetTask();
+    this.cameraController.setLookCell(this.getConst("START_CELL", GAME_SETTINGS.START_CELL));
     return result;
   }
 
@@ -324,13 +325,17 @@ class RailGame extends BaseGame {
         this.loadCells(cells);
       else this.createDefaultTrain();
     }
+
+    this.doAfterFrame(()=>{
+      eventBus.emit('created-game-objects', this);
+    });
   }
 
   createNewLevel() {
     let keys = Object.keys(GAME_PARAMS);
 
     let newName = START_GAME + '-' + keys.length;
-    GAME_PARAMS[newName] = $.extend({}, DEFAULT_LEVEL, {NAME: newName});
+    GAME_PARAMS[newName] = $.extend({}, DEFAULT_LEVEL);
     this.GoToLevel(newName);
   }
 
@@ -345,6 +350,8 @@ class RailGame extends BaseGame {
       this.items.dispose();
       this.items = null;
     }
+
+    eventBus.emit('cleared-game-objects', this);
   }
   
   onResize() {

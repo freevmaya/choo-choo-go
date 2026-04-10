@@ -71,7 +71,9 @@ class Train extends BaseCart {
     }
 
     onGaDown(data) {
-        if ((data.intersects.length > 0) && (data.intersects[0].object.userData.gameObject == this)) 
+        if (this.game.isPlaying() &&
+            (data.intersects.length > 0) && 
+            (data.intersects[0].object.userData.gameObject == this)) 
             this.beginDrag(data.pos);
     }
 
@@ -123,7 +125,7 @@ class Train extends BaseCart {
 
                     this.setForward(direct.dot(forward) < 0);
                     this.State('run');
-                    this.game.completedTask('user-drag-train');
+                    eventBus.emit(this.getUserActionEvent(0), this);
                 }
             } else eventBus.emit('toast', 'wrong_boarding');
         }
@@ -262,11 +264,11 @@ class Train extends BaseCart {
         
         // Крыша кабины
         const roofGeo = new THREE.BoxGeometry(0.85, 0.1, 0.95);
-        const roof = new THREE.Mesh(roofGeo, darkMaterial);
-        roof.position.set(0, 0.4, 0);
-        roof.castShadow = true;
+        this.roof = new THREE.Mesh(roofGeo, darkMaterial);
+        this.roof.position.set(0, 0.4, 0);
+        this.roof.castShadow = true;
         this._registerGeometry(roofGeo);
-        cab_group.add(roof);
+        cab_group.add(this.roof);
 
         cab_group.position.set(-0.6, this.getConst('TRAIN_WHEEL_RADIUS') + 1, 0);
 
@@ -345,9 +347,9 @@ class Train extends BaseCart {
             this.toggle();
 
         if (this.State() == 'run')
-            this.game.completedTask('user-run');
+            eventBus.emit(this.getUserActionEvent(1), this);
         else if (this.State() == 'braking')
-            this.game.completedTask('user-stop');
+            eventBus.emit(this.getUserActionEvent(2), this);
     }
     
     createSmokeSystem(parentGroup) {
@@ -535,6 +537,17 @@ class Train extends BaseCart {
 
     isMoving() {
         return super.isMoving() && (this.State() != 'wait');
+    }
+
+    getHandle(userActionEvent='') {
+        if (['user-drag-train', 'user-run-train', 'user-brack-train'].includes(userActionEvent))
+            return this.roof;
+
+        return super.getHandle(userActionEvent);
+    }
+
+    getUserActionEvent(index) {
+        return ['user-drag-train', 'user-run-train', 'user-brack-train'][index];
     }
 
     dispose() {

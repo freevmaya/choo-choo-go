@@ -12,6 +12,7 @@ class BaseGame {
     this.paramsIndex = START_GAME;
     this.gameObjects = [];
     this.raycasterManager = null;
+    this.afterFrame = [];
 
     this.advProvider = () => {
       return new Promise((resolve, reject)=>{
@@ -40,6 +41,10 @@ class BaseGame {
             this.init();
           });
       });
+  }
+
+  doAfterFrame(call) {
+    this.afterFrame.push(call);
   }
 
   initScene() {
@@ -772,6 +777,9 @@ class BaseGame {
     this.gameObjects.forEach((ga)=>{
       ga.update(dt);
     });
+
+    this.afterFrame.forEach(c=>c());
+    this.afterFrame.length = 0;
   }
   
   animate() {

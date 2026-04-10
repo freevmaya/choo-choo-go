@@ -4,6 +4,7 @@
 class EventEmitter {
   constructor() {
     this.events = {};
+    this.broadcast = [];
   }
 
   on(event, listener) {
@@ -20,8 +21,19 @@ class EventEmitter {
   }
 
   emit(event, data) {
-    if (!this.events[event]) return;
-    this.events[event].forEach(listener => listener(data));
+    if (this.events[event])
+      this.events[event].forEach(listener => listener(data));
+    this.broadcast.forEach(b=>b(event, data));
+  }
+
+  onBroadcast(listener) {
+    this.broadcast.push(listener);
+  }
+
+  offBroadcast(listener) {
+    let idx = this.broadcast.indexOf(listener);
+    if (idx > -1)
+      this.broadcast.splice(idx, 1);
   }
 }
 

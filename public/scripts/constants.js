@@ -96,7 +96,6 @@ const USER_TITLES = {
 }
 
 const DEFAULT_LEVEL = {
-    NAME: '',
     ENV: {
         BACKGROUND_COLOR: 0xBBBBFF,
         GROUND_COLOR: 0x884455,
@@ -153,5 +152,7 @@ const GAME_SETTINGS = {
     BASE_PLATFORM_SIZE: 10,
     GROUND_DENSITY: 2,
 
-    GROUND_COLOR: 0x336633
+    GROUND_COLOR: 0x336633,
+
+    START_CELL: {x: 0, y: 0}
 };

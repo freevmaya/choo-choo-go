@@ -56,9 +56,9 @@ class ForkTrack extends BaseCurveTrack {
 
     	this.handleGroup = new THREE.Group();
 
-        let collider = this.createColliderBox(baseSize * 3, baseSize * 6, baseSize * 3);
-        collider.position.set(0, baseSize * 3, center - baseSize);
-        this.handleGroup.add(collider);
+        this.collider = this.createColliderBox(baseSize * 3, baseSize * 6, baseSize * 3);
+        this.collider.position.set(0, baseSize * 3, center - baseSize);
+        this.handleGroup.add(this.collider);
 
     	let handleSize = baseSize * 0.5;
     	let handle = this.createBox(handleSize, baseSize * 5, handleSize, this.railMaterial);
@@ -72,17 +72,30 @@ class ForkTrack extends BaseCurveTrack {
 
     	this.handleGroup.add(lever);
 
-    	this._registerClickable(collider, this.onHandleClick.bind(this));
+    	this._registerClickable(this.collider, this.onHandleClick.bind(this));
 
     	group.add(this.handleGroup);
 	    this._updateHandle();
     }
 
     onHandleClick(collider) {
-        console.log(collider);
-        if (this.carts.length == 0)
+
+        if (this.carts.length == 0) {
             this.setCurrentPath((this._currentPath + 1) % this.getPathCount());
+            eventBus.emit(this.getUserActionEvent(0), this);
+        }
         else this.doBusy();
+    }
+
+    getUserActionEvent(index) {
+        return 'user-set-current-path';
+    }
+
+    getHandle(userActionEvent='') {
+        if (userActionEvent == 'user-set-current-path')
+            return this.collider;
+
+        return super.getHandle(userActionEvent);
     }
 
     doBusy() {

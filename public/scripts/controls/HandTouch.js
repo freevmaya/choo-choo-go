@@ -9,27 +9,92 @@ class HandTouch {
 
 	initListeners() {
 		eventBus.on('complete-task', this._onTask = this.onTask.bind(this));
+		eventBus.on('game-mode-change', this._onModeChange = this.onModeChange.bind(this));
+		eventBus.onBroadcast(this._onBroadcast = this.onBroadcast.bind(this));
+        eventBus.on('disposed', this._onDisposed = this.onDisposed.bind(this));
+	}
+
+	onDisposed(obj) {
+		if (this.focus == obj)
+			this.closeWaitAction();
+	}
+
+	onModeChange(mode) {
+		if (this.focus)
+			if (this.game.isPlaying() && this.animClass) {
+				this.show(this.animClass);
+			}
+			else this.hide();
 	}
 
 	onTask(task) {
-		this.focus = this.game.items.findAsTask(task, 'expect');
-		if (this.focus) {
-			this.show(this.focus.getCellPosition());
+		if (this.game.isPlaying()) {
+			let focus = this.game.items.findAsTask(task, 'expect');
+			if (focus)
+				this.setFocus(focus, task);
 		}
 	}
 
-	show(a_class='pushAnim') {
-		this.element.removeClass(['show', 'hide', 'pushAnim', 'rightMoveAnim']);
-		this.element.addClass(['show', a_class]);
+	setFocus(focus, expect) {
+		if (focus) {
+
+			if (focus == this.focus)
+				return;
+
+			if (this.focus) {
+				this.closeWaitAction();
+			}
+
+			this.focus = focus;
+
+			let expectData = parseUserAction(this.focus.data.expect, expect);
+
+			if (this.userActionEvent = this.focus.getUserActionEvent(expectData.index)) {
+
+				eventBus.on(this.userActionEvent, this._onUserActionEvent = this.onUserActionEvent.bind(this));
+				this.game.items.findTrains().forEach(t=>t.State('braking'));
+				this.show(this.animClass = expectData.animClass);
+				return;
+			}
+		}
+		this.closeWaitAction();
 	}
 
-	hide(cell, task, direct='') {
+	onBroadcast(event, data) {
+		if (this.game.isPlaying() && this.game.items) {
+			let focus = this.game.items.findAsTask(event, 'expect');
+			if (focus)
+				this.setFocus(focus, event);
+		}
+	}
+
+	onUserActionEvent(data) {
+		this.closeWaitAction();
+	}
+
+	closeWaitAction() {
+		if (this.focus) {
+			this.focus = null;
+			eventBus.off(this.userActionEvent, this._onUserActionEvent);
+			this.userActionEvent = null;
+			this.animClass = null;
+			this.hide();
+		}
+	}
+
+	show(a_class='') {
+		this.element.removeClass(['show', 'hide', 'pushAnim', 'rightMoveAnim']);
+		this.element.addClass(['show', a_class || 'pushAnim']);
+	}
+
+	hide() {
+		this.element.removeClass(['show', 'hide', 'pushAnim', 'rightMoveAnim']);
 		this.element.addClass('hide');
 	}
 
 	update(dt) {
 		if (this.focus) {
-			let pos = this.game.cameraManager.getScreenPosition(this.focus);
+			let pos = this.game.cameraController.getScreenPosition(this.focus.getHandle(this.userActionEvent));
 			this.element.css({left: pos.x, top: pos.y});
 		}
 	}
@@ -41,5 +106,29 @@ class HandTouch {
 		}
 
 		eventBus.off('complete-task', this._onTask);
+		eventBus.offBroadcast(this._onBroadcast);
 	}
+}
+
+function parseUserAction(input, expect) {
+    // Если пришёл массив — ищем элемент, который содержит expect
+    let str = input;
+    
+    if (Array.isArray(input)) {
+        str = input.find(item => item?.startsWith(expect));
+        if (!str) {
+            return { index: 0, animClass: '' };
+        }
+    }
+    
+    const match = str?.match(/^[^:]+:(\d+):(.+)$/);
+    
+    if (!match) {
+        return { index: 0, animClass: '' };
+    }
+    
+    return {
+        index: parseInt(match[1], 10),
+        animClass: match[2]
+    };
 }
