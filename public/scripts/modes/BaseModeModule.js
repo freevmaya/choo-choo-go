@@ -16,7 +16,10 @@ class BaseModeModule extends BaseStateMashine {
 	    let description = this.game.getConst('DESCRIPTION');
 	    if (showToast && description) {
 	    	this.toast = this.game.toast.show(lang.get(description));
-	    }
+	    } else if (this.toast) {
+			this.toast.dispose();
+			this.toast = null;
+		}
 	}
 
 	dispose() {

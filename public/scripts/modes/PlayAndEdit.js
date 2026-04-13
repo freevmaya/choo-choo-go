@@ -45,6 +45,7 @@ class PlayAndEdit extends BaseModeModule {
 	}
 
 	dispose() {
+		super.dispose();
 	    eventBus.off('ground-click', this._onGroundClick);
 	   	eventBus.off('gameObject:click', this._handleObjectClick);
 	}

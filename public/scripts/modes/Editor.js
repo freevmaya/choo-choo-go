@@ -85,6 +85,7 @@ class Editor extends BaseModeModule {
 			this.library.dispose();
 	    eventBus.off('ground-click', this._onGroundClick);
 	   	eventBus.off('gameObject:click', this._handleObjectClick);
+		super.dispose();
 	}
 }
 

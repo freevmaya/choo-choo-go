@@ -28,6 +28,7 @@ class Delete {
 	dispose() {
 	    eventBus.off('ground-click', this._onGroundClick);
 	   	eventBus.off('gameObject:click', this._handleObjectClick);
+		super.dispose();
 	}
 }
 
