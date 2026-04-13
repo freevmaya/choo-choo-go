@@ -69,8 +69,11 @@ class HandTouch {
 	}
 
 	onUserActionEvent(data) {
-		this.game.showAchievEffect(this.focus.getHandle(this.userActionEvent).getWorldPosition(new THREE.Vector3()));
+		let pos = this.focus.getHandle(this.userActionEvent).getWorldPosition(new THREE.Vector3());
 		this.closeWaitAction();
+		eventBus.emit('user-action', {
+			position: pos
+		});
 	}
 
 	closeWaitAction() {
@@ -83,14 +86,18 @@ class HandTouch {
 		}
 	}
 
+	_setClass(a_classes) {
+		this.element.removeClass(['show', 'hide', 'pushAnim', 'rightMoveAnim', 'rightUpMoveAnim', 
+									'leftMoveAnim', 'leftUpMoveAnim']);
+		this.element.addClass(a_classes);
+	}
+
 	show(a_class='') {
-		this.element.removeClass(['show', 'hide', 'pushAnim', 'rightMoveAnim']);
-		this.element.addClass(['show', a_class || 'pushAnim']);
+		this._setClass(['show', a_class || 'pushAnim']);
 	}
 
 	hide() {
-		this.element.removeClass(['show', 'hide', 'pushAnim', 'rightMoveAnim']);
-		this.element.addClass('hide');
+		this._setClass('hide');
 	}
 
 	update(dt) {

@@ -120,14 +120,17 @@ class BaseCameraController {
 	trainToVisibility() {
 		if (this.point_edge) {
 
-			let delta = this.screenToWorldPoint(this.point_edge.pos)
-							.sub(this.screenToWorldPoint(this.point_edge.edge));
+			let edgePoint = this.screenToWorldPoint(this.point_edge.pos);
+			if (edgePoint) {
 
-			//delta.multiplyScalar(2);
-			let newCellX = this.lookPoint.x + addIgnoreSign(delta.x / this.cellSize(), 1);
-			let newCellY = this.lookPoint.y + addIgnoreSign(delta.z / this.cellSize(), 1);
-			this.setLookCell(new THREE.Vector2(newCellX, newCellY));
-			this.point_edge = null;
+			let delta = edgePoint.sub(this.screenToWorldPoint(this.point_edge.edge));
+
+				//delta.multiplyScalar(2);
+				let newCellX = this.lookPoint.x + addIgnoreSign(delta.x / this.cellSize(), 1);
+				let newCellY = this.lookPoint.y + addIgnoreSign(delta.z / this.cellSize(), 1);
+				this.setLookCell(new THREE.Vector2(newCellX, newCellY));
+				this.point_edge = null;
+			}
 		}
 	}
 

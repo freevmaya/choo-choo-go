@@ -52,6 +52,7 @@
       'effects/SparkEffect',
       'effects/ParticleSystem',
       'audio/SoundManager',
+      'audio/GSoundManager',
       'UI/Swipeable',
       'UI/RailwaySpawner',
       'UI/Library',

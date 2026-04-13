@@ -15,12 +15,21 @@ class RailGame extends BaseGame {
     this._resetTask();
 
     eventBus.on('change-cells', this.onChangeCells.bind(this));
+    eventBus.on('user-action', this.onUserAction.bind(this));
 
     this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame'];
     this.gameMode('Play');
   }
 
+  onUserAction(data) {
+    this.showAchievEffect(data.position);
+  }
+
   onChangeCells(cells) {
+  }
+
+  createSoundManager() {
+    return new GSoundManager(this);
   }
 
   preVictory(object) {

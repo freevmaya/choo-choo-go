@@ -45,8 +45,7 @@ function DevKeySupport() {
 	    window.game.gameState.set(GAME_STATE.GAME_OVER);
 
 	  } else if (event.key === 'v' || event.key === 'V') {
-	    
-	    window.game.ball.bounceCount = 20;
+	  	
 	    window.game.gameState.set(GAME_STATE.VICTORY);
 
 	  } else if (event.key === 'c' || event.key === 'C') {

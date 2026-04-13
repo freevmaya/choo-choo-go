@@ -178,20 +178,12 @@ class BaseGame {
     return duration;
   }
 
-  gameSounds() {
-    return [];
+  createSoundManager() {
+    return null;
   }
   
   async initAudio() {
-    this.soundManager = new SoundManager(this.gameState);
-    try {
-      console.log('Загрузка звуков...');
-      await this.soundManager.loadAllSounds(this.gameSounds());
-      this.soundsLoaded = true;
-      console.log('Звуки успешно загружены');
-    } catch (error) {
-      console.warn('Ошибка загрузки звуков:', error);
-    }
+    this.soundManager = this.createSoundManager();
   }
 
   doPlaying() {
@@ -252,8 +244,8 @@ class BaseGame {
       
       // Клавиша M для отключения звука
       if (e.key === 'm' || e.key === 'M') {
-        this.soundManager.setMuted(!this.soundManager.muted);
-        console.log(`Звук ${this.soundManager.muted ? 'выключен' : 'включен'}`);
+        this.soundManager.ToggleUserMuted();
+        console.log(`Звук ${this.soundManager.userMuted ? 'выключен' : 'включен'}`);
       }
     });
     
@@ -367,10 +359,7 @@ class BaseGame {
 
   clearUserData() {
     this.currentScore = 0;
-    this.stateManager.delete('score');
-    this.stateManager.delete('vin');
-    this.stateManager.delete('title');
-    this.stateManager.delete('paramsIndex');
+    this.stateManager.clear();
 
     this.paramsIndex = Object.keys(GAME_PARAMS)[0];
 
@@ -681,8 +670,10 @@ class BaseGame {
     $(window).on('resize', this.onResize.bind(this));
     $(window).trigger('game-ready');
 
+    /*
     if (DEV) 
       setTimeout(this.gameState.start.bind(this.gameState), 1000);
+      */
   }
 
   soundControl() {
@@ -700,7 +691,7 @@ class BaseGame {
   updateSoundControl() {
     let on = this.volume.hasClass('on');
     this.stateManager.set('sound_on', on);
-    this.soundManager.setMuted(!on);
+    this.soundManager.SetUserMuted(!on);
   }
   
   createGameObjects() {

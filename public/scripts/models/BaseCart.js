@@ -95,6 +95,19 @@ class BaseCart extends BaseGameObject {
         return boxPlate;
     }
 
+    createCaptures() {
+
+        let size = this.size();
+
+        this.capture = [
+            this.createBox(size.captureLenght, size.captureLenght / 2, size.captureLenght / 2, this.mainMaterial),
+            this.createBox(size.captureLenght, size.captureLenght / 2, size.captureLenght / 2, this.mainMaterial)
+        ];
+
+        this.capture[0].position.set((size.length - size.captureLenght) / 2, this.basePlate.position.y, 0);
+        this.capture[1].position.set(-(size.length - size.captureLenght) / 2, this.basePlate.position.y, 0);
+    }
+
 	createModel() {
 
         let size = this.size();
@@ -122,20 +135,16 @@ class BaseCart extends BaseGameObject {
         
         // ========== ОСНОВНОЙ КОРПУС ==========
         // Нижняя платформа
-        const basePlate = this.createBox(this.baseLength, 0.2, size.width, this.mainMaterial);
-        basePlate.position.y = GAME_SETTINGS.TRAIN_WHEEL_RADIUS;
+        this.basePlate = this.createBox(this.baseLength, 0.2, size.width, this.mainMaterial);
+        this.basePlate.position.y = GAME_SETTINGS.TRAIN_WHEEL_RADIUS;
 
-        this.createBox(size.captureLenght, size.captureLenght / 2, size.captureLenght / 2, this.mainMaterial)
-            .position.set((size.length - size.captureLenght) / 2, basePlate.position.y, 0);
-
-        this.createBox(size.captureLenght, size.captureLenght / 2, size.captureLenght / 2, this.mainMaterial)
-            .position.set(-(size.length - size.captureLenght) / 2, basePlate.position.y, 0);
+        this.createCaptures();
         
         // ========== ФАРА ==========
         
         const lampGeo = new THREE.SphereGeometry(0.13, 16, 16);
         const lamp = new THREE.Mesh(lampGeo, lampMaterial);
-        lamp.position.set(this.baseLength / 2, basePlate.position.y, 0);
+        lamp.position.set(this.baseLength / 2, this.basePlate.position.y, 0);
         lamp.castShadow = true;
         this._registerGeometry(lampGeo);
         this.base.add(lamp);
@@ -194,7 +203,7 @@ class BaseCart extends BaseGameObject {
             	group: wheelGroup,
             	radius: pos.radius
             });
-            this._registerClickable(basePlate);
+            //this._registerClickable(basePlate);
         });
 
         return group;

@@ -28,6 +28,7 @@ class BaseCellObject extends BaseGameObject {
         if (value != this.rotation) {
             this.rotation = value;
             this.updateAppearance();
+            eventBus.emit(this.getUserActionEvent(0), this);
             eventBus.emit('cell-rotate', this);
         }
     }

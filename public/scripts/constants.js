@@ -112,7 +112,7 @@ const DEFAULT_LEVEL = {
     objects: []
 };
 
-const START_GAME = 'PICKUP';
+const START_GAME = 'START';
 const PI_HALF = Math.PI / 2;
 
 // Камера

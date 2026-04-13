@@ -17,8 +17,11 @@ class PlayAndEdit extends BaseModeModule {
 		let trackIndex = this.game.items.find(cell);
 		if (trackIndex > -1) {
 			let track = this.game.items.get(trackIndex);
-			if (!track.isBusy())
-	        	track.nextRotation();
+
+			if (!track.isBusy()) {
+				if (!track.data.fixed)
+	        		track.nextRotation();
+			}
 	        else eventBus.emit('track-busy');
 		}
 	}

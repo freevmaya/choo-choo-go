@@ -83,16 +83,17 @@ class ForkTrack extends BaseCurveTrack {
         if (this.carts.length == 0) {
             this.setCurrentPath((this._currentPath + 1) % this.getPathCount());
             eventBus.emit(this.getUserActionEvent(0), this);
+            eventBus.emit('fork-change');
         }
         else this.doBusy();
     }
 
     getUserActionEvent(index) {
-        return 'user-set-current-path';
+        return super.getUserActionEvent(index) || 'user-set-current-path';
     }
 
     getHandle(userActionEvent='') {
-        if (userActionEvent == 'user-set-current-path')
+        if (userActionEvent == this.getUserActionEvent(0))
             return this.collider;
 
         return super.getHandle(userActionEvent);

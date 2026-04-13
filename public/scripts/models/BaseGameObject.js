@@ -134,7 +134,7 @@ class BaseGameObject extends BaseStateMashine {
     }
 
     getUserActionEvent(index) {
-        return '';
+        return this.data.user_action_event && this.data.user_action_event[index] ? this.data.user_action_event[index] : '';
     }
 
     /**

@@ -334,7 +334,7 @@ class Train extends BaseCart {
         // Создаем систему дыма
         this.createSmokeSystem(this.base);
 
-        let collider = this.createColliderBox((size.width + size.wheel.width * 2) * 1.2, size.height * 1.2, size.length * 1.2);
+        let collider = this.createColliderBox((size.width + size.wheel.width * 2) * 1.2, size.height * 1.4, size.length * 1.2);
         collider.position.y = size.height / 2 + size.wheel.radius;
         group.add(collider)
         this._registerClickable(collider);
@@ -472,6 +472,8 @@ class Train extends BaseCart {
 
                 this.addChain(collistion.cart);
                 this.State('braking');
+
+                eventBus.emit('train-add-chain', collistion.cart);
             }
         } else {
 
@@ -485,6 +487,17 @@ class Train extends BaseCart {
                 });
             }
         }
+    }
+
+    createCaptures() {
+
+        let size = this.size();
+
+        this.capture = [
+            this.createBox(size.captureLenght, size.captureLenght / 2, size.captureLenght / 2, this.mainMaterial)
+        ];
+
+        this.capture[0].position.set(-(size.length - size.captureLenght) / 2, this.basePlate.position.y, 0);
     }
     
     update(dt) {
@@ -527,6 +540,13 @@ class Train extends BaseCart {
             this.State('run');
     }
 
+    State(value = null) {
+        let result = super.State(value);
+        if (value)
+            eventBus.emit('train-' + super.State());
+        return result;
+    }
+
     _afterChangeForward() {
         super._afterChangeForward();
         this.chain.forEach((cart)=>{
@@ -547,7 +567,7 @@ class Train extends BaseCart {
     }
 
     getUserActionEvent(index) {
-        return ['user-drag-train', 'user-run-train', 'user-brack-train'][index];
+        return super.getUserActionEvent(index) || ['user-drag-train', 'user-run-train', 'user-brack-train'][index];
     }
 
     dispose() {

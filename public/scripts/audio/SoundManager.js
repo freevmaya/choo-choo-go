@@ -1,203 +1,441 @@
-// scripts/audio/SoundManager.js
-
 class SoundManager {
-  constructor() {
-    this.sounds = new Map();
-    this.activated = false;
-    this.muted = false;
-    this.masterVolume = 0.7;
+    constructor() {
+        this.audioContext = null;
+        this.sounds = new Map();
+        this.masterVolume = 1;
+        this.muted = false;
+        this.userMuted = false;
+        this.requirePlay = {};
+        this.activeSources = new Map(); // Хранилище активных источников
+        this.suspendedSources = new Map(); // Хранилище приостановленных источников
+    }
 
-    this.setupActivation();
+    ToggleUserMuted() {
+        this.SetUserMuted(!this.userMuted);
+    }
+
+    SetUserMuted(value) {
+        this.userMuted = value;
+        this.setMuted(this.userMuted);
+    }
     
-    console.log('SoundManager: Инициализирован (ожидает активации)');
-  }
-  
-  /**
-   * Настройка активации по первому клику
-   */
-  setupActivation() {
-    const activate = () => {
-      if (!this.activated) {
-        this.activated = true;
-        console.log('SoundManager: Активирован пользователем');
-        
-        // Воспроизводим тихий звук для разблокировки Audio в браузерах
-        const silentAudio = new Audio();
-        silentAudio.volume = 0.01;
-        silentAudio.play().catch(() => {});
-        
-        // Удаляем обработчики после активации
-        $(document).off('click', activate);
-        $(document).off('touchstart', activate);
-        $(document).off('keydown', activate);
-      }
-    };
+    // Инициализация (должна вызываться после взаимодействия с пользователем)
+    async init() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        await this.audioContext.resume();
+    }
+
+    isActivated() {
+        return this.audioContext != null;
+    }
     
-    $(document).on('click', activate);
-    $(document).on('touchstart', activate);
-    $(document).on('keydown', activate);
-  }
-  
-  /**
-   * Загрузка звука
-   * @param {string} id - идентификатор звука
-   * @param {string} url - путь к файлу
-   * @param {Object} options - опции (volume, loop)
-   */
-  loadSound(id, url, options = {}) {
+    // Загрузка звука
+    async loadSound(name, url) {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+        this.sounds.set(name, audioBuffer);
 
-    return new Promise((resolve, reject) => {
+        if (this.requirePlay[name]) {
+            this._play(name, this.requirePlay[name]);
+            delete(this.requirePlay[name]);
+        }
+    }
 
-      let audio = this.sounds.get(id);
-      if (audio) {
-        resolve(audio);
-        return;
+    Play(name, a_options) {
+        const buffer = this.sounds.get(name);
+        if (buffer)
+            this. _play(name, a_options);
+        else this.requirePlay[name] = a_options;
+    }
 
-      } else audio = new Audio();
+    _play(name, a_options) {
+        let options = {...{volume: 0.5, loop: false, startTime: 0}, ...a_options};
 
-      audio.src = url;
-      audio.preload = 'auto';
-      audio.volume = (options.volume || 1.0) * this.masterVolume;
-      audio.loop = options.loop || false;
-      
-      audio.addEventListener('canplaythrough', () => {
-        console.log(`SoundManager: Звук "${id}" загружен`);
-        this.sounds.set(id, {
-          audio,
-          options,
-          url
+        let asMuted = !options.ignoreMuted && (this.userMuted || this.muted);
+
+        if (!this.audioContext || asMuted) 
+            return null;
+        
+        const buffer = this.sounds.get(name);
+        if (!buffer) return null;
+        
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.loop = options.loop;
+        
+        const gainNode = this.audioContext.createGain();
+        
+        gainNode.gain.value = options.volume * this.masterVolume;
+        
+        source.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        const sourceId = Symbol();
+        const sourceInfo = {
+            id: sourceId,
+            source,
+            gainNode,
+            name,
+            volume: options.volume,
+            loop: options.loop,
+            startTime: options.startTime,
+            startOffset: 0,
+            startTimestamp: this.audioContext.currentTime
+        };
+        
+        this.activeSources.set(sourceId, sourceInfo);
+        
+        source.onended = () => {
+            if (!source.loop) {
+                this.activeSources.delete(sourceId);
+            }
+        };
+        
+        if (this.userMuted) {
+            this.suspendedSources.set(sourceId, {
+                id: sourceId,
+                name: sourceInfo.name,
+                volume: sourceInfo.volume,
+                loop: sourceInfo.loop,
+                startTime: options.startTime,
+                buffer: this.sounds.get(sourceInfo.name),
+                options: { volume: sourceInfo.volume, loop: sourceInfo.loop, startTime: options.startTime }
+            });
+        } else source.start(0, options.startTime);
+        
+        return { source, gainNode, sourceId };
+    }
+
+    stop(name) {
+        if (!this.audioContext) return false;
+        
+        let stopped = false;
+        
+        // Ищем и останавливаем активные источники
+        for (const [sourceId, sourceInfo] of this.activeSources) {
+            if (sourceInfo.name === name) {
+                try {
+                    sourceInfo.source.stop();
+                    this.activeSources.delete(sourceId);
+                    stopped = true;
+                } catch (e) {
+                    console.warn('Ошибка при остановке звука:', e);
+                }
+            }
+        }
+        
+        // Также удаляем из приостановленных, если есть
+        for (const [sourceId, sourceInfo] of this.suspendedSources) {
+            if (sourceInfo.name === name) {
+                this.suspendedSources.delete(sourceId);
+                stopped = true;
+            }
+        }
+        
+        if (stopped) {
+            console.log(`Звук "${name}" остановлен`);
+        }
+        
+        return stopped;
+    }
+    
+    stopAll(name) {
+        if (!this.audioContext) return 0;
+        
+        let count = 0;
+        
+        // Останавливаем активные источники
+        for (const [sourceId, sourceInfo] of this.activeSources) {
+            if (sourceInfo.name === name) {
+                try {
+                    sourceInfo.source.stop();
+                    this.activeSources.delete(sourceId);
+                    count++;
+                } catch (e) {
+                    console.warn('Ошибка при остановке звука:', e);
+                }
+            }
+        }
+        
+        // Удаляем из приостановленных
+        for (const [sourceId, sourceInfo] of this.suspendedSources) {
+            if (sourceInfo.name === name) {
+                this.suspendedSources.delete(sourceId);
+                count++;
+            }
+        }
+        
+        if (count > 0) {
+            console.log(`Остановлено ${count} источник(ов) звука "${name}"`);
+        }
+        
+        return count;
+    }
+
+    // Пауза для конкретного звука по имени
+    pause(name) {
+        if (!this.audioContext) return 0;
+        
+        let pausedCount = 0;
+        const now = this.audioContext.currentTime;
+        
+        // Находим и приостанавливаем активные источники с указанным именем
+        for (const [sourceId, sourceInfo] of this.activeSources) {
+            if (sourceInfo.name === name) {
+                try {
+                    // Сохраняем текущее время воспроизведения
+                    const elapsed = now - sourceInfo.startTimestamp;
+                    const currentOffset = sourceInfo.startOffset + elapsed;
+                    
+                    // Останавливаем источник
+                    sourceInfo.source.stop();
+                    
+                    // Сохраняем в приостановленные
+                    this.suspendedSources.set(sourceId, {
+                        id: sourceId,
+                        name: sourceInfo.name,
+                        volume: sourceInfo.volume,
+                        loop: sourceInfo.loop,
+                        startTime: currentOffset,
+                        buffer: this.sounds.get(sourceInfo.name),
+                        options: { 
+                            volume: sourceInfo.volume, 
+                            loop: sourceInfo.loop, 
+                            startTime: currentOffset 
+                        }
+                    });
+                    
+                    // Удаляем из активных
+                    this.activeSources.delete(sourceId);
+                    pausedCount++;
+                    
+                } catch (e) {
+                    console.warn(`Ошибка при паузе звука "${name}":`, e);
+                }
+            }
+        }
+        
+        if (pausedCount > 0) {
+            console.log(`Приостановлено ${pausedCount} источник(ов) звука "${name}"`);
+        } else {
+            console.log(`Звук "${name}" не найден среди активных`);
+        }
+        
+        return pausedCount;
+    }
+
+    // Возобновление конкретного приостановленного звука
+    resume(name) {
+        if (!this.audioContext || this.muted) return 0;
+        
+        let resumedCount = 0;
+        
+        // Находим и возобновляем приостановленные источники с указанным именем
+        for (const [sourceId, sourceInfo] of this.suspendedSources) {
+            if (sourceInfo.name === name) {
+                const buffer = this.sounds.get(sourceInfo.name);
+                if (!buffer) continue;
+                
+                const source = this.audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.loop = sourceInfo.loop;
+                
+                const gainNode = this.audioContext.createGain();
+                gainNode.gain.value = sourceInfo.volume * this.masterVolume;
+                
+                source.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                const startOffset = sourceInfo.startTime;
+                
+                const newSourceInfo = {
+                    id: sourceId,
+                    source,
+                    gainNode,
+                    name: sourceInfo.name,
+                    volume: sourceInfo.volume,
+                    loop: sourceInfo.loop,
+                    startTime: startOffset,
+                    startOffset: startOffset,
+                    startTimestamp: this.audioContext.currentTime
+                };
+                
+                this.activeSources.set(sourceId, newSourceInfo);
+                
+                source.onended = () => {
+                    if (!source.loop) {
+                        this.activeSources.delete(sourceId);
+                    }
+                };
+                
+                source.start(0, startOffset);
+                
+                // Удаляем из приостановленных
+                this.suspendedSources.delete(sourceId);
+                resumedCount++;
+            }
+        }
+        
+        if (resumedCount > 0) {
+            console.log(`Возобновлено ${resumedCount} источник(ов) звука "${name}"`);
+        } else {
+            console.log(`Приостановленный звук "${name}" не найден`);
+        }
+        
+        return resumedCount;
+    }
+    
+    // Приостановка всех звуков (пауза)
+    pauseAllSounds() {
+
+        if (!this.audioContext) return;
+
+        const now = this.audioContext.currentTime;
+        
+        this.activeSources.forEach((sourceInfo, sourceId) => {
+            try {
+                // Сохраняем текущее время воспроизведения
+                const elapsed = now - sourceInfo.startTimestamp;
+                const currentOffset = sourceInfo.startOffset + elapsed;
+                
+                sourceInfo.source.stop();
+                
+                // Сохраняем в приостановленные
+                this.suspendedSources.set(sourceId, {
+                    id: sourceId,
+                    name: sourceInfo.name,
+                    volume: sourceInfo.volume,
+                    loop: sourceInfo.loop,
+                    startTime: currentOffset,
+                    buffer: this.sounds.get(sourceInfo.name),
+                    options: { volume: sourceInfo.volume, loop: sourceInfo.loop, startTime: currentOffset }
+                });
+            } catch (e) {
+                console.warn('Ошибка при остановке:', e);
+            }
         });
         
-        // Сообщаем о загрузке
-        eventBus.emit('sound:loaded', { id, success: true });
-        resolve(audio);
-      }, { once: true });
-      
-      audio.addEventListener('error', (e) => {
-        console.warn(`SoundManager: Ошибка загрузки "${id}"`, e);
-        eventBus.emit('sound:error', { id, error: e.message });
-        reject(e);
-      });
-      
-      audio.load();
-
-      eventBus.on(id, ()=>{
-        this.play(id);
-      });
-    });
-  }
-  
-  /**
-   * Воспроизведение звука
-   * @param {string} id - идентификатор звука
-   * @param {Object} options - параметры воспроизведения
-   */
-  play(id, options = {}) {
-    // Проверяем активацию
-    if (!this.activated) {
-      console.log(`SoundManager: Звук "${id}" не воспроизведен (ожидание активации)`);
-      return false;
+        this.activeSources.clear();
+        console.log('звуки на паузе');
     }
     
-    // Проверяем наличие звука
-    if (!this.sounds.has(id)) {
-      console.warn(`SoundManager: Звук "${id}" не найден`);
-      return false;
-    }
-    
-    if (this.muted) return false;
-    
-    try {
-      const sound = this.sounds.get(id);
-
-      options = {...sound.options, ...options};
-
-      const audio = sound.audio;
-      audio.volume = (options.volume || 1.0) * this.masterVolume;
-      audio.loop = options.loop || sound.options.loop || false;
-      audio.playbackRate = options.playbackRate || 1.0;
-      audio.currentTime = 0;
-      
-      // Воспроизводим
-      const playPromise = audio.play();
-      
-      if (playPromise !== undefined) {
-        playPromise.catch(e => {
-          console.warn(`SoundManager: Ошибка воспроизведения "${id}":`, e);
+    // Возобновление всех приостановленных звуков
+    resumeAllSounds() {
+        if (this.muted) return;
+        
+        this.suspendedSources.forEach((sourceInfo, sourceId) => {
+            const buffer = this.sounds.get(sourceInfo.name);
+            if (!buffer) return;
+            
+            const source = this.audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.loop = sourceInfo.loop;
+            
+            const gainNode = this.audioContext.createGain();
+            gainNode.gain.value = sourceInfo.volume * this.masterVolume;
+            
+            source.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            const startOffset = sourceInfo.startTime;
+            
+            const newSourceInfo = {
+                id: sourceId,
+                source,
+                gainNode,
+                name: sourceInfo.name,
+                volume: sourceInfo.volume,
+                loop: sourceInfo.loop,
+                startTime: startOffset,
+                startOffset: startOffset,
+                startTimestamp: this.audioContext.currentTime
+            };
+            
+            this.activeSources.set(sourceId, newSourceInfo);
+            
+            source.onended = () => {
+                if (!source.loop) {
+                    this.activeSources.delete(sourceId);
+                }
+            };
+            
+            source.start(0, startOffset);
         });
-      }
-      
-      /*
-      // Удаляем элемент после окончания
-      audio.addEventListener('ended', () => {
-        audio.remove();
-      });
-      */
-      
-      // Сообщаем о воспроизведении
-      eventBus.emit('sound:played', { 
-        id, 
-        time: Date.now(),
-        options 
-      });
-      
-      return true;
-    } catch (e) {
-      console.warn(`SoundManager: Ошибка при воспроизведении "${id}":`, e);
-      return false;
+        
+        this.suspendedSources.clear();
+        console.log('звуки возобновлены');
     }
-  }
-  
-  /**
-   * Остановка звука (если он играет)
-   */
-  stop(id) {
+    
+    // Остановка всех активных звуков (полная остановка)
+    stopAllSounds() {
+        this.activeSources.forEach(sourceInfo => {
+            try {
+                sourceInfo.source.stop();
+            } catch (e) {}
+        });
+        this.activeSources.clear();
+        
+        // Также очищаем приостановленные
+        this.suspendedSources.clear();
+        
+        console.log('звуки остановлены');
+    }
+    
+    // Установка громкости
+    setMasterVolume(volume) {
+        this.masterVolume = Math.max(0, Math.min(1, volume));
+        
+        this.activeSources.forEach(sourceInfo => {
+            if (sourceInfo.gainNode) {
+                sourceInfo.gainNode.gain.value = sourceInfo.volume * this.masterVolume;
+            }
+        });
+    }
 
-    let sound = this.sounds.get(id);
-    if (sound)
-      sound.audio.pause();
+    setMuted(value) {
+        if (value) this.mute();
+        else this.unmute();
+    }
     
-    // Останавливаем все копии? Сложно отследить
-    // Можно добавить функциональность позже при необходимости
-    eventBus.emit('sound:stopped', { id });
-  }
-  
-  /**
-   * Загрузка всех звуков игры
-   * sounds = [
-      { id: 'bounce', url: 'sounds/bounce.mp3', options: { volume: 0.5 }},
-      { id: 'dirt', url: 'sounds/dirt.mp3', options: { volume: 0.5 }},
-      { id: 'blade', url: 'sounds/blade.mp3', options: { volume: 0.5 }}
-    ];
-   */
-  loadAllSounds(sounds = []) {
+    mute() {
+        if (this.muted) return;
+        
+        this.muted = true;
+        
+        // Приостанавливаем все активные звуки
+        this.pauseAllSounds();
+        
+        console.log('Звук выключен (все звуки на паузе)');
+    }
     
+    unmute() {
+        if (!this.muted) return;
+        
+        this.muted = false;
+        
+        // Возобновляем все приостановленные звуки
+        this.resumeAllSounds();
+        
+        console.log('Звук включен (звуки продолжаются)');
+    }
     
-    return Promise.allSettled(
-      sounds.map(s => this.loadSound(s.id, s.url, s.options))
-    );
-  }
-  
-  /**
-   * Установка громкости
-   */
-  setMasterVolume(volume) {
-    this.masterVolume = Math.max(0, Math.min(1, volume));
-    eventBus.emit('sound:volumeChanged', { volume: this.masterVolume, muted: this.muted });
-  }
-  
-  /**
-   * Включение/выключение звука
-   */
-  setMuted(muted) {
-    this.muted = muted;
-    eventBus.emit('sound:muteChanged', { muted: this.muted });
-  }
-  
-  /**
-   * Проверка активации
-   */
-  isActivated() {
-    return this.activated;
-  }
+    // Возобновление контекста (после бездействия браузера)
+    async resume() {
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            await this.audioContext.resume();
+            
+            // Если был muted, нужно восстановить звуки
+            if (!this.muted && this.suspendedSources.size > 0) {
+                this.resumeAllSounds();
+            }
+        }
+    }
 }
+
+/*
+const soundManager = new SoundManager();
+document.addEventListener('click', async () => {
+    await soundManager.init();
+}, { once: true });
+*/
