@@ -70,7 +70,7 @@ class RailwayPlatform extends BaseCellObject {
     this.injectPeople(this.data.peopleCount);
 
     eventBus.on('runOver', this._onRunOver = this.onRunOver.bind(this));
-    eventBus.on('change_cart_state', this._onChangeTrainState = this.onChangeTrainState.bind(this));
+    eventBus.on('change_mashine_state', this._onChangeTrainState = this.onChangeTrainState.bind(this));
     return this;
   }
 
@@ -121,7 +121,7 @@ class RailwayPlatform extends BaseCellObject {
       train.State('run');
 
       if (this.data.taskName)
-        this.game.completedTask(this.data.taskName);
+        this.game.completedTask(this.data.taskName, this);
     }
   }
 
@@ -160,7 +160,7 @@ class RailwayPlatform extends BaseCellObject {
 
   finishUnloading(train) {
     if (this.data.taskName)
-      this.game.completedTask(this.data.taskName);
+      this.game.completedTask(this.data.taskName, this);
   }
 
   injectPeople(count) {
@@ -570,7 +570,7 @@ class RailwayPlatform extends BaseCellObject {
     this.materials = {};
 
     eventBus.off('runOver', this._onRunOver);
-    eventBus.off('change_cart_state', this._onChangeTrainState);
+    eventBus.off('change_mashine_state', this._onChangeTrainState);
   }
 }
 

@@ -1,6 +1,6 @@
-class Delete {
+class Delete extends BaseModeModule {
 	constructor(game) {
-		this.game = game;
+		super(game);
 	    this.initListeners();
 	}
 

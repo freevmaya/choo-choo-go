@@ -1,12 +1,7 @@
-class BaseCurveTrack extends BaseTrack {
+class BaseCurveTrack extends StraightTrack {
 
     /**
      * Создаёт рельсу из прямоугольных сегментов по заданным точкам
-     * @param {THREE.Vector3[]} points - массив точек кривой
-     * @param {THREE.Material} material - материал рельсы
-     * @param {number} railWidth - ширина рельсы
-     * @param {number} railHeight - высота рельсы
-     * @param {THREE.Group} group - группа для добавления
      */
     createRailFromPoints(points, material, railWidth, railHeight, group) {
 

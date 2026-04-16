@@ -137,6 +137,7 @@ class BaseCart extends BaseGameObject {
         // Нижняя платформа
         this.basePlate = this.createBox(this.baseLength, 0.2, size.width, this.mainMaterial);
         this.basePlate.position.y = GAME_SETTINGS.TRAIN_WHEEL_RADIUS;
+        this._registerClickable(this.basePlate);
 
         this.createCaptures();
         
@@ -263,8 +264,12 @@ class BaseCart extends BaseGameObject {
         }
     }
 
+    moveDirect() {
+        return this.model.worldDirection().multiplyScalar(this.velocity);
+    }
+
     isMoving() {
-    	return Math.abs(this.velocity) > 0.02;
+    	return Math.abs(this.velocity) > 0.08;
     }
 
     headTrain() {
@@ -275,16 +280,37 @@ class BaseCart extends BaseGameObject {
 
     addedToChain() {
         if (this.data.taskName)
-            this.game.completedTask(this.data.taskName);
+            this.game.completedTask(this.data.taskName, this);
     }
 
     deChain() {
         let train = this.headTrain();
-        if (train) {
+        if (train && train.isLastChain(this) && (train.State() == 'stop')) {
             train.removeChain(this);
+
+            let last = train.getLastChain();
+
+            let pen = this.trackPos.penetration(last.trackPos, false);
+            if (pen) {
+
+                let dot = this.model.worldDirection().dot(pen.distance);
+                let push = Math.max(pen.depth * 1.5, 0.2);
+                this.setForward(dot > 0);
+                this.trackPos.applyVelocity(push, this, 1, []);
+            }
+
+            eventBus.emit('train-remove-chain', this);
             if (this.data.taskName)
                 this.game.deCompletedTask(this.data.taskName);
+
+            return true;
         }
+
+        return false;
+    }
+
+    allowedToJoin(train) {
+        return !this.data.fixed;
     }
 }
 

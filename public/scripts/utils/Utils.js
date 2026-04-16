@@ -301,6 +301,12 @@ THREE.Object3D.prototype.worldToLocalDirection = function(globalDirection) {
     return globalDirection.clone().applyQuaternion(inverseQuaternion);
 };
 
+THREE.Object3D.prototype.worldDirection = function() {
+    const direction = new THREE.Vector3();
+    this.getWorldDirection(direction);
+    return direction;
+};
+
 THREE.Object3D.prototype.contains = function(child) {
     if (this === child) return true;
     return this.children.some(c => c === child || c.contains(child));
@@ -354,4 +360,25 @@ function addIgnoreSign(a, b) {
 function hasParam(paramName) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.has(paramName);
+}
+
+function loadScript(src, callback) {
+    const script = document.createElement('script');
+    script.src = src;
+    
+    script.onload = () => {
+        if (callback) callback();
+    };
+    
+    script.onerror = () => {
+        console.error(`Ошибка загрузки: ${src}`);
+    };
+    
+    document.head.appendChild(script);
+}
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }

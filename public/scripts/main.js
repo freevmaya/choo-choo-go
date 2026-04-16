@@ -16,6 +16,7 @@ class RailGame extends BaseGame {
 
     eventBus.on('change-cells', this.onChangeCells.bind(this));
     eventBus.on('user-action', this.onUserAction.bind(this));
+    eventBus.on('wrong', this.onWrong.bind(this));
 
     this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame'];
     this.gameMode('Play');
@@ -28,6 +29,22 @@ class RailGame extends BaseGame {
   onChangeCells(cells) {
   }
 
+  onWrong(data) {
+    if (typeof data == 'string') {
+
+      if (this.wrongToastTimer) {
+        clearTimeout(this.wrongToastTimer);
+        this.wrongToastTimer = null;
+      }
+
+      this.wrongToast = this.toast.show(data);
+      this.wrongToastTimer = setTimeout(()=>{
+        if (this.wrongToast)
+          this.wrongToast.dispose();
+      }, 5000);
+    }
+  }
+
   createSoundManager() {
     return new GSoundManager(this);
   }
@@ -35,6 +52,9 @@ class RailGame extends BaseGame {
   preVictory(object) {
     let pos = object.getPosition();
     this.showMagicSwirl(pos.x, pos.y, pos.z);
+
+    if (this.timerId)
+      clearInterval(this.timerId);
 
     eventBus.emit('pre-victory');
 
@@ -49,6 +69,7 @@ class RailGame extends BaseGame {
 
     this.toast = new ToastMessage(this);
     this.handTouch = new HandTouch(this);
+    this.timerElem = $('#time');
 
     if (DEV)
       this.initDevTools();
@@ -122,15 +143,47 @@ class RailGame extends BaseGame {
     this.modeModule = createObject(this.gameModes[this.gameModeIndex], this);
   }
 
+  _resetTimer() {
+    let amountTime = this.getConst('AMOUNT_TIME');
+    this.timerElem.css('display', amountTime ? 'flex' : 'none');
+
+    if (this.timerId)
+      clearInterval(this.timerId);
+
+    this.alarmTime = false;
+    this.timerElem.removeClass('warning');
+
+    if (amountTime) {
+      this.timerId = setInterval(()=>{
+        if (this.isPlaying()) {
+          amountTime -= 1;
+
+          if (!this.alarmTime && (amountTime < 10))
+            this.timerElem.addClass('warning');
+
+          if (amountTime > 0) {
+            this.timerElem.find('.time').text(formatTime(amountTime));
+          } else this.gameState.set(GAME_STATE.GAME_OVER);
+        }
+      }, 1000);
+    }
+  }
+
   isCompletedTask(task) {
       return this.taskCompleted.includes(task);
   }
 
-  completedTask(task) {
+  completedTask(task, ga) {
 
     if (!this.isCompletedTask(task)) {
       this.taskCompleted.push(task);
       console.log('Tasks completed: ' + JSON.stringify(this.taskCompleted));
+
+      this.addCurrentScore(ga && ga.data.score ? ga.data.score : this.getConst("DEFAULT_TASK_SCORE"));
+
+      if (ga)
+        this.showAchievEffect(ga.getPosition());
+
       eventBus.emit('complete-task', task);
     }
 
@@ -232,20 +285,27 @@ class RailGame extends BaseGame {
     this.scene.add(ambient);
     this.lights.push(ambient);
     
-    const keyLight = new THREE.DirectionalLight(toThreeColor(env.KEY_LIGHT_COLOR), env.KEY_LIGHT_INTENSITY);
-    keyLight.position.set(20, 20, 20);
+    const keyLight = new THREE.PointLight(
+        toThreeColor(this.getConst('KEY_LIGHT_COLOR')), 
+        this.getConst('KEY_LIGHT_INTENSITY')
+    );
+    keyLight.position.set(0, 10, 0);
+    keyLight.distance = 20;      // На расстоянии 30 интенсивность станет 0
+    keyLight.decay = 1.5;        // Плавность затухания
+
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
     keyLight.shadow.camera.near = 0.5;
-    keyLight.shadow.camera.far = 1000;
+    keyLight.shadow.camera.far = 50;
     keyLight.shadow.camera.left = -20;
     keyLight.shadow.camera.right = 20;
     keyLight.shadow.camera.top = 20;
     keyLight.shadow.camera.bottom = -20;
     keyLight.shadow.bias = 0;
+
     this.scene.add(keyLight);
     this.lights.push(keyLight);
-    
+    /*
     const fillLight = new THREE.DirectionalLight(toThreeColor(env.FILL_LIGHT_COLOR), env.FILL_LIGHT_INTENSITY);
     fillLight.position.set(-3, 2, 3);
     this.scene.add(fillLight);
@@ -255,6 +315,7 @@ class RailGame extends BaseGame {
     rimLight.position.set(-2, -1, 4);
     this.scene.add(rimLight);
     this.lights.push(rimLight);
+    */
   }
 
   loadCells(cells) {
@@ -317,6 +378,7 @@ class RailGame extends BaseGame {
 
     this.gameMode(env.GAME_MODE || 'Play');
 
+    this._resetTimer();
     this.createLights();
     this.createGameUI();
     super.createGameObjects();
@@ -392,8 +454,171 @@ class RailGame extends BaseGame {
   }
 }
 
-
 // Запуск игры
 onAllImagesLoaded(() => {
   window.game = new RailGame();
+});
+
+//____________________________MODAL_______________
+
+/*
+function generateTrainBackground(element, options = {}) {
+    const {
+        opacity = 0.4,
+        minScale = 1.0,
+        maxScale = 2.0,
+        maxAttemptsPerTrain = 2000
+    } = options;
+
+    if (getComputedStyle(element).position === 'static') {
+        element.style.position = 'relative';
+    }
+
+    const oldLayer = element.querySelector('.train-bg-layer');
+    if (oldLayer) oldLayer.remove();
+
+    const bgLayer = document.createElement('div');
+    bgLayer.className = 'train-bg-layer';
+    bgLayer.style.position = 'absolute';
+    bgLayer.style.top = '0';
+    bgLayer.style.left = '0';
+    bgLayer.style.width = '100%';
+    bgLayer.style.height = '100%';
+    bgLayer.style.pointerEvents = 'none';
+    bgLayer.style.opacity = opacity;
+
+    const canvas = document.createElement('canvas');
+    bgLayer.appendChild(canvas);
+    element.appendChild(bgLayer);
+
+    const ctx = canvas.getContext('2d');
+
+    // Хранилище занятых областей
+    let occupiedZones = [];
+
+    // Проверка пересечения прямоугольников
+    function isOverlapping(x, y, w, h) {
+        const rect = { x: x - w/2, y: y - h/2, w: w, h: h };
+        for (let zone of occupiedZones) {
+            if (rect.x < zone.x + zone.w &&
+                rect.x + rect.w > zone.x &&
+                rect.y < zone.y + zone.h &&
+                rect.y + rect.h > zone.y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Добавление занятой зоны
+    function addOccupiedZone(x, y, w, h) {
+        occupiedZones.push({ x: x - w/2, y: y - h/2, w: w, h: h });
+    }
+
+    function drawTrains() {
+        const rect = element.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+
+        if (width === 0 || height === 0) return;
+
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+
+        ctx.clearRect(0, 0, width, height);
+        occupiedZones = [];
+
+        let placed = 0;
+        let consecutiveFailures = 0;
+        const maxConsecutiveFailures = 500;
+
+        while (consecutiveFailures < maxConsecutiveFailures) {
+            // Случайный масштаб и размер квадрата
+            const scale = minScale + Math.random() * (maxScale - minScale);
+            const squareSize = 30 * scale; // базовый размер квадрата 30px
+            
+            const margin = 15;
+            const x = margin + Math.random() * (width - squareSize - margin * 2) + squareSize/2;
+            const y = margin + Math.random() * (height - squareSize - margin * 2) + squareSize/2;
+            
+            if (!isOverlapping(x, y, squareSize, squareSize)) {
+                const angle = Math.random() * Math.PI * 2;
+                const color = '#000000';
+                
+                drawSquare(ctx, x, y, squareSize, angle, color);
+                addOccupiedZone(x, y, squareSize, squareSize);
+                placed++;
+                consecutiveFailures = 0;
+            } else {
+                consecutiveFailures++;
+            }
+        }
+        
+        console.log(`Размещено квадратов: ${placed}`);
+    }
+
+    // Простое рисование квадрата
+    function drawSquare(ctx, x, y, size, angle, color) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        
+        ctx.fillStyle = color;
+        ctx.fillRect(-size/2, -size/2, size, size);
+        
+        ctx.restore();
+    }
+
+    window.addEventListener('resize', () => drawTrains());
+    drawTrains();
+}
+
+document.addEventListener('show.bs.modal', function (event) {
+    if (event.target) {
+      setTimeout(()=>{
+        generateTrainBackground(event.target, { count: 30, opacity: 0.1 });
+
+      }, 200);
+    }
+});
+*/
+
+class SmoothRainbowBackground {
+  constructor(element, options = {}) {
+    this.element = element || document.body;
+    this.hue = options.hue || 0;
+    this.speed = options.speed || 2;           // градусов за шаг
+    this.saturation = options.saturation || 70;
+    this.lightness = options.lightness || 50;
+    this.alpha = options.alpha !== undefined ? options.alpha : 1;
+    
+    this.interval = setInterval(() => {
+      this.hue = (this.hue + this.speed) % 360;
+      this.element.style.backgroundColor = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha})`;
+    }, 50);
+  }
+  
+  stop() {
+    clearInterval(this.interval);
+  }
+}
+
+document.addEventListener('show.bs.modal', function (event) {
+    if (event.target) {
+      const rainbow = new SmoothRainbowBackground(event.target, {
+        hue: Math.random() * 360,
+        speed: 0.5, 
+        saturation: 80, 
+        lightness: 30,
+        alpha: 0.3
+      });
+
+      let _onHide = () =>{
+        rainbow.stop();
+        document.removeEventListener('hide.bs.modal', _onHide);
+      }
+      document.addEventListener('hide.bs.modal', _onHide);
+    }
 });

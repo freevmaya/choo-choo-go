@@ -19,7 +19,7 @@ class Train extends BaseCart {
         super.init(game, data);
 
         this.force = this.getConst('TRAIN_FORCE');
-        this.brack = this.force;
+        this.brack = this.getConst('TRAIN_BRACK');
 
         if (data.chain)
             setTimeout(()=>{
@@ -50,6 +50,14 @@ class Train extends BaseCart {
 
     hasInChain(cart) {
         return this.chain.indexOf(cart) > -1;
+    }
+
+    isLastChain(cart) {
+        return this.getLastChain() == cart;
+    }
+
+    getLastChain(cart) {
+        return this.chain.length > 0 ? this.chain[this.chain.length - 1] : this;
     }
 
     toSaveData() {
@@ -112,13 +120,13 @@ class Train extends BaseCart {
     }
 
     endDrag(pos) {
-        if (this.isDrag) {
+        if (this.isDrag && pos) {
             this.game.cameraController.setEnable(true);
             this.isDrag = false;
             let endDragPoint = this.game.raycasterManager.getIntersectionWithPlane(pos.x, pos.y, this.getPosition());
             let direct = endDragPoint.clone().sub(this.startDragPoint);
 
-            if (this.State() != 'boarding') {
+            if (!['boarding'].includes(this.State())) {
                 if (direct.length() > 0.1) {
                     let forward = new THREE.Vector3();
                     this.model.getWorldDirection(forward);
@@ -198,6 +206,7 @@ class Train extends BaseCart {
         const eye = this.createSphere(0.22, 32, eyeMaterial);
         eyeGroup.add(eye);
         eyeGroup.Eye = eye;
+        this._registerClickable(eye);
 
         const pupil = this.createSphere(0.12, 32, pupilMaterial);
         pupil.position.set(0.2, 0, 0);        
@@ -246,6 +255,7 @@ class Train extends BaseCart {
         body.castShadow = true;
         this._registerGeometry(bodyGeo);
         this.base.add(body);
+        this._registerClickable(body);
 
         const cab_group = new THREE.Group();
         
@@ -253,14 +263,17 @@ class Train extends BaseCart {
         let cab = this.createBox(0.4, 0.7, 0.1, darkMaterial);
         cab.position.set(0.2, 0, 0.4);
         cab_group.add(cab);
+        this._registerClickable(cab);
 
         cab = this.createBox(0.4, 0.7, 0.1, darkMaterial);
         cab.position.set(0.2, 0, -0.4);
         cab_group.add(cab);
+        this._registerClickable(cab);
 
         cab = this.createBox(0.1, 0.3, 0.7, darkMaterial);
         cab.position.set(0.3, -0.2, 0);
         cab_group.add(cab);
+        this._registerClickable(cab);
         
         // Крыша кабины
         const roofGeo = new THREE.BoxGeometry(0.85, 0.1, 0.95);
@@ -269,6 +282,7 @@ class Train extends BaseCart {
         this.roof.castShadow = true;
         this._registerGeometry(roofGeo);
         cab_group.add(this.roof);
+        this._registerClickable(this.roof);
 
         cab_group.position.set(-0.6, this.getConst('TRAIN_WHEEL_RADIUS') + 1, 0);
 
@@ -291,6 +305,7 @@ class Train extends BaseCart {
         pipe.castShadow = true;
         this._registerGeometry(pipeGeo);
         pipe_group.add(pipe);
+        this._registerClickable(pipe);
         
         const pipeTopGeo = new THREE.CylinderGeometry(0.18, 0.24, 0.3, 12);
         const pipeTop = new THREE.Mesh(pipeTopGeo, pipeMaterial);
@@ -298,6 +313,7 @@ class Train extends BaseCart {
         pipeTop.castShadow = true;
         this._registerGeometry(pipeTopGeo);
         pipe_group.add(pipeTop);
+        this._registerClickable(pipeTop);        
 
         pipe_group.position.set(length / 2 - 0.1, this.getConst('TRAIN_WHEEL_RADIUS') + 1.15);
 
@@ -333,11 +349,12 @@ class Train extends BaseCart {
         
         // Создаем систему дыма
         this.createSmokeSystem(this.base);
-
-        let collider = this.createColliderBox((size.width + size.wheel.width * 2) * 1.2, size.height * 1.4, size.length * 1.2);
+        /*
+        let collider = this.createColliderBox((size.width + size.wheel.width * 2), size.height, size.length, true);
         collider.position.y = size.height / 2 + size.wheel.radius;
         group.add(collider)
         this._registerClickable(collider);
+        */
 
         return group;
     }
@@ -465,15 +482,21 @@ class Train extends BaseCart {
 
                 let collistion = collisions[0];
 
-                let sameDirect = collistion.dot > 0;
-                console.log(`sameDirect: ${sameDirect}`);
+                if (collistion.cart.allowedToJoin(this)) {
+                    let sameDirect = collistion.dot > 0;
 
-                collistion.cart.setForward(sameDirect ? collistion.cart.trackPos.forwardInTrack : !collistion.cart.trackPos.forwardInTrack);
+                    console.log(`sameDirect: ${sameDirect}`);
 
-                this.addChain(collistion.cart);
-                this.State('braking');
+                    collistion.cart.setForward(!sameDirect);
 
-                eventBus.emit('train-add-chain', collistion.cart);
+                    this.addChain(collistion.cart);
+                    this.State('braking');
+
+                    eventBus.emit('train-add-chain', collistion.cart);
+                } else {
+                    this.State('stop');
+                    eventBus.emit('wrong');
+                }
             }
         } else {
 
@@ -489,6 +512,11 @@ class Train extends BaseCart {
         }
     }
 
+    allowedToJoin(train) {
+        return false;
+    }
+
+    /*
     createCaptures() {
 
         let size = this.size();
@@ -498,7 +526,7 @@ class Train extends BaseCart {
         ];
 
         this.capture[0].position.set(-(size.length - size.captureLenght) / 2, this.basePlate.position.y, 0);
-    }
+    }*/
     
     update(dt) {
 

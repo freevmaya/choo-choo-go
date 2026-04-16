@@ -257,9 +257,9 @@ class ParticleSystem {
     const material = new THREE.MeshStandardMaterial({
       color: this.options.colorStart,
       emissive: this.options.colorStart,
-      emissiveIntensity: 0.5,
-      roughness: 0.3,
-      metalness: 0.1,
+      emissiveIntensity: 1,
+      roughness: 0.0,
+      metalness: 0.0,
       transparent: true,
       depthTest: !this.options.forceTopLayer,
       depthWrite: !this.options.forceTopLayer
@@ -772,7 +772,7 @@ class SmokeParticles extends ParticleSystemObject {
     return [
         new ParticleSystem(this.game.scene, {
           particleType: 'sphere',
-          particleCount: 80,
+          particleCount: 120,
           lifetime: 1.2,
           fade: (v) => Math.sin(v * Math.PI),
           airResistance: 0.99,
@@ -783,7 +783,7 @@ class SmokeParticles extends ParticleSystemObject {
           sizeStart: 0.2,
           sizeEnd: 0.5,
           emitDirection: new THREE.Vector3(0, 1, 0),
-          emissionRate: 8,
+          emissionRate: 12,
           emitConeAngle: 0,
           spreadRadius: 0.1,
           position: this.getPosition(),

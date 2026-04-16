@@ -15,7 +15,16 @@ class DropGame extends BaseModeModule {
 		    this.timerId1 = setTimeout(()=>{
 		    	this.toast = this.game.toast.show(lang.get('drop-game-description'), null, ()=>{
 		    		this.State('showFinish');
-		    	});
+		    	}, [
+		    		{
+		    			caption: lang.get('got-it'),
+		    			callback: ()=>{
+		    				this.toast.dispose();
+		    				this.toast = null;
+		    				this.State('showFinish');
+		    			}
+		    		}
+		    	]);
 		    }, 500);
 	    } else {
 		    this.timerId1 = setTimeout(()=>{

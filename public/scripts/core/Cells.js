@@ -95,17 +95,17 @@ class Cells {
 
 		if (railway)
 		    railway.forEach((trackItem)=>{
-		      this.addTrackItem(trackItem);
+		      this.addTrackItem({...trackItem});
 		    });
 
 	    if (carts)
 		    carts.forEach((item)=>{
-		      this.addCart(item);
+		      this.addCart({...item});
 		    });
 
 	    if (objects)
 		    objects.forEach((item)=>{
-		      this.addObject(item);
+		      this.addObject({...item});
 		    });
 	}
 

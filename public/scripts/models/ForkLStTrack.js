@@ -1,13 +1,11 @@
-class ForkTrack extends BaseCurveTrack {
+class ForkLStTrack extends ForkTrack {
     
     createModel() {
         const group = new THREE.Group();
         
-        this.createRailPair(group, true);
         this.createRailPair(group, false);
-
-        this.createSleepers(group, true, 3);
         this.createSleepers(group, false, 3);
+        this.createStRail(group);
 
         this.createLever(group);
         
@@ -17,8 +15,11 @@ class ForkTrack extends BaseCurveTrack {
     /* relPathPos от -1 до 1 */
     calcPathPoint(relPathPos, path = 0) {
 
+        if (path == 0)
+            return StraightTrack.prototype.calcPathPoint.call(this, relPathPos, path);
+
         const rotationY = this.rotation * PI_HALF;
-        const direction = path == 0 ? 1 : -1;
+        const direction = -1;
 
         const angle = (relPathPos + 1) / 2 * PI_HALF * direction + rotationY;
         const center = GAME_SETTINGS.CELL_SIZE / 2;
@@ -50,25 +51,28 @@ class ForkTrack extends BaseCurveTrack {
         this._registerMaterial(this.leverMaterial);
         this._registerMaterial(this.boxMaterial);
 
+        let pos = center - baseSize;
+
     	let box = this.createBox(baseSize, baseSize, baseSize, this.boxMaterial);
-    	box.position.set(0, baseSize / 2, center - baseSize);
+    	box.position.set(-pos, baseSize / 2, pos);
     	group.add(box);
 
     	this.handleGroup = new THREE.Group();
+        this.handleGroup.position.set(-pos, 0, 0);
 
         this.collider = this.createColliderBox(baseSize * 3, baseSize * 6, baseSize * 3);
-        this.collider.position.set(0, baseSize * 3, center - baseSize);
+        this.collider.position.set(0, baseSize * 3, pos);
         this.handleGroup.add(this.collider);
 
     	let handleSize = baseSize * 0.5;
     	let handle = this.createBox(handleSize, baseSize * 5, handleSize, this.railMaterial);
-    	handle.position.set(0, baseSize / 2 + baseSize * 2, center - baseSize);
+    	handle.position.set(0, baseSize / 2 + baseSize * 2, pos);
 
     	this.handleGroup.add(handle);
     	
     	let leverSize = baseSize * 1.5;
     	let lever = this.createBox(leverSize, leverSize, leverSize, this.leverMaterial);
-    	lever.position.set(0, baseSize / 2 + baseSize * 4, center - baseSize);
+    	lever.position.set(0, baseSize / 2 + baseSize * 4, pos);
 
     	this.handleGroup.add(lever);
 
@@ -78,53 +82,13 @@ class ForkTrack extends BaseCurveTrack {
 	    this._updateHandle();
     }
 
-    onHandleClick(collider) {
-
-        if (this.carts.length == 0) {
-            this.setCurrentPath((this._currentPath + 1) % this.getPathCount());
-            eventBus.emit(this.getUserActionEvent(0), this);
-            eventBus.emit('fork-change');
-        }
-        else this.doBusy();
-    }
-
-    getUserActionEvent(index) {
-        return super.getUserActionEvent(index) || 'user-set-current-path';
-    }
-
-    getHandle(userActionEvent='') {
-        if (userActionEvent == this.getUserActionEvent(0))
-            return this.collider;
-
-        return super.getHandle(userActionEvent);
-    }
-
-    doBusy() {
-        eventBus.emit('wrong');
-    }
-
-    _updateHandle() {
-	    this.handleGroup.rotation.z = Math.PI * 0.2 * (0.5 - this._currentPath);
-    }
-
-    getCurrentPath() {
-    	return this._currentPath;
-    }
-
-    getPathCount() {
-    	return 2;
-    }
-
     getPath(index) {
         let paths = [
-        	[0, 3], 
-        	[2, 3]
+        	[3, 1],
+            [2, 3]
         ];
         return paths[index];
     }
-
-    _afterSetCurrentPath() {
-        this._updateHandle();
-    }
 }
-registerClass(ForkTrack);
+
+registerClass(ForkLStTrack);

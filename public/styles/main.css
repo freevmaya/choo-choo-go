@@ -57,7 +57,6 @@ body {
 }
 
 .modal-open #game-container {
-  opacity: 0;
 }
 
 .start-blocking .game-ui {
@@ -116,25 +115,16 @@ body {
   left: 0;
   right: 0;
   height: 70px;
-  background-image: url(images/game-bottom-center.png);
-  background-position-x: 44px;
   pointer-events: none;
-  background-repeat: repeat-x;
   display: flex;
   justify-content: space-between;
   align-items: end;
 }
 
 .game-bottom .left {
-  background-image: url(images/game-bottom-left.png);
-  width: 44px;
-  height: 70px;
 }
 
 .game-bottom .right {
-  background-image: url(images/game-bottom-right.png);
-  width: 43px;
-  height: 70px;
 }
 
 .game-top {
@@ -160,7 +150,7 @@ body {
   position: relative;
 }
 
-canvas {
+#game-container canvas {
   display: block;
   outline: none;
   width: 100%;
@@ -362,6 +352,7 @@ canvas {
 .modal.fade .modal-dialog {
   transform: scale(0.8);
   transition: transform 0.3s ease-out;
+  z-index: 101;
 }
 
 .modal.show .modal-dialog {
@@ -510,24 +501,7 @@ canvas {
 }
 
 .score-indicator {
-  position: absolute;
   display: none;
-  background-image: url(dialog/button.png);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  color: gold;
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  z-index: 100;
-  box-shadow: 2px 2px 6px black;
-  width: 129px;
-  height: 50px;
-  line-height: 37px;
-  top: 10px;
-  right: 20px;
 }
 
 .title-image {
@@ -583,6 +557,8 @@ canvas {
 
 .modal {
   overflow: hidden;
+  backdrop-filter: blur(5px);
+  background: rgb(77 75 26 / 50%);
 }
 
 body {
@@ -592,26 +568,40 @@ body {
   background-repeat: no-repeat;
 }
 
-@media (min-aspect-ratio: 1/1) {
-  body {
-    background-image: url(dialog/background-512.jpg);
-  }
+.border-block {
+  border-radius: 20px;
+  box-shadow: 2px 2px 6px black;
+  overflow: hidden;
 }
 
-@media (max-aspect-ratio: 1/1) {
-  body {
-    background-image: url(dialog/background-23-512.jpg);
-  }
+.padding {
+  padding: 5px;
+}
+
+.padding-2 {
+  padding: 5px 10px;
+}
+
+.border-block > .frame {
+  margin: 5px;
+  border-radius: 16px;
+  box-shadow: -1px -1px 6px black;
+  background: var(--tools-bg-color);
+  display: flex;
+  gap: 6px;
+  flex-direction: row;
 }
 
 .toast-message {
   background: var(--tools-bg-color);
-  padding: 10px;
-  border-radius: 20px;
-  box-shadow: 2px 2px 6px black;
   z-index: 101;
-  top: 40px;
+  bottom: 70px;
   transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast-message .frame {
+  flex-direction: column;
+  gap: 0px;
 }
 
 .toast-message .footer {
@@ -623,7 +613,7 @@ body {
 }
 
 .toast-message.show {
-  transform: translateX(calc(100vw - 100% - 10px));
+  transform: translateX(calc(100vw - 100% - 5px));
 }
 
 .toast-message.hide {
@@ -658,7 +648,7 @@ body {
 }
 
 .dev-block.show {
-  left: 10px;
+  left: 5px;
 }
 
 .dev-block.hide {
@@ -1051,4 +1041,231 @@ body {
     35% { 
       transform: translate(-15px, 8px); 
     }
+}
+
+/*_________________DIALOGS__________________*/
+.modal {
+  --bs-modal-width: 500px;
+}
+
+/* Простая bounce анимация */
+@keyframes bounce {
+  /* Начало - прозрачный, маленький, повернутый */
+  0% { 
+    transform: scale(0.3); 
+    opacity: 0; 
+  }
+  
+  /* Первый отскок (максимальный) - появляется */
+  20% { 
+    transform: scale(1.1); 
+    opacity: 1; 
+  }
+  
+  /* Первое затухание после первого отскока */
+  35% { 
+    transform: scale(0.9); 
+    opacity: 1; 
+  }
+  
+  /* Второй отскок (средний) */
+  50% { 
+    transform: scale(1.05); 
+    opacity: 1; 
+  }
+  
+  /* Второе затухание */
+  65% { 
+    transform: scale(0.95); 
+    opacity: 1; 
+  }
+  
+  /* Третий отскок (маленький) */
+  80% { 
+    transform: scale(1.01); 
+    opacity: 1; 
+  }
+  
+  /* Финальная позиция */
+  100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+.modal .modal-dialog {
+  animation: bounce 1s ease-out;
+  margin: auto;
+}
+
+.dialog-1.modal-content {
+  border: none;
+  background: none;
+  width: var(--bs-modal-width);
+}
+
+.dialog-1 .top, .dialog-1 .middle, .dialog-1 .bottom {
+  background-position: center;
+  background-repeat: repeat-y;
+}
+
+.dialog-1 .top {
+  background-image: url(dialog/dialog-top.png);
+  height: 124px;
+  flex-shrink: 0;
+}
+
+.dialog-1 .middle {
+  background-image: url(dialog/dialog-middle.png);
+  flex: 1 1 auto;
+}
+
+.dialog-1 .bottom {
+  background-image: url(dialog/dialog-bottom.png);
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.dialog-1 .dialog-content {
+  margin: -20px 120px;
+}
+
+.dialog-1 .dialog-content p {
+  padding: 0.2em 1em;
+  margin-bottom: 10px;
+}
+
+.dialog-1 .background {
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 50px;
+  margin-bottom: 10px;
+  position: absolute;
+  width: calc(100% - 100px);
+  height: calc(100% - 60px);
+  z-index: -1;
+  background-image: url(dialog/dialog-bg.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.dialog-1 .wrapper {
+  /*background-image: url(dialog/dialog-bg.png);*/
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  color: #d9c0a9;
+  font-size: 14px;
+  margin: auto;
+  width: var(--bs-modal-width);
+}
+
+.tools-block {
+  position: absolute;
+  top: 35px;
+  right: 5px;
+  z-index: 1;
+  gap: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.tools-panel {
+  background: var(--tools-bg-color);
+  width: fit-content;
+  font-size: 12px;
+  color: #fff7bf;
+  border: none !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.warning {
+  background-color: red;
+  animation: shakeAll 0.3s ease-in-out infinite;
+}
+
+@keyframes shakeAll {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-2px, -2px); }
+    50% { transform: translate(2px, 2px); }
+    75% { transform: translate(-2px, 2px); }
+}
+
+.tools-panel span {
+  display: inline-block;
+  line-height: 28px;
+  height: 24px;
+  cursor: pointer;
+}
+
+#time {
+}
+
+#time .time {
+  width: 30px;
+}
+
+#tools {
+  position: absolute;
+  top: 35px;
+  left: 5px;
+  z-index: 1;
+}
+
+#tools .on i {
+  color: #fff7bf;
+}
+
+#tools i {
+  color: #b9a336;
+}
+
+#volume i {
+  font-size: 24px;
+}
+
+.btn {
+  background-image: url(dialog/button.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  font-size: 12px;
+  color:black;
+  width: 103px;
+  height: 39px;
+  filter: drop-shadow(1px 1px 2px black);
+  border: none !important;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn:hover {
+  filter: drop-shadow(3px 3px 4px black);
+  color: #5d0000;
+}
+
+.btn:active {
+  filter: brightness(0.8) drop-shadow(1px 1px 2px black);
+  color: red;
+}
+
+@media (max-width: 576px) {
+  .modal .modal-dialog {
+    width: var(--bs-modal-width);
+    scale: calc(100dvw / var(--bs-modal-width));
+    margin-left: calc((100dvw - var(--bs-modal-width)) / 2);
+  }
 }

@@ -123,6 +123,7 @@ const MAXSCREENSIZE = 1024;
 // Настройки игры
 const GAME_SETTINGS = {
     TRAIN_FORCE: 3,               // Мощность паровозика 
+    TRAIN_BRACK: 1,
     TRAIN_WEIGHT: 0.5,
     TRAIN_WHEEL_RADIUS : 0.18,
     TRAIN_LEIGHT: 1.5,
@@ -154,5 +155,7 @@ const GAME_SETTINGS = {
     GROUND_COLOR: 0x336633,
 
     START_CELL: {x: 0, y: 0},
-    CAMERA_FOCUS: [25, 15]
+    CAMERA_FOCUS: [25, 15],
+
+    DEFAULT_TASK_SCORE: 100
 };

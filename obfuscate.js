@@ -60,6 +60,7 @@ const filesToBundle = [
     'UI/RailwaySpawner',
     'UI/Library',
     'UI/ToastMessage',
+    'utils/DevTools',
     'modes/BaseModeModule',
     'modes/Play',
     'modes/Editor',
@@ -88,37 +89,26 @@ function bundleFiles(filePaths) {
 
 // Исправленные опции обфускации
 const obfuscationOptions = {
-    compact: true,
-    controlFlowFlattening: true,
-    controlFlowFlatteningThreshold: 0.75,
-    deadCodeInjection: true,
-    deadCodeInjectionThreshold: 0.4,
-    debugProtection: false,
-    debugProtectionInterval: 0,  // Исправлено: число (0 = выключено, >0 = интервал в мс)
-    disableConsoleOutput: false,
-    identifierNamesGenerator: 'hexadecimal',
-    log: false,
-    numbersToExpressions: true,
-    renameGlobals: false,
-    selfDefending: true,
-    simplify: true,
-    splitStrings: true,
-    splitStringsChunkLength: 10,
-    stringArray: true,
-    stringArrayCallsTransform: true,
-    stringArrayEncoding: ['rc4'],
-    stringArrayIndexShift: true,
-    stringArrayRotate: true,
-    stringArrayShuffle: true,
-    stringArrayWrappersCount: 2,
-    stringArrayWrappersChainedCalls: true,
-    stringArrayWrappersParametersMaxCount: 4,
-    stringArrayWrappersType: 'function',
-    stringArrayThreshold: 0.75,
-    transformObjectKeys: true,
-    unicodeEscapeSequence: false,
-    sourceMap: false,  // Отключаем source map для экономии места
-    target: 'browser'  // Указываем цель
+    // --- Core Compression ---
+    compact: true,              // Убирает все пробелы и переносы строк [citation:4][citation:10]
+    simplify: true,            // Упрощает константные выражения [citation:1]
+
+    // --- Renames (Minification) ---
+    identifierNamesGenerator: 'mangled', // Генерирует самые короткие имена (a, b, c...) [citation:10]
+    renameGlobals: false,      // НЕ трогаем глобальные переменные (риск сломать код) [citation:4]
+
+    // --- Strings ---
+    stringArray: false,        // ПОЛНОСТЬЮ отключаем, это уменьшает размер [citation:1]
+    unicodeEscapeSequence: false, // Не кодируем в Unicode (сильно увеличивает размер) [citation:4]
+
+    // --- Advanced Protection (DISABLED for size) ---
+    controlFlowFlattening: false,   // Выключено — увеличивает код в 1.5-2 раза [citation:9]
+    deadCodeInjection: false,       // Выключено — увеличивает код до 200% [citation:6]
+    selfDefending: false,           // Выключено — добавляет ~1.5 КБ служебного кода [citation:1]
+    debugProtection: false,         // Выключено
+    transformObjectKeys: false,     // Выключено
+    numbersToExpressions: false,    // Выключено (превращает 100 в (99+1) — увеличивает код)
+    splitStrings: false             // Выключено
 };
 
 // Объединение файлов
@@ -137,7 +127,7 @@ try {
     const obfuscatedCode = JavaScriptObfuscator.obfuscate(combinedCode, obfuscationOptions);
     
     // Сохранение результата
-    const outputPath = 'public/scripts/main.mini.js';
+    const outputPath = 'prepare/mini/scripts/main.mini.js';
     fs.writeFileSync(outputPath, obfuscatedCode.getObfuscatedCode());
     const stats = fs.statSync(outputPath);
     console.log(`\n✅ Готово! Результат сохранен в ${outputPath}`);

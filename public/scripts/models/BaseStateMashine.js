@@ -30,7 +30,7 @@ class BaseStateMashine {
             
             tracer.log(`State ${this.getName()} changed: ${this.State()}`);
 
-            eventBus.emit('change_cart_state', this);
+            eventBus.emit('change_mashine_state', this);
         }
     }
 

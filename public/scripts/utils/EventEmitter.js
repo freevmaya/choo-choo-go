@@ -15,6 +15,14 @@ class EventEmitter {
     return () => this.off(event, listener);
   }
 
+  once(event, listener) {
+    let func = (data)=>{
+      this.off(event, func);
+      listener(data);
+    }
+    this.on(event, func);
+  }
+
   off(event, listener) {
     if (!this.events[event]) return;
     this.events[event] = this.events[event].filter(l => l !== listener);

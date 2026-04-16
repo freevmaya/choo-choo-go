@@ -47,9 +47,21 @@ class GSoundManager extends SoundManager {
     this.setupEventListeners();
   }
 
+  SetUserMusicMuted(value) {
+    super.SetUserMusicMuted(value);
+    this.updateMusicMuted();
+  }
+
+  updateMusicMuted() {
+    if (this.userMusicMuted)
+      this.stop('bg-music');
+    else this.Play('bg-music', {volume: 0.5, loop: true, ignoreMuted: true});
+  }
+
   setupEventListeners() {
 
     this.game.gameState.on(GAME_STATE.GAME_OVER, () => {
+      this.stop('phuf');
       this.Play('fail-music');
     });
 
@@ -73,11 +85,12 @@ class GSoundManager extends SoundManager {
   */
 
     this.game.gameState.on(GAME_STATE.VICTORY, () => {
+      this.stop('phuf');
       this.Play('win-music');
     });
 
     this.game.gameState.on(GAME_STATE.START, () => {
-      this.Play('bg-music', {volume: 0.5, loop: true, ignoreMuted: true});
+      this.updateMusicMuted();
     });
 
     eventBus.on('user-action', () => {
@@ -107,8 +120,16 @@ class GSoundManager extends SoundManager {
       this.Play('train-add-chain', {volume: 0.4});
     });
 
+    eventBus.on('train-remove-chain', () => {
+      this.Play('train-add-chain', {volume: 0.4});
+    });
+
     eventBus.on('fork-change', () => {
       this.Play('fork-change', {volume: 0.4});
+    });
+
+    eventBus.on('wrong', () => {
+      this.Play('wrong');
     });
   }
 
@@ -122,7 +143,8 @@ class GSoundManager extends SoundManager {
         { id: 'train-start', url: 'sounds/train-start.mp3' },
         { id: 'phuf', url: 'sounds/phuf.mp3' },
         { id: 'train-add-chain', url: 'sounds/train-add-chain.mp3' },
-        { id: 'fork-change', url: 'sounds/fork-change.mp3' }
+        { id: 'fork-change', url: 'sounds/fork-change.mp3' },
+        { id: 'wrong', url: 'sounds/wrong.mp3' }
     ];
     const promises = sounds.map(sound => this.loadSound(sound.id, sound.url));
     return Promise.allSettled(promises);

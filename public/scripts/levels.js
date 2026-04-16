@@ -8,7 +8,7 @@ var GAME_PARAMS = {
             "RIM_LIGHT_COLOR": 8490232,
             "FILL_LIGHT_COLOR": 6529416,
             "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
+            "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "PlayAndEdit",
@@ -251,7 +251,7 @@ var GAME_PARAMS = {
             "RIM_LIGHT_COLOR": 8490232,
             "FILL_LIGHT_COLOR": 6529416,
             "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
+            "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "DESCRIPTION": "lead-wagon-to-finish",
@@ -558,6 +558,365 @@ var GAME_PARAMS = {
             }
         ]
     },
+    "THREE_WAGONS": {
+        "ENV": {
+            "BACKGROUND_COLOR": "#4444AA",
+            "GROUND_COLOR": 7819366,
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 0.8,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": "Play",
+            "AMOUNT_TIME": 800,
+            "DESCRIPTION": "three-wagon-description",
+            "task": [
+                "green-placed",
+                "blue-placed",
+                "gray-placed"
+            ]
+        },
+        "items": [
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    0,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    0,
+                    0,
+                    2
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    1,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    0,
+                    3
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    0,
+                    -4,
+                    0
+                ],
+                "color": 34816,
+                "title": "green",
+                "taskName": "green-placed",
+                "cart_name": "green"
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    0,
+                    3,
+                    0
+                ],
+                "color": 17544,
+                "title": "blue",
+                "taskName": "blue-placed",
+                "cart_name": "blue"
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    1,
+                    -2,
+                    2
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -1,
+                    -2,
+                    2
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    2,
+                    -3,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    -2,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    -3,
+                    2
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    1,
+                    -3,
+                    3
+                ],
+                "color": 4473924,
+                "taskName": "gray-placed",
+                "cart_name": "gray"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -1,
+                    -3,
+                    1
+                ],
+                "color": 4473924,
+                "taskName": "gray-placed",
+                "cart_name": "gray"
+            }
+        ],
+        "tracks": [],
+        "objects": [
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -1,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -4,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    1,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Train",
+                "location": [
+                    0,
+                    1,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": false
+                },
+                "chain": []
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    1,
+                    -1,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "color": 34816,
+                "name": "green",
+                "expect": "green-placed:0:pushAnim",
+                "user_action_event": ["train-remove-chain"]
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -1,
+                    -1,
+                    false
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "color": 17544,
+                "name": "blue"
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    0,
+                    2,
+                    false
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "color": 4473924,
+                "name": "gray"
+            }
+        ]
+    },
     "PICKUP-BASE": {
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
@@ -565,7 +924,7 @@ var GAME_PARAMS = {
             "RIM_LIGHT_COLOR": 8490232,
             "FILL_LIGHT_COLOR": 6529416,
             "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
+            "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "task": ['pickup', 'unload'],
@@ -904,7 +1263,7 @@ var GAME_PARAMS = {
             "RIM_LIGHT_COLOR": 8490232,
             "FILL_LIGHT_COLOR": 6529416,
             "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
+            "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "PlayAndEdit",
@@ -1407,7 +1766,7 @@ var GAME_PARAMS = {
             "RIM_LIGHT_COLOR": 8490232,
             "FILL_LIGHT_COLOR": 6529416,
             "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
+            "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "PlayAndEdit",
@@ -1832,7 +2191,7 @@ var GAME_PARAMS = {
             "RIM_LIGHT_COLOR": "#000000",
             "FILL_LIGHT_COLOR": "#000000",
             "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
+            "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "DropGame",
@@ -2083,7 +2442,7 @@ var GAME_PARAMS = {
             "RIM_LIGHT_COLOR": 8490232,
             "FILL_LIGHT_COLOR": 6529416,
             "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
+            "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "DropGame",
@@ -2389,11 +2748,13 @@ var GAME_PARAMS = {
             "RIM_LIGHT_COLOR": 8490232,
             "FILL_LIGHT_COLOR": 6529416,
             "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 3,
+            "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "PlayAndEdit",
-            "task": ["finish"]
+            "GAME_MODE": "Play",
+            "task": [
+                "finish"
+            ]
         },
         "items": [
             {
@@ -2408,27 +2769,89 @@ var GAME_PARAMS = {
                 "type": "StraightTrack",
                 "location": [
                     0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    0,
                     -1,
+                    0
+                ]
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    -1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "CrossTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    1,
                     1
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    2,
+                    1,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    1,
+                    3
                 ]
             },
             {
                 "type": "StraightTrack",
                 "location": [
                     0,
-                    0,
+                    2,
                     0
                 ]
             },
             {
-                "type": "PointTrack",
+                "type": "EndTrack",
                 "location": [
                     0,
-                    1,
+                    3,
                     0
-                ],
-                "title": "finish",
-                "taskName": "finish"
+                ]
             }
         ],
         "tracks": [],
@@ -2441,11 +2864,15 @@ var GAME_PARAMS = {
                     -2,
                     false
                 ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": false
-                },
+                "chain": []
+            }, {
+                "type": "Train",
+                "location": [
+                    1,
+                    1,
+                    false
+                ],
+                "chain": []
             }
         ]
     }

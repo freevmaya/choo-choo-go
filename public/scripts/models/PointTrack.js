@@ -28,7 +28,7 @@ class PointTrack extends StraightTrack {
         });
 
         this.boardMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x0B3B2F, 
+            color: this.data.color ? this.data.color : 0x0B3B2F, 
             metalness: 0.2,
             roughness: 0.3
         });

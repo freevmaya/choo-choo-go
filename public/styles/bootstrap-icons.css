@@ -11,6 +11,14 @@
     font-style: normal;
 }
 
+.bi-pause-fill::before {
+    content: "\F4C3";
+}
+
+.bi-music-note-beamed::before {
+    content: "\F49E";
+}
+
 .bi-arrow-up-short::before {
     content: "\F145";
 }

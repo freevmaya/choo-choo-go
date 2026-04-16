@@ -35,17 +35,33 @@
         <i class="bi bi-mouse"></i> <span data-lang="game_hint_mouse">Нажмите и тяните, чтобы вращать дерево</span>
       </div>
 
-      <div id="tools">
-        <span id="pause-btn" data-lang="pause">Пауза</span>
-        <span id="volume" class="on">
-          <i class="bi bi-volume-down"></i>
-          <i class="bi bi-volume-mute"></i>
-        </span>
+      <div id="tools" class="tools-panel border-block">
+        <div class="frame padding-2">
+          <span id="pause-btn">
+            <i class="bi bi-pause-fill"></i>
+          </span>
+          <span id="music" class="on">
+            <i class="bi bi-music-note-beamed"></i>
+          </span>
+          <span id="volume" class="on">
+            <i class="bi bi-volume-down"></i>
+          </span>
+        </div>
       </div>
 
-      <!-- Индикатор очков (только при победе) -->
-      <div class="score-indicator" id="score-indicator">
-        <i class="bi bi-trophy-fill"></i> <span data-lang="score_indicator">Счет:</span> <span id="current-score">0</span>
+      <div class="tools-block">
+        <div id="time" class="tools-panel border-block">
+          <div class="frame padding">
+            <span data-lang="leave-time">Осталось: </span><span class="time"></span>
+          </div>
+        </div>
+
+        <!-- Индикатор очков -->
+        <div class="tools-panel score-indicator border-block" id="score-indicator">
+          <div class="frame padding">
+            <i class="bi bi-trophy-fill"></i> <span data-lang="score_indicator">Счет:</span> <span class="current-score">0</span>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -72,8 +88,8 @@
               <p>
                 <i class="bi bi-exclamation-triangle-fill"></i> <span data-lang="start_info_2">Красные платформы смертельны при ударе сверху!</span>
               </p>
-              <p <?=Page::isDev() ? '' : 'style="display:none"'?>>
-                <span data-lang="gpu_speed">GPU speed:</span> <span id="testResult"></span>. 
+              <p style="display:none" class="devBlock">
+                <span data-lang="gpu_speed">GPU speed:</span> <span class="testResult"></span>. 
                 <span data-lang="version">Version:</span> <span><?=APP_VERSION?></span>
               </p>
               <div class="text-center buttons">
@@ -139,14 +155,8 @@
               <!-- Статистика игры -->
               <div class="stats-container victory-stats" id="victoryState">
                 <div class="row">
-                  <div class="col-6">
-                    <div class="stat-value" id="victoryBounceCount">0</div>
-                    <div class="stat-label" data-lang="victory_bounces">Отскоков</div>
-                  </div>
-                  <div class="col-6">
-                    <div class="stat-value" id="victoryScore">0</div>
-                    <div class="stat-label" data-lang="victory_score">Очки</div>
-                  </div>
+                  <div class="stat-value" id="victoryScore">0</div>
+                  <div class="stat-label" data-lang="victory_score">Очки</div>
                 </div>
               </div>
 

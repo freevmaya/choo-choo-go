@@ -1,14 +1,4 @@
 class Wagon extends BaseCart {
-    constructor() {
-        super();
-        
-        // Цвета
-        this.wallColor = 0x4A90D9;   // Синий
-        this.trimColor = 0xFFD700;   // Золотая отделка
-        this.roofColor = 0x8B4513;   // Коричневая крыша
-        this.windowFrameColor = 0xDEB887; // Деревянные рамы
-        this.cargoCount = 0;
-    }
 
     setCargoCount(value) {
         this.cargoCount = value;
@@ -42,6 +32,15 @@ class Wagon extends BaseCart {
     }
     
     createModel() {
+
+        
+        // Цвета
+        this.wallColor = this.data.color ? this.data.color : 0x4A90D9;   // Синий
+        this.trimColor = 0xFFD700;   // Золотая отделка
+        this.roofColor = 0x8B4513;   // Коричневая крыша
+        this.windowFrameColor = 0xDEB887; // Деревянные рамы
+        this.cargoCount = 0;
+        
         let group = super.createModel();
         
         let size = this.size();
@@ -97,7 +96,12 @@ class Wagon extends BaseCart {
     }
 
     onClick(hit, eventData) {
-        this.deChain();
+        if (!this.deChain()) {
+            let train = this.headTrain();
+            if (train && (train.State() != 'stop'))
+                eventBus.emit('wrong', lang.get("wrong-dechain-run"));
+            else eventBus.emit('wrong', lang.get("wrong-dechain-last"));
+        }
     }
 
     defaultWeight() {

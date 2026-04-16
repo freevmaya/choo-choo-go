@@ -111,12 +111,19 @@ class BaseGame {
     }
   }
 
+  addCurrentScore(score) {
+    this.currentScore += score;
+    this.updateScoreIndicator();
+  }
+
   initUI() {
     this.stateView = {
       score: $('#state-score'),
       vin: $('#state-vin'),
       title: $('#state-title')
     };
+
+    this.currentScoreElem = $('#score-indicator');
 
     this.pauseBtn = $('#pause-btn');
     this.pauseBtn.click(()=>{
@@ -429,7 +436,10 @@ class BaseGame {
     // Получаем элемент модального окна Start
     this.startModalElement = $('#startModal');
 
-    $('#testResult').text(Math.round(this.testResult));
+    if (DEV) {
+      this.startModalElement.find('.devBlock').css('display', 'block');
+      this.startModalElement.find('.testResult').text(Math.round(this.testResult));
+    }
     
     if (this.startModalElement && bootstrap) {
       // Создаем экземпляр Bootstrap модального окна
@@ -631,27 +641,11 @@ class BaseGame {
   }
   
   updateScoreIndicator() {
+    this.currentScoreElem.css('display', this.currentScore == 0 ? 'none' : 'inline-flex');
+    this.currentScoreElem.find('.current-score').text(this.currentScore);
   }
   
   calculateScore() {
-    if (!this.ball) return;
-    
-    const bounceCount = this.ball.getBounceCount();
-    // Формула: чем меньше отскоков, тем больше очков
-    // Максимум 1000 очков при 0 отскоков, минимум 100 при максимальном количестве
-    const MAX_BOUNCES = 80; // Ожидаемое максимальное количество отскоков
-    const MAX_SCORE = 500;
-    const MIN_SCORE = 50;
-    
-    if (bounceCount >= MAX_BOUNCES) {
-      this.currentScore = MIN_SCORE;
-    } else {
-      // Линейная интерполяция: больше отскоков = меньше очков
-      this.currentScore = Math.floor(
-        MAX_SCORE - (bounceCount / MAX_BOUNCES) * (MAX_SCORE - MIN_SCORE)
-      );
-    }
-    
     this.updateScoreIndicator();
   }
   
@@ -680,10 +674,19 @@ class BaseGame {
 
     this.volume = $('#volume');
     this.volume.toggleClass('on', this.stateManager.get('sound_on', true));
+
+    this.music = $('#music');
+    this.music.toggleClass('on', this.stateManager.get('music_on', true));
+
     this.updateSoundControl();
 
     this.volume.click(()=>{
       this.volume.toggleClass('on');
+      this.updateSoundControl();
+    });
+
+    this.music.click(()=>{
+      this.music.toggleClass('on');
       this.updateSoundControl();
     });
   }
@@ -692,6 +695,10 @@ class BaseGame {
     let on = this.volume.hasClass('on');
     this.stateManager.set('sound_on', on);
     this.soundManager.SetUserMuted(!on);
+
+    on = this.music.hasClass('on');
+    this.stateManager.set('music_on', on);
+    this.soundManager.SetUserMusicMuted(!on);
   }
   
   createGameObjects() {

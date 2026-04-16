@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="./styles/bootstrap-icons.css">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="<?=BASEURL?>/styles/main.css?v=<?=$v?>">
-  <link rel="stylesheet" href="<?=BASEURL?>/styles/dialog.css?v=<?=$v?>">
 
   <!-- JQUERY -->
   <script src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>

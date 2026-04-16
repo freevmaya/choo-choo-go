@@ -123,27 +123,94 @@ class PositionCart {
         return pos;
     }
 
-    checkCollistionWith(other, minDistance) {
-        let depth = 0;
+    distanceBroken(other) {
+        let pos1 = this.calcLocation();
+        let pos2 = other.calcLocation();
+        
+        // Получаем направления моделей (нормализованные векторы)
+        let d1 = this.cart.model.worldDirection();
+        let d2 = other.cart.model.worldDirection();
+        
+        // Игнорируем разницу по высоте
+        pos1.y = pos2.y = 0;
+        d1.y = d2.y = 0;
+        d1.normalize();
+        d2.normalize();
+        
+        // Вектор между объектами
+        const delta = pos2.clone().sub(pos1);
+        
+        // Проекции расстояния на направления
+        const distAlongD1 = delta.dot(d1);      // Проекция на направление первого объекта
+        const distAlongD2 = delta.dot(d2);      // Проекция на направление второго объекта
+        
+        // Ломаное расстояние: путь от pos1 по направлению d1, 
+        // затем разворот и подход к pos2 по направлению d2
+        let totalDistance = 0;
+        
+        if (distAlongD1 > 0 && distAlongD2 < 0) {
+            // Объекты смотрят друг на друга
+            totalDistance = Math.abs(distAlongD1) + Math.abs(distAlongD2);
+        } else if (distAlongD1 > 0 && distAlongD2 > 0) {
+            // Оба смотрят в одну сторону
+            totalDistance = Math.abs(distAlongD1) + delta.length() + Math.abs(distAlongD2);
+        } else if (distAlongD1 < 0 && distAlongD2 < 0) {
+            // Оба смотрят от друг друга
+            totalDistance = delta.length();
+        } else {
+            // Один смотрит на другой, другой отворачивается
+            totalDistance = Math.abs(distAlongD1) + Math.abs(distAlongD2);
+        }
+        
+        return totalDistance;
+    }
+
+    distance(other) {
+
         let pos1 = this.calcLocation();
         let pos2 = other.calcLocation();
 
         pos1.y = pos2.y = 0;
 
-        let direction = pos2.clone().sub(pos1);
-        let len = direction.length();
+        return pos2.clone().sub(pos1);
+    }
 
-        if (len < minDistance) {
+    penetration(other, checkDistance = true) {
 
-            depth = minDistance - len;
+        let minDistance = this.cart.sizeRadius() + other.cart.sizeRadius();
+        let distance = this.distance(other);
 
-            let trackDirect = other.currentTrack.calcDirect(other.pathIndex);
+        let depth = minDistance - distance.length();
+        if (depth > 0) {
 
-            let dot = trackDirect.dot(direction);
+            //let bdist = this.distanceBroken(other) / 2;
+            //depth = minDistance - bdist;
+
+            if ((depth > 0) || !checkDistance) 
+                return {
+                    distance: distance,
+                    depth: depth,
+                    minDistance: minDistance
+                }
+        }
+
+        return null;
+    }
+
+    checkCollistionWith(other, minDistance) {
+
+        let pen = this.penetration(other);
+
+        if (pen) {
+
+            //let otherDirect = other.currentTrack.calcDirect(other.pathIndex);
+            let otherDirect = other.cart.model.worldDirection();
+
+            let dot = otherDirect.dot(pen.distance);
             
-            console.log(`Dot ${dot} (${trackDirect.x}, ${trackDirect.z} / ${direction.x}, ${direction.z})`);
+            tracer.log(`Dot ${dot} (${otherDirect.x}, ${otherDirect.z} / ${pen.distance.x}, ${pen.distance.z})`);
             return {
-                depth: depth,
+                depth: pen.depth,
                 dot: dot
             }
         }

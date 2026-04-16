@@ -13,6 +13,12 @@ class Editor extends BaseModeModule {
 	      },{
 	        type: ForkTrack
 	      },{
+	        type: ForkRStTrack
+	      },{
+	        type: ForkLStTrack
+	      },{
+	        type: CrossTrack
+	      },{
 	        type: PointTrack
 	      },{
 	        type: Train

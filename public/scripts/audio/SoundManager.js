@@ -18,6 +18,10 @@ class SoundManager {
         this.userMuted = value;
         this.setMuted(this.userMuted);
     }
+
+    SetUserMusicMuted(value) {
+        this.userMusicMuted = value;
+    }
     
     // Инициализация (должна вызываться после взаимодействия с пользователем)
     async init() {

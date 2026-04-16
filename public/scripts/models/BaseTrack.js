@@ -31,13 +31,17 @@ class BaseTrack extends BaseCellObject {
     runOut(positionCart) {
         let idx = this.carts.indexOf(positionCart.cart);
         if (idx > -1) {
-            this.carts.splice(idx, 1);
             this.afterRunOut();
+            this.carts.splice(idx, 1);
             eventBus.emit('runOut', {
                 track: this,
                 positionCart: positionCart
             });
         }
+    }
+
+    getTrain() {
+        return this.carts.find(c => c.headTrain())?.headTrain();
     }
 
     runOver(positionCart) {
@@ -56,15 +60,41 @@ class BaseTrack extends BaseCellObject {
         return this.carts.length > 0;
     }
 
-    afterRunOver() {
+    getTaskCart() {
+        return this.carts.find(c => c.data.name == this.data.cart_name);
+    }
+
+    checkTaskComplete() {
         if (this.data.taskName) {
-            let train = this.carts.find(c => c.headTrain());
-            if (train)
-                this.game.completedTask(this.data.taskName);
+            if (this.data.cart_name)
+                return this.getTaskCart() != null;
+            else return true;
+        }
+        return false;
+    }
+
+    afterRunOver() {
+        if (this.checkTaskComplete()) {
+            let train = this.getTrain();
+
+            var taskCart = this.getTaskCart();
+            if (taskCart)
+                taskCart.data.fixed = true;
+
+            if (train && (train.State() == 'run')) {
+                train.State('braking');
+                eventBus.once('change_mashine_state', (data)=>{
+                    tracer.log(data);
+                    this.game.completedTask(this.data.taskName, this);
+                });
+            } else this.game.completedTask(this.data.taskName, this);
         }
     }
 
     afterRunOut() {
+        if (this.data.taskName) {
+            this.game.deCompletedTask(this.data.taskName, this);
+        }
     }
 
     setCurrentPath(pathIndex) {

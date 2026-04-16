@@ -3,6 +3,13 @@ class StraightTrack extends BaseTrack {
     createModel() {
         const group = new THREE.Group();
         
+        this.createStRail(group);
+        return group;
+    }
+
+    createStRail(group) {
+
+        
         const trackLength = GAME_SETTINGS.CELL_SIZE;
         const railSpacing = GAME_SETTINGS.RAIL_SPACE;
         
@@ -33,11 +40,7 @@ class StraightTrack extends BaseTrack {
             sleeper.position.set(0, GAME_SETTINGS.SLEEPER_HEIGHT / 2, pos);
             sleeper.rotation.y = PI_HALF;
             group.add(sleeper);
-
-            //this._registerClickable(sleeper);
         }
-        
-        return group;
     }
 
     /* relPathPos от -1 до 1 */

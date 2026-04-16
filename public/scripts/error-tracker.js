@@ -125,16 +125,21 @@ const ErrorTracker = {
     },
 
     async sendPrepareList() {
-        let tmp = [...this.prepareList];
-        tmp.forEach(async (itm)=>{
-            if (itm.count)
-                itm.message = `${itm.message} (${itm.count})`;
 
-            await Ajax({
-                action: 'addError',
-                data: itm
+        if (!this.serverNoAvailable) {
+            let tmp = [...this.prepareList];
+            tmp.forEach(async (itm)=>{
+                if (itm.count)
+                    itm.message = `${itm.message} (${itm.count})`;
+
+                await Ajax({
+                    action: 'addError',
+                    data: itm
+                }).catch(error => {
+                    this.serverNoAvailable = true;
+                });;
             });
-        });
+        }
     },
     
     // Проверяет, находится ли URL в списке исключаемых доменов
