@@ -54,11 +54,11 @@ class ForkLStTrack extends ForkTrack {
         let pos = center - baseSize;
 
     	let box = this.createBox(baseSize, baseSize, baseSize, this.boxMaterial);
-    	box.position.set(-pos, baseSize / 2, pos);
+    	box.position.set(pos, baseSize / 2, pos);
     	group.add(box);
 
     	this.handleGroup = new THREE.Group();
-        this.handleGroup.position.set(-pos, 0, 0);
+        this.handleGroup.position.set(pos, 0, 0);
 
         this.collider = this.createColliderBox(baseSize * 3, baseSize * 6, baseSize * 3);
         this.collider.position.set(0, baseSize * 3, pos);

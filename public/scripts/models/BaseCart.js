@@ -278,17 +278,23 @@ class BaseCart extends BaseGameObject {
         });
     }
 
-    addedToChain() {
+    addedToChain(train) {
         if (this.data.taskName)
             this.game.completedTask(this.data.taskName, this);
+
+        if (this.data.name) {
+            let target = this.game.items.findAsTask(this.data.name, 'cart_name');
+            if (target)
+                this.game.showTargetEffect(this.getWorldPosition(), target.getWorldPosition());
+        }
     }
 
     deChain() {
         let train = this.headTrain();
-        if (train && train.isLastChain(this) && (train.State() == 'stop')) {
-            train.removeChain(this);
+        let last;
 
-            let last = train.getLastChain();
+        if (train && (last = train.getLastCart(this)) && (train.State() == 'stop')) {
+            train.removeChain(this);
 
             let pen = this.trackPos.penetration(last.trackPos, false);
             if (pen) {

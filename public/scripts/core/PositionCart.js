@@ -20,9 +20,6 @@ class PositionCart {
         this.forwardInTrack  = forwardInTrack;
 
         if (this.trackIndex != trackIndex) {
-            if (this.currentTrack)
-                this.currentTrack.runOut(this);
-
             this.trackIndex = trackIndex;
             this.currentTrack = this.game.items.get(this.trackIndex);
             this.currentTrack.runOver(this);
@@ -53,12 +50,22 @@ class PositionCart {
             let nextTrack = this.game.items.get(nextIndex);
             let paths = nextTrack.getConnectPaths(this.currentTrack.getCellPosition());
             if (paths.length > 0) {
+
                 let index = 0;
 
                 //Если входов несколько, переходим какой влючен
                 if (paths.length > 1) {
                     index = paths.findIndex(path => path.pathIndex == nextTrack.getCurrentPath());
-                    if (index == -1) index = 0;
+                    if (index == -1)
+                        return false;
+                }
+
+                //Если уже что то есть на этом пути
+                if (nextTrack.carts.length > 0) {
+                    if (nextTrack.carts.find(c=> 
+                        c.trackPos.pathIndex != paths[index].pathIndex
+                        ))
+                        return false;
                 }
 
                 let enterSector = nextTrack.getPath(index)[paths[index].forward ? 0 : 1];
@@ -181,17 +188,16 @@ class PositionCart {
         let distance = this.distance(other);
 
         let depth = minDistance - distance.length();
-        if (depth > 0) {
+        if ((depth > 0) || !checkDistance) {
 
             //let bdist = this.distanceBroken(other) / 2;
             //depth = minDistance - bdist;
 
-            if ((depth > 0) || !checkDistance) 
-                return {
-                    distance: distance,
-                    depth: depth,
-                    minDistance: minDistance
-                }
+            return {
+                distance: distance,
+                depth: depth,
+                minDistance: minDistance
+            }
         }
 
         return null;
@@ -203,15 +209,29 @@ class PositionCart {
 
         if (pen) {
 
-            //let otherDirect = other.currentTrack.calcDirect(other.pathIndex);
-            let otherDirect = other.cart.model.worldDirection();
+            let mePos = this.cart.trackPos.calcLocation();
+            let directMove = mePos.clone().sub(this.calcLocation());
+            let directToOther = mePos.clone().sub(other.calcLocation());
 
-            let dot = otherDirect.dot(pen.distance);
-            
-            tracer.log(`Dot ${dot} (${otherDirect.x}, ${otherDirect.z} / ${pen.distance.x}, ${pen.distance.z})`);
-            return {
-                depth: pen.depth,
-                dot: dot
+            if (directMove.dot(directToOther) > 0) {
+
+                let tracks = this.game.items.findShortestPath(this.currentTrack, other.currentTrack, false);
+
+                if (tracks && (tracks.length <= 2)) {
+
+                    let otherDirect = other.cart.model.worldDirection();
+
+                    let dot = otherDirect.dot(pen.distance);
+                    
+                    tracer.log(`Dot ${dot} (${otherDirect.x}, ${otherDirect.z} / ${pen.distance.x}, ${pen.distance.z})`);
+                    return {
+                        depth           : pen.depth,
+                        sameDirection   : dot > 0,
+                        forward         : directToOther.dot(this.cart.model.worldDirection()) > 0
+                    }
+                } else return {
+                        fromTheSide: true
+                    }
             }
         }
 
@@ -222,14 +242,12 @@ class PositionCart {
         let result = null;
         this.game.items.carts.forEach((cart)=>{
             if ((a_cart != cart) && 
-                !chain.includes(cart)) {
+                !chain.some(item => item.cart == cart)) {
                 let collision = this.checkCollistionWith(cart.trackPos, a_cart.sizeRadius() + cart.sizeRadius());
                 if (collision) {
-                    result = {
-                        cart: cart,
-                        depth: collision.depth,
-                        dot: collision.dot
-                    };
+                    collision.cart = cart;
+                    collision.meCart = this.cart;
+                    result = collision;
                 }
             }
         });

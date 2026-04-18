@@ -29,13 +29,17 @@ class BaseTrack extends BaseCellObject {
     }
 
     runOut(positionCart) {
-        let idx = this.carts.indexOf(positionCart.cart);
+        this.runOutCar(positionCart.cart);
+    }
+
+    runOutCar(cart) {
+        let idx = this.carts.indexOf(cart);
         if (idx > -1) {
             this.afterRunOut();
             this.carts.splice(idx, 1);
             eventBus.emit('runOut', {
                 track: this,
-                positionCart: positionCart
+                positionCart: cart.trackPos
             });
         }
     }
@@ -46,6 +50,12 @@ class BaseTrack extends BaseCellObject {
 
     runOver(positionCart) {
         if (this.carts.indexOf(positionCart.cart) == -1) {
+
+            this.game.items.items.forEach(t => {
+                if (t.carts.includes(positionCart.cart))
+                    t.runOutCar(positionCart.cart);
+            });
+
             this.carts.push(positionCart.cart);
             this.setCurrentPath(positionCart.pathIndex);
             this.afterRunOver();
@@ -95,6 +105,10 @@ class BaseTrack extends BaseCellObject {
         if (this.data.taskName) {
             this.game.deCompletedTask(this.data.taskName, this);
         }
+    }
+
+    getCurrentPath() {
+        return this._currentPath;
     }
 
     setCurrentPath(pathIndex) {
@@ -170,11 +184,11 @@ class BaseTrack extends BaseCellObject {
         return connectCell;
     }
 
-    findConnections() {
+    findConnections(allPath = true) {
         let result = [];
-        let list = this.game.items.findNearest(this.cellPosition);
+        let list = this.game.items.findNearest(this.cellPosition, allPath);
         list.forEach((index)=>{
-            let path = this.getConnectPath(this.game.items.get(index).getCellPosition());
+            let path = this.getConnectPath(this.game.items.get(index).getCellPosition(), allPath);
             if (path)
                 result.push(index);
         });
@@ -196,10 +210,6 @@ class BaseTrack extends BaseCellObject {
         return this.calcPathPoint(1, pathIndex).sub(this.calcPathPoint(-1, pathIndex));
     }
 
-    getCurrentPath() {
-        return 0;
-    }
-
     getConnectPaths(check_cell) {
         let result = [];
         const count = this.getPathCount();
@@ -217,15 +227,26 @@ class BaseTrack extends BaseCellObject {
         return result;
     }
 
-    getConnectPath(check_cell) {
+    getConnectPath(check_cell, allPath = true) {
 
-        const count = this.getPathCount();
-        for (let i=0; i<count; i++) {
+        if (allPath) {
+            const count = this.getPathCount();
+            for (let i=0; i<count; i++) {
+                for (let f=0; f<2; f++) {
+                    let cell = this.getNearestCell(i, f == 0);
+                    if (check_cell.equals(cell))
+                        return {
+                            pathIndex: i,
+                            forward: f != 0
+                        }
+                }
+            }
+        } else {
             for (let f=0; f<2; f++) {
-                let cell = this.getNearestCell(i, f == 0);
+                let cell = this.getNearestCell(this._currentPath, f == 0);
                 if (check_cell.equals(cell))
                     return {
-                        pathIndex: i,
+                        pathIndex: this._currentPath,
                         forward: f != 0
                     }
             }

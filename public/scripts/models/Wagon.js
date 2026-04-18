@@ -96,11 +96,13 @@ class Wagon extends BaseCart {
     }
 
     onClick(hit, eventData) {
-        if (!this.deChain()) {
+        if (this.game.isPlaying() && !this.deChain()) {
             let train = this.headTrain();
-            if (train && (train.State() != 'stop'))
-                eventBus.emit('wrong', lang.get("wrong-dechain-run"));
-            else eventBus.emit('wrong', lang.get("wrong-dechain-last"));
+            if (train) {
+                if (train.State() != 'stop')
+                    eventBus.emit('wrong', lang.get("wrong-dechain-run"));
+                else eventBus.emit('wrong', lang.get("wrong-dechain-last"));
+            }
         }
     }
 

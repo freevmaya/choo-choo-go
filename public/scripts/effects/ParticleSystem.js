@@ -7,8 +7,17 @@ class ParticleSystem {
     this.emissionTime = 0;
     this.emissionTimer = 0;
     this.emittedCount = 0;
+    this.options = { ...this.defaultOptions(), ...options};
     
-    this.options = {
+    // Убеждаемся, что скорость имеет значения
+    if (this.options.speedMin === undefined) this.options.speedMin = 1;
+    if (this.options.speedMax === undefined) this.options.speedMax = 3;
+    
+    this.init();
+  }
+
+  defaultOptions() {
+    return {
       // Общие настройки
       particleType: 'sprite',
       particleCount: 50,
@@ -61,16 +70,8 @@ class ParticleSystem {
       // Колбэки
       onParticleUpdate: null,
       onParticleComplete: null,
-      onEmissionComplete: null,
-      
-      ...options
-    };
-    
-    // Убеждаемся, что скорость имеет значения
-    if (this.options.speedMin === undefined) this.options.speedMin = 1;
-    if (this.options.speedMax === undefined) this.options.speedMax = 3;
-    
-    this.init();
+      onEmissionComplete: null
+    }
   }
   
   init() {
@@ -107,6 +108,12 @@ class ParticleSystem {
     
     this.scene.add(particle);
     
+    // Обработка rotationSpeed как массива
+    let rotationSpeed = this.options.rotationSpeed;
+    if (Array.isArray(rotationSpeed)) {
+      rotationSpeed = rotationSpeed[0] + Math.random() * (rotationSpeed[1] - rotationSpeed[0]);
+    }
+    
     particle.userData = {
       active: false,
       life: 0,
@@ -117,7 +124,7 @@ class ParticleSystem {
       endColor: new THREE.Color(this.options.colorEnd),
       startSize: this.options.sizeStart,
       endSize: this.options.sizeEnd,
-      rotationSpeed: this.options.rotationSpeed,
+      rotationSpeed: rotationSpeed,
       twinkleSpeed: this.options.twinkleSpeed,
       initialPosition: null
     };
@@ -158,7 +165,7 @@ class ParticleSystem {
       const centerY = 64;
       const outerRadius = 56;
       const innerRadius = 24;
-      const points = 5;
+      const points = this.options.points || 5;
       
       const color = this.getShapeColor();
       
@@ -368,11 +375,18 @@ class ParticleSystem {
       vel = new THREE.Vector3(0, 1, 0).multiplyScalar(this.options.speedMin);
     }
     
+    // Обработка rotationSpeed как массива для каждой новой частицы
+    let rotationSpeed = this.options.rotationSpeed;
+    if (Array.isArray(rotationSpeed)) {
+      rotationSpeed = rotationSpeed[0] + Math.random() * (rotationSpeed[1] - rotationSpeed[0]);
+    }
+    
     inactiveParticle.userData.active = true;
     inactiveParticle.userData.life = 0;
     inactiveParticle.userData.maxLife = this.options.lifetime;
     inactiveParticle.userData.velocity.copy(vel);
     inactiveParticle.userData.initialPosition = finalPos.clone();
+    inactiveParticle.userData.rotationSpeed = rotationSpeed;
     
     Object.assign(inactiveParticle.userData, customData);
     inactiveParticle.position.copy(finalPos);
@@ -468,10 +482,15 @@ class ParticleSystem {
     particle.position.z += data.velocity.z * dt;
     
     // Вращение
-    if (data.rotationSpeed > 0 && this.options.particleType !== 'sprite') {
-      particle.rotation.x += data.rotationSpeed * dt;
-      particle.rotation.y += data.rotationSpeed * dt;
-      particle.rotation.z += data.rotationSpeed * dt;
+    if (data.rotationSpeed > 0) {
+      if (this.options.particleType === 'sprite' || this.options.particleType === 'star') {
+        particle.material.rotation += data.rotationSpeed * dt;
+      } else {
+        // Для 3D объектов вращаем mesh
+        particle.rotation.x += data.rotationSpeed * dt;
+        particle.rotation.y += data.rotationSpeed * dt;
+        particle.rotation.z += data.rotationSpeed * dt;
+      }
     }
   }
 
@@ -575,13 +594,102 @@ class ParticleSystem {
   }
 }
 
+class DirectParticleSystem extends ParticleSystem {
+
+
+  updateParticlePosition(particle, dt) {
+    const data = particle.userData;
+    
+    // Получаем прогресс жизни частицы
+    const progress = data.life / data.maxLife;
+    
+    if (this.options.target) {
+      // Вектор от частицы к цели
+      const toTarget = new THREE.Vector3().subVectors(this.options.target, particle.position);
+      const distanceToTarget = toTarget.length();
+      
+      // Если частица уже близко к цели - останавливаем её движение
+      if (distanceToTarget < 0.1) {
+        particle.position.copy(this.options.target);
+        data.velocity.set(0, 0, 0);
+        return;
+      }
+      
+      // Рассчитываем силу притяжения с демпфированием
+      let attractionStrength = this.options.attractionStrength || 8.0;
+      
+      // Увеличиваем силу притяжения по мере приближения к концу жизни
+      if (progress > 0.6) {
+        const finalPhase = Math.min(1.0, (progress - 0.6) / 0.4);
+        attractionStrength = attractionStrength * (1.0 + finalPhase * 3.0);
+      }
+      
+      // Критически важно: добавляем сильное демпфирование скорости при приближении к цели
+      // Это предотвращает перелет и кружение
+      const dampingFactor = Math.min(0.95, distanceToTarget * 3.0);
+      data.velocity.multiplyScalar(dampingFactor);
+      
+      // Добавляем ускорение к цели
+      const directionToTarget = toTarget.clone().normalize();
+      const acceleration = directionToTarget.multiplyScalar(attractionStrength * dt);
+      data.velocity.add(acceleration);
+      
+      // Проверяем, не перелетит ли частица цель
+      const newPosition = particle.position.clone().add(data.velocity.clone().multiplyScalar(dt));
+      const newDistance = newPosition.distanceTo(this.options.target);
+      
+      // Если после движения частица окажется дальше от цели или перелетит - телепортируем в цель
+      /*
+      if (newDistance > distanceToTarget || distanceToTarget < data.velocity.length() * dt) {
+        particle.position.copy(this.options.target);
+        data.velocity.set(0, 0, 0);
+        return;
+      }*/
+    } else {
+      // Если цели нет - применяем гравитацию (как в родительском классе)
+      data.velocity.y -= this.options.gravity * dt;
+    }
+    
+    // Сопротивление воздуха
+    if (this.options.airResistance !== 1) {
+      data.velocity.multiplyScalar(Math.pow(this.options.airResistance, dt * 60));
+    }
+    
+    // Линейное сопротивление
+    if (this.options.drag > 0) {
+      const dragForce = data.velocity.clone().multiplyScalar(this.options.drag * dt);
+      data.velocity.sub(dragForce);
+    }
+    
+    // Обновление позиции
+    particle.position.x += data.velocity.x * dt;
+    particle.position.y += data.velocity.y * dt;
+    particle.position.z += data.velocity.z * dt;
+    
+    // Вращение - применяем для всех типов частиц, кроме спрайтов
+    // У спрайтов вращение через rotation не работает, нужно использовать материал
+    if (data.rotationSpeed > 0) {
+      if (this.options.particleType === 'sprite' || this.options.particleType === 'star') {
+        particle.material.rotation += data.rotationSpeed * dt;
+      } else {
+        // Для 3D объектов вращаем mesh
+        particle.rotation.x += data.rotationSpeed * dt;
+        particle.rotation.y += data.rotationSpeed * dt;
+        particle.rotation.z += data.rotationSpeed * dt;
+      }
+    }
+  }
+}
+
 class ParticleSystemObject extends BaseGameObject {
   constructor(game = null, options = {}) {
     super(game);
     
     this.psList = [];
-    this.position = new THREE.Vector3();
+    this.position = options.position || new THREE.Vector3();
     this.options = options;
+    if (this.position)
+      this.setPosition(this.position);
   }
 
   isActive() {
@@ -681,7 +789,7 @@ class TaskAchievParticles extends ParticleSystemObject {
           emissionDuration: 600,
           emitConeAngle: Math.PI * 0.3,
           spreadRadius: 0.5,
-          position: this.getPosition(),
+          position: this.options.position || this.getPosition(),
           blending: THREE.AdditiveBlending,
           twinkleSpeed: 30,
           rotationSpeed: 2
@@ -790,6 +898,40 @@ class SmokeParticles extends ParticleSystemObject {
           blending: THREE.AdditiveBlending,
           twinkleSpeed: 30,
           rotationSpeed: 2
+        })
+    ];
+  }
+}
+
+class ShowTargetEffect extends ParticleSystemObject {
+
+  createPS() {
+    return [
+        new DirectParticleSystem(this.game.scene, {
+          particleType: 'star',
+          particleCount: 60,
+          lifetime: 1.5,
+          fade: true,
+          points: 8,
+          airResistance: 1,
+          speedMin: 9,
+          speedMax: 10,
+          colorStart: 0xffdd88,
+          colorEnd: 0x0000FF,
+          shapeColor: () => {
+            return getRandomColorWithIntensity(1, 0.3);
+          },
+          sizeStart: 0.3,
+          sizeEnd: 0.2,
+          emissionRate: 200,
+          emissionDuration: 200,
+          emitConeAngle: Math.PI * 0.1,
+          spreadRadius: 0.5,
+          position: this.options.position || this.getPosition(),
+          target: this.options.target,
+          attractionStrength: 50,
+          twinkleSpeed: 30,
+          rotationSpeed: [-16, 16]
         })
     ];
   }

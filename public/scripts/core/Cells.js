@@ -201,7 +201,7 @@ class Cells {
         return index;
 	}
 
-	findNearest(cell) {
+	findNearest(cell, allPath) {
 		let offsets = [
             [-1, 0],
             [0, 1],
@@ -215,7 +215,7 @@ class Cells {
         	let index = this.find(cell.x + offset[0], cell.y + offset[1]);
         	if (index > -1) {
         		let track = this.get(index);
-        		let path = track.getConnectPath(cell);
+        		let path = track.getConnectPath(cell, allPath);
         		if (path) result.push(index);
         	}
         });
@@ -236,7 +236,7 @@ class Cells {
 	            return;
 	        }
 	        
-	        const connections = possible ? this.findNearest(current.getCellPosition()) : current.findConnections();
+	        const connections = current.findConnections(possible);
 	        for (const idx of connections) {
 	            const next = this.items[idx];
 	            if (!visited.has(next)) {
@@ -264,7 +264,7 @@ class Cells {
 	        const path = queue.shift();
 	        const current = path[path.length - 1];
 	        
-	        const connections = possible ? this.findNearest(current.getCellPosition()) : current.findConnections();
+	        const connections = current.findConnections(possible);
 	        for (const idx of connections) {
 	            const next = this.items[idx];
 	            if (!visited.has(next)) {
@@ -305,7 +305,7 @@ class Cells {
 	        const current = queue.shift();
 	        reachable.push(current);
 	        
-	        const connections = possible ? this.findNearest(current.getCellPosition()) : current.findConnections();
+	        const connections = current.findConnections(possible);
 	        for (const idx of connections) {
 	            const next = this.items[idx];
 	            if (!visited.has(next)) {

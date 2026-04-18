@@ -35,46 +35,55 @@ class Train extends BaseCart {
         return ['stop', 'run', 'braking', 'boarding', 'wait', 'prepare'];
     }
 
-    addChain(cart) {
-        if (!this.chain.includes(cart)) {
-            this.chain.push(cart);
+    addChain(cart, forward) {
+        if (!this.hasInChain(cart)) {
+            this.chain.push({
+                cart: cart,
+                forward: forward
+            });
             cart.addedToChain(this);
         }
     }
 
     removeChain(cart) {
-        let idx = this.chain.indexOf(cart);
+        let idx = this.chain.findIndex(c => c.cart == cart);
         if (idx > -1)
             this.chain.splice(idx, 1);
     }
 
     hasInChain(cart) {
-        return this.chain.indexOf(cart) > -1;
+        let result = this.chain.some(c => c.cart === cart);
+        return result;
     }
 
-    isLastChain(cart) {
-        return this.getLastChain() == cart;
-    }
+    getLastCart(cart) {
 
-    getLastChain(cart) {
-        return this.chain.length > 0 ? this.chain[this.chain.length - 1] : this;
+        let cart_item = this.chain.find(item => item.cart == cart);
+        if (cart_item) {
+            let sameList = this.chain.filter(item => (item.forward == cart_item.forward) && (item.cart != cart));
+
+            return sameList.length > 0 ? sameList[sameList.length - 1].cart : this;
+        }
+        return false;
     }
 
     toSaveData() {
         let data = super.toSaveData();
         data.chain = [];
-        this.chain.forEach((cart)=>{
-            let idx = cart.index();
+        this.chain.forEach((item)=>{
+            let idx = item.cart.index();
             if (idx > -1)
-                data.chain.push(idx);
+                data.chain.push([idx, item.forward]);
         });
         return data;
     }
 
     _resetChain(chain) {        
         this.chain = [];
-        chain.forEach((idx)=>{
-            this.chain.push(this.game.items.carts[idx]);
+        chain.forEach((item)=>{
+            let cart = this.game.items.carts[item[0]];
+            if (cart)
+                this.addChain(cart, item[1]);
         });
     }
 
@@ -432,20 +441,32 @@ class Train extends BaseCart {
 
     totalWeight() {
         let weight = this.weight;
-        this.chain.forEach((cart)=>{ weight += cart.weight; });
+        this.chain.forEach((item)=>{ weight += item.cart.weight; });
         return weight;
     }
 
     totalResistance() {
         let resistance = this.trackPos.currentTrack.getPhysicMaterial().resistance;
-        this.chain.forEach((cart)=>{ resistance += cart.trackPos.currentTrack.getPhysicMaterial().resistance; });
+        this.chain.forEach((item)=>{ resistance += item.cart.trackPos.currentTrack.getPhysicMaterial().resistance; });
         return resistance;
     }
 
     applyVelocity(newVelocity, dt) {
-        let allChain = [...[this], ...this.chain];
+        let allChain = [...[{cart: this, forward: true}], ...this.chain];
         let newPos = [];
         let collisions = [];
+
+        let applyNewPos = ()=>{
+            if (this.State() == 'wait')
+                this.State('prepare');
+
+            if (['run', 'braking'].includes(this.State())) {
+                allChain.forEach((item, i)=>{
+                    item.cart.trackPos.copy(newPos[i]);
+                    item.cart.velocity = newVelocity;
+                });
+            }
+        }
 
         let max_velocity = this.getConst('MAX_VELOCITY');
 
@@ -453,9 +474,9 @@ class Train extends BaseCart {
 
         newVelocity = newVelocity > 0 ? vel : -vel;
 
-        allChain.forEach((cart)=>{
-            let pos = cart.trackPos.clone();
-            let collision = pos.applyVelocity(newVelocity, cart, dt, allChain);
+        allChain.forEach((item)=>{
+            let pos = item.cart.trackPos.clone();
+            let collision = pos.applyVelocity(newVelocity, item.cart, dt, allChain);
             if (collision)
                 collisions.push(collision);
             newPos.push(pos);
@@ -470,46 +491,46 @@ class Train extends BaseCart {
                     else {
 
                         if (edgeCollision.reflect) {
-                            allChain.forEach((cart, i)=>{
-                                cart.forwardTrain = !cart.forwardTrain;
-                                cart.trackPos.toggleDirect();
-                                cart.velocity = newVelocity;
+                            allChain.forEach((item, i)=>{
+                                item.cart.forwardTrain = !item.cart.forwardTrain;
+                                item.cart.trackPos.toggleDirect();
+                                item.cart.velocity = newVelocity;
                             });
-                        }
+                        } else this.State('stop');
                     }
                 }
             } else {
 
-                let collistion = collisions[0];
+                let collision = collisions[0];
 
-                if (collistion.cart.allowedToJoin(this)) {
-                    let sameDirect = collistion.dot > 0;
+                if (collision.cart.allowedToJoin(this)) {
 
-                    console.log(`sameDirect: ${sameDirect}`);
+                    if (collision.fromTheSide)
+                        this.State('stop');
+                    else {
+                        console.log(`forward: ${collision.forward}`);
 
-                    collistion.cart.setForward(!sameDirect);
+                        collision.cart.setForward(!collision.sameDirection);
 
-                    this.addChain(collistion.cart);
-                    this.State('braking');
+                        let forward;
+                        if (collision.meCart == this) forward = collision.forward;
+                        else {
+                            let chainItem = this.chain.find(c => c.cart == collision.meCart);
 
-                    eventBus.emit('train-add-chain', collistion.cart);
+                            forward = chainItem.forward;
+                        }
+
+                        this.addChain(collision.cart, forward);
+                        this.State('braking');
+
+                        eventBus.emit('train-add-chain', collision.cart);
+                    }
                 } else {
                     this.State('stop');
                     eventBus.emit('wrong');
                 }
             }
-        } else {
-
-            if (this.State() == 'wait')
-                this.State('prepare');
-
-            if (['run', 'braking'].includes(this.State())) {
-                allChain.forEach((cart, i)=>{
-                    cart.trackPos.copy(newPos[i]);
-                    cart.velocity = newVelocity;
-                });
-            }
-        }
+        } else applyNewPos();
     }
 
     allowedToJoin(train) {
@@ -577,9 +598,9 @@ class Train extends BaseCart {
 
     _afterChangeForward() {
         super._afterChangeForward();
-        this.chain.forEach((cart)=>{
-            if (cart != this) 
-                cart.setForward(!cart.forwardTrain);
+        this.chain.forEach(item=>{
+            if (item.cart != this) 
+                item.cart.setForward(!item.cart.forwardTrain);
         });
     }
 

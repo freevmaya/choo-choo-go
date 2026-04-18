@@ -16,8 +16,6 @@ class CrossTrack extends StraightTrack {
         let pos = this.getPosition();
         let rotation = this.rotation * PI_HALF - PI_HALF * path;
 
-        tracer.log(rotation);
-
         let offset = new THREE.Vector3(0, 0, relPathPos / 2 * GAME_SETTINGS.CELL_SIZE);
         const euler = new THREE.Euler(0, rotation, 0);
         offset.applyEuler(euler);

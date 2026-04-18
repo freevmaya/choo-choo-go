@@ -127,7 +127,7 @@ class BaseGame {
 
     this.pauseBtn = $('#pause-btn');
     this.pauseBtn.click(()=>{
-      this.gameState.pause();
+      this.showPauseModal();
     });
 
     this.initModals();    
@@ -232,6 +232,7 @@ class BaseGame {
     this.initGameOverModal();
     this.initVictoryModal();
     this.initPauseModal();
+    this.initLevelsModal();
     
     // Настройка обработчика нажатия клавиш
     $(window).on('keydown', (e) => {
@@ -242,9 +243,14 @@ class BaseGame {
       
       // Пауза по ESC (только если игра активна и не на паузе)
       if (e.key === 'Escape') {
+
         if (this.gameState.isPlaying()) {
-          this.gameState.pause();
+          this.showPauseModal();
         } else if (this.gameState.isPaused()) {
+          if (this.currentModal) {
+            this.currentModal.hide();
+            this.currentModal = null;
+          }
           this.doResume();
         }
       }
@@ -282,13 +288,13 @@ class BaseGame {
     
     this.gameState.on(GAME_STATE.PAUSED, () => {
       console.log("Pause callback вызван");
-      this.showPauseModal();
+      //this.showPauseModal();
       this.disableControls();
     });
     
     this.gameState.on(GAME_STATE.RESUME, () => {
       console.log("Resume callback вызван");
-      this.hidePauseModal();
+      //this.hidePauseModal();
       this.gameState.set(GAME_STATE.PLAYING);
     });
     
@@ -325,6 +331,7 @@ class BaseGame {
   }
 
   GoToLevel(levelKey) {
+    this.gameState.set(GAME_STATE.IDLE);
     this.setGameIndex(levelKey)
           .then(()=>{
             this.resetGame();
@@ -513,13 +520,46 @@ class BaseGame {
       });
       
       // Обработчик для кнопки продолжения
-      btnOnClick('#resumeButton', this.doResume.bind(this));
+      //btnOnClick('#resumeButton', this.doResume.bind(this));
       
       // Обработчик для кнопки рестарта в паузе
       btnOnClick('#pauseRestartButton', () => {
         this.hidePauseModal();
         this.resetGame();
       });
+    }
+  }
+  
+  initLevelsModal() {
+    // Получаем элемент модального окна Pause
+    this.levelsModalElement = $('#levelsModal');
+    
+    if (this.levelsModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.levelsModal = new bootstrap.Modal(this.levelsModalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      //btnOnClick(this.levelsModalElement.find('#resumeButton'), this.doResume.bind(this));
+    }
+  }
+
+  showLevelsModal() {
+    if (this.levelsModal) {
+      let content = this.levelsModalElement.find('.list-content');
+      content.empty();
+
+      Object.keys(GAME_PARAMS).forEach((k, i) => {
+        let item = $(`<div class="item"><span class="num">${i}</span><span class="name">${lang.get(k)}</span></div>`);
+        item.click(()=>{
+          this.levelsModal.hide();
+          this.GoToLevel(k);
+        });
+        content.append(item);
+      });
+
+      this.levelsModal.show();
     }
   }
   
@@ -663,11 +703,29 @@ class BaseGame {
     
     $(window).on('resize', this.onResize.bind(this));
     $(window).trigger('game-ready');
+    document.addEventListener('show.bs.modal', this.onShowModal.bind(this));
+    document.addEventListener('hide.bs.modal', this.onHideModal.bind(this));
 
     /*
     if (DEV) 
       setTimeout(this.gameState.start.bind(this.gameState), 1000);
       */
+  }
+
+  onShowModal(event) {
+    if (this.gameState.isPlaying())
+      this.gameState.set(GAME_STATE.PAUSED);
+
+    const modal = bootstrap.Modal.getInstance(event.target);
+    if (modal)
+      this.currentModal = modal;
+  }
+
+  onHideModal(event) {
+    if (this.gameState.isPaused())
+      this.gameState.set(GAME_STATE.RESUME);
+
+    this.currentModal = null;
   }
 
   soundControl() {

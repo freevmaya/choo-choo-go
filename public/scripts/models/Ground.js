@@ -222,7 +222,8 @@ class Ground extends BaseGameObject {
     tracer.log(p);
     eventBus.emit('ground-click', p);
 
-    //this.game.showAchievEffect(hit.point.x, 0, hit.point.z);
+    //this.game.showTargetEffect(hit.point, new THREE.Vector3(5, 0, 5));
+    //this.game.showAchievEffect(hit.point.x, hit.point.y, hit.point.z);
   }
 
   /**

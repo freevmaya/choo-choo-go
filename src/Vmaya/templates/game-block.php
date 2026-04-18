@@ -1,4 +1,4 @@
-<div class="loader">
+  <div class="loader">
       <div class="spinner-border" role="status">
       </div>
   </div>
@@ -31,10 +31,6 @@
         </div>
       </div>
 
-      <div class="hint" id="game-hint">
-        <i class="bi bi-mouse"></i> <span data-lang="game_hint_mouse">Нажмите и тяните, чтобы вращать дерево</span>
-      </div>
-
       <div id="tools" class="tools-panel border-block">
         <div class="frame padding-2">
           <span id="pause-btn">
@@ -62,6 +58,12 @@
             <i class="bi bi-trophy-fill"></i> <span data-lang="score_indicator">Счет:</span> <span class="current-score">0</span>
           </div>
         </div>
+
+        <div id="levels" class="tools-panel border-block">
+          <div class="frame padding">
+             <a href="#" onclick="window.game.showLevelsModal()">Уровни</a>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -83,10 +85,10 @@
           <div class="middle">
             <div class="dialog-content">
               <p>
-                <i class="bi bi-info-circle"></i> <span data-lang="start_info_1">Управляйте вращением дерева, чтобы шарик отскакивал от платформ</span>
+                <i class="bi bi-info-circle"></i> <span data-lang="start_info_1"></span>
               </p>
               <p>
-                <i class="bi bi-exclamation-triangle-fill"></i> <span data-lang="start_info_2">Красные платформы смертельны при ударе сверху!</span>
+                <i class="bi bi-exclamation-triangle-fill"></i> <span data-lang="start_info_2"></span>
               </p>
               <p style="display:none" class="devBlock">
                 <span data-lang="gpu_speed">GPU speed:</span> <span class="testResult"></span>. 
@@ -189,8 +191,39 @@
               <p><span data-lang="current_rank">Ваше текущее звание:</span> <span class="title"></span></p>
               <div class="title-image"></div>
               <div class="text-center">
-                <button type="button" class="btn" id="resumeButton" data-lang="pause_resume">Продолжить</button>
+                <button type="button" class="btn" data-bs-dismiss="modal" data-lang="pause_resume">Продолжить</button>
                 <button type="button" class="btn" id="pauseRestartButton" data-lang="pause_restart">Новая игра</button>
+              </div>
+            </div>
+          </div>
+          <div class="bottom">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap модальное окно для Levels -->
+  <div class="modal fade" id="levelsModal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="dialog-1 modal-content">
+        <div class="background">
+        </div>
+        <div class="wrapper">
+          <div class="top">
+            
+          </div>
+          <div class="middle">
+            <div class="dialog-content">
+              <p class="status" data-lang="levels">Уровни</p>
+              <div class="list">
+                <div class="list-content">
+                  
+                </div>
+              </div>
+              <div class="text-center">
+                <button type="button" class="btn" data-bs-dismiss="modal" data-lang="pause_resume">Продолжить</button>
               </div>
             </div>
           </div>

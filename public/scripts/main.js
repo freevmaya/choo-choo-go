@@ -227,9 +227,19 @@ class RailGame extends BaseGame {
     }
   }
 
+  showTargetEffect(start, target) {
+    let effect = new ShowTargetEffect(this, {
+      position: start,
+      target: target
+    });
+
+    effect.play();
+  }
+
   showAchievEffect(x, y, z) {
-    let effect = new TaskAchievParticles(this);
-    effect.setPosition(x, y, z);
+    let effect = new TaskAchievParticles(this, {
+      position: new THREE.Vector3(x, y, z)
+    });
     effect.play();
   }
 
@@ -459,132 +469,6 @@ onAllImagesLoaded(() => {
   window.game = new RailGame();
 });
 
-//____________________________MODAL_______________
-
-/*
-function generateTrainBackground(element, options = {}) {
-    const {
-        opacity = 0.4,
-        minScale = 1.0,
-        maxScale = 2.0,
-        maxAttemptsPerTrain = 2000
-    } = options;
-
-    if (getComputedStyle(element).position === 'static') {
-        element.style.position = 'relative';
-    }
-
-    const oldLayer = element.querySelector('.train-bg-layer');
-    if (oldLayer) oldLayer.remove();
-
-    const bgLayer = document.createElement('div');
-    bgLayer.className = 'train-bg-layer';
-    bgLayer.style.position = 'absolute';
-    bgLayer.style.top = '0';
-    bgLayer.style.left = '0';
-    bgLayer.style.width = '100%';
-    bgLayer.style.height = '100%';
-    bgLayer.style.pointerEvents = 'none';
-    bgLayer.style.opacity = opacity;
-
-    const canvas = document.createElement('canvas');
-    bgLayer.appendChild(canvas);
-    element.appendChild(bgLayer);
-
-    const ctx = canvas.getContext('2d');
-
-    // Хранилище занятых областей
-    let occupiedZones = [];
-
-    // Проверка пересечения прямоугольников
-    function isOverlapping(x, y, w, h) {
-        const rect = { x: x - w/2, y: y - h/2, w: w, h: h };
-        for (let zone of occupiedZones) {
-            if (rect.x < zone.x + zone.w &&
-                rect.x + rect.w > zone.x &&
-                rect.y < zone.y + zone.h &&
-                rect.y + rect.h > zone.y) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Добавление занятой зоны
-    function addOccupiedZone(x, y, w, h) {
-        occupiedZones.push({ x: x - w/2, y: y - h/2, w: w, h: h });
-    }
-
-    function drawTrains() {
-        const rect = element.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-
-        if (width === 0 || height === 0) return;
-
-        canvas.width = width;
-        canvas.height = height;
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-
-        ctx.clearRect(0, 0, width, height);
-        occupiedZones = [];
-
-        let placed = 0;
-        let consecutiveFailures = 0;
-        const maxConsecutiveFailures = 500;
-
-        while (consecutiveFailures < maxConsecutiveFailures) {
-            // Случайный масштаб и размер квадрата
-            const scale = minScale + Math.random() * (maxScale - minScale);
-            const squareSize = 30 * scale; // базовый размер квадрата 30px
-            
-            const margin = 15;
-            const x = margin + Math.random() * (width - squareSize - margin * 2) + squareSize/2;
-            const y = margin + Math.random() * (height - squareSize - margin * 2) + squareSize/2;
-            
-            if (!isOverlapping(x, y, squareSize, squareSize)) {
-                const angle = Math.random() * Math.PI * 2;
-                const color = '#000000';
-                
-                drawSquare(ctx, x, y, squareSize, angle, color);
-                addOccupiedZone(x, y, squareSize, squareSize);
-                placed++;
-                consecutiveFailures = 0;
-            } else {
-                consecutiveFailures++;
-            }
-        }
-        
-        console.log(`Размещено квадратов: ${placed}`);
-    }
-
-    // Простое рисование квадрата
-    function drawSquare(ctx, x, y, size, angle, color) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(angle);
-        
-        ctx.fillStyle = color;
-        ctx.fillRect(-size/2, -size/2, size, size);
-        
-        ctx.restore();
-    }
-
-    window.addEventListener('resize', () => drawTrains());
-    drawTrains();
-}
-
-document.addEventListener('show.bs.modal', function (event) {
-    if (event.target) {
-      setTimeout(()=>{
-        generateTrainBackground(event.target, { count: 30, opacity: 0.1 });
-
-      }, 200);
-    }
-});
-*/
-
 class SmoothRainbowBackground {
   constructor(element, options = {}) {
     this.element = element || document.body;
@@ -607,6 +491,7 @@ class SmoothRainbowBackground {
 
 document.addEventListener('show.bs.modal', function (event) {
     if (event.target) {
+      /*
       const rainbow = new SmoothRainbowBackground(event.target, {
         hue: Math.random() * 360,
         speed: 0.5, 
@@ -620,5 +505,6 @@ document.addEventListener('show.bs.modal', function (event) {
         document.removeEventListener('hide.bs.modal', _onHide);
       }
       document.addEventListener('hide.bs.modal', _onHide);
+      */
     }
 });
