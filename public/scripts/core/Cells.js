@@ -23,11 +23,7 @@ class Cells {
 	delete(ga) {
 		if (ga) {
 			if (ga instanceof BaseCart) {
-				let idx = this.carts.indexOf(ga);
-				if (idx > -1) {
-					this.carts.splice(idx, 1);
-					ga.dispose();
-				}
+				ga.dispose();
 			} else if (ga instanceof BaseTrack) {
 				let idx = this.items.indexOf(ga);
 				if (idx > -1) {
@@ -134,6 +130,7 @@ class Cells {
 		this.carts.push(item);
 
 		this.doAfterChange();
+		return item;
 	}
 
 	addTrackItem(data) {

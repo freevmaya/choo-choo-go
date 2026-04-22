@@ -11,6 +11,14 @@
     font-style: normal;
 }
 
+.bi-eraser::before {
+    content: "\F331";
+}
+
+.bi-database-fill::before {
+    content: "\F8BE";
+}
+
 .bi-pause-fill::before {
     content: "\F4C3";
 }

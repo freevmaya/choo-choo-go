@@ -328,35 +328,8 @@ class BaseGameObject extends BaseStateMashine {
     }
 
     createText(text, color = '#FFFFFF', font="Bold 60px Arial") {
-      // Создаем canvas элемент
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.width = 512;
-      canvas.height = 512;
-
-      // Рисуем текст на canvas
-      context.font = font;
-      context.fillStyle = color;
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
-      context.fillText(text, canvas.width / 2, canvas.height / 2);
-
-      // Создаем текстуру из canvas
-      const texture = new THREE.CanvasTexture(canvas);
-
-      // Создаем материал с текстурой
-      const text_material = new THREE.MeshBasicMaterial({ 
-          map: texture,
-          side: THREE.DoubleSide,
-          transparent: true
-      });
-
-      // Создаем плоскость и накладываем текст
-      const plane = new THREE.Mesh(
-          new THREE.PlaneGeometry(3, 3),
-          text_material
-      );
-      //this.game.scene.add(plane);
+      
+      let plane = createText(text, color, font);
       this._registerGeometry(plane);
       return plane;
     }
@@ -396,5 +369,260 @@ class BaseGameObject extends BaseStateMashine {
         mesh.receiveShadow = true;
         this._registerGeometry(mesh);
         return mesh;
+    }
+
+    /*
+     * Управляет свечением всех мешей в модели
+     */
+    setEmission(intensity, customIntensity = null, color = null) {
+        if (!this.model) return;
+        
+        this._origEmission = this._origEmission || new Map();
+        
+        const isEnabled = intensity > 0 || intensity === true;
+        const newIntensity = customIntensity !== null ? customIntensity : (isEnabled ? 0.5 : 0);
+        const emissionColor = color?.clone ? color.clone() : new THREE.Color(0xffffff);
+        
+        this.model.traverse(child => {
+            if (!child.isMesh) return;
+            
+            const materials = [child.material].flat();
+            
+            for (const mat of materials) {
+                if (!mat || mat.emissiveIntensity === undefined || mat.emissive === undefined) continue;
+                
+                if (!isEnabled) {
+                    const orig = this._origEmission.get(mat.uuid);
+                    if (orig) {
+                        mat.emissiveIntensity = orig.intensity;
+                        mat.emissive = orig.color?.clone() || new THREE.Color(0x000000);
+                        this._origEmission.delete(mat.uuid);
+                    } else if (mat.emissiveIntensity !== 0) {
+                        mat.emissiveIntensity = 0;
+                        mat.emissive = new THREE.Color(0x000000);
+                    }
+                    mat.needsUpdate = true;
+                } 
+                else {
+                    if (!this._origEmission.has(mat.uuid)) {
+                        this._origEmission.set(mat.uuid, {
+                            intensity: mat.emissiveIntensity,
+                            color: mat.emissive?.clone() || new THREE.Color(0x000000)
+                        });
+                    }
+
+                    mat.emissiveIntensity = newIntensity;
+                    mat.emissive = emissionColor;
+                    mat.needsUpdate = true;
+                }
+            }
+        });
+    }
+
+    // Простые методы-обертки
+    enableEmission(intensity = 0.5) { this.setEmission(true, intensity); }
+    disableEmission() { this.setEmission(false); }
+    resetEmission() { 
+        this._origEmission && this.setEmission(false);
+        this._origEmission = null;
+    }
+
+    blink(sec, periods = 1, color = new THREE.Color(0xFFFFFF)) {
+        this.animateEmission(sec, p => (1 - Math.cos(p * Math.PI * 2 * periods)) / 2, color);
+    }
+
+    /*
+        Плавно меняет свечение. 
+        duration - длительность (сек)
+        curve - функция интенсивности от 0 до 1
+    */
+    animateEmission(duration, curve, color = null, onComplete = null) {
+        if (this._animFrame) 
+            this.stopEmissionAnimation();
+        
+        const startTime = performance.now();
+        
+        const animate = () => {
+            if (!this.model) return;
+            
+            let progress = Math.min(1, (performance.now() - startTime) / duration / 1000);
+            const intensity = curve(progress);
+
+            this.setEmission(true, intensity, color);
+            
+            if (progress < 1) {
+                this._animFrame = requestAnimationFrame(animate);
+            } else {
+                this.stopEmissionAnimation();
+                onComplete?.();
+            }
+        };
+        
+        this._animFrame = requestAnimationFrame(animate);
+        return { stop: () => this.stopEmissionAnimation() };
+    }
+
+    stopEmissionAnimation() {
+        this.setEmission(false);
+        if (this._animFrame) cancelAnimationFrame(this._animFrame);
+        this._animFrame = null;
+    }
+
+    // Утилиты
+    fadeIn(duration = 0.5, intensity = 0.5, color = null) {
+        return this.animateEmission(duration, p => p * intensity, color);
+    }
+
+    fadeOut(duration = 0.5) {
+        return this.animateEmission(duration, p => (1 - p) * 0.5);
+    }
+
+    pulse(duration = 0, min = 0.2, max = 0.8, speed = 2) {
+        return this.animateEmission(duration || 999999, p => {
+            return min + (max - min) * (0.5 + 0.5 * Math.sin(p * speed * Math.PI * 2));
+        });
+    }
+
+    deformModel(params = {}) {
+        if (!this.model) return;
+        
+        if (this._deformAnimFrame) {
+            cancelAnimationFrame(this._deformAnimFrame);
+            this._deformAnimFrame = null;
+        }
+        
+        const {
+            duration = 0.5,
+            type = 'scale',
+            amount = 0.5,
+            axis = 'y',
+            customFn = null,
+            onComplete = null,
+            loop = false
+        } = params;
+        
+        // Сохраняем исходный scale
+        if (!this._originalScale) {
+            this._originalScale = this.model.scale.clone();
+        }
+        
+        const startTime = performance.now();
+        
+        const animate = () => {
+            if (!this.model) {
+                this.stopDeformation();
+                return;
+            }
+            
+            let progress = Math.min(1, (performance.now() - startTime) / duration / 1000);
+            const t = customFn ? customFn(progress) : loop ? Math.sin(progress * Math.PI) : progress;
+            const value = t * amount;
+            
+            switch (type) {
+                case 'scale':
+                    this._applyScale(value, axis);
+                    break;
+                case 'stretch':
+                    this._applyStretch(value, axis);
+                    break;
+                case 'custom':
+                    if (customFn) customFn(this.model, value, t);
+                    break;
+            }
+            
+            if (progress >= 1 && !loop) {
+                this.resetDeformation();
+                onComplete?.();
+                this._deformAnimFrame = null;
+                return;
+            }
+            
+            this._deformAnimFrame = requestAnimationFrame(animate);
+        };
+        
+        this._deformAnimFrame = requestAnimationFrame(animate);
+        return { stop: () => this.stopDeformation() };
+    }
+
+    _applyScale(value, axis) {
+        const orig = this._originalScale;
+        
+        if (axis === 'x') this.model.scale.x = orig.x + value;
+        if (axis === 'y') this.model.scale.y = orig.y + value;
+        if (axis === 'z') this.model.scale.z = orig.z + value;
+        if (axis === 'xy') {
+            this.model.scale.x = orig.x + value;
+            this.model.scale.y = orig.y + value;
+        }
+        if (axis === 'xz') {
+            this.model.scale.x = orig.x + value;
+            this.model.scale.z = orig.z + value;
+        }
+        if (axis === 'yz') {
+            this.model.scale.y = orig.y + value;
+            this.model.scale.z = orig.z + value;
+        }
+        if (axis === 'xyz') {
+            this.model.scale.x = orig.x + value;
+            this.model.scale.y = orig.y + value;
+            this.model.scale.z = orig.z + value;
+        }
+    }
+
+    _applyStretch(value, axis) {
+        const orig = this._originalScale;
+        
+        if (axis === 'x') {
+            this.model.scale.x = orig.x + value;
+            this.model.scale.y = orig.y - value * 0.5;
+            this.model.scale.z = orig.z - value * 0.5;
+        }
+        if (axis === 'y') {
+            this.model.scale.y = orig.y + value;
+            this.model.scale.x = orig.x - value * 0.5;
+            this.model.scale.z = orig.z - value * 0.5;
+        }
+        if (axis === 'z') {
+            this.model.scale.z = orig.z + value;
+            this.model.scale.x = orig.x - value * 0.5;
+            this.model.scale.y = orig.y - value * 0.5;
+        }
+    }
+
+    stopDeformation() {
+        if (this._deformAnimFrame) {
+            cancelAnimationFrame(this._deformAnimFrame);
+            this._deformAnimFrame = null;
+        }
+    }
+
+    resetDeformation() {
+        if (this._originalScale) {
+            this.model.scale.copy(this._originalScale);
+        }
+    }
+
+    // Простые методы
+    pulseScale(duration = 0.5, amount = 0.3, axis = 'xyz') {
+        return this.deformModel({ duration, type: 'scale', amount, axis, loop: true });
+    }
+
+    pulseStretch(duration = 0.5, amount = 0.3, axis = 'y') {
+        return this.deformModel({ duration, type: 'stretch', amount, axis, loop: true });
+    }
+
+    bounce(amount = 0.3, duration = 0.4, inverse = false, onComplete=null) {
+        
+
+        this.deformModel({ 
+            duration: duration, 
+            type: 'stretch', 
+            amount :amount, 
+            customFn: (p) => {
+                return Math.sin(p * Math.PI * 5) * (inverse ? p : (1 - p));
+            }, 
+            axis: 'y',
+            onComplete: onComplete
+        });
     }
 }

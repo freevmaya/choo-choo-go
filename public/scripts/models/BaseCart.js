@@ -19,15 +19,15 @@ class BaseCart extends BaseGameObject {
     }
 
     resetTrackPos() {
-        let index = this.game.items.find(this.data.location[0], this.data.location[1]);
-        if (index > -1) {
-            this.trackPos = new PositionCart(this, index);
-            if (this.data.trackPos)
-                this.trackPos.setCurrentChain(index, this.data.trackPos.pathIndex, this.data.trackPos.indexPosInChain, this.data.trackPos.forwardInTrack);
-         
-            this.forwardTrain = typeof this.data.location[2] == 'boolean' ? this.data.location[2] : true;
-            this.updatePosition();
-        }
+        let index = Math.max(0, this.game.items.find(this.data.location[0], this.data.location[1]));
+        this.trackPos = new PositionCart(this, index);
+
+        if (this.data.trackPos)
+            this.trackPos.setCurrentChain(index, this.data.trackPos.pathIndex, this.data.trackPos.indexPosInChain, this.data.trackPos.forwardInTrack);
+     
+        this.forwardTrain = typeof this.data.location[2] == 'boolean' ? this.data.location[2] : true;
+        this.updatePosition();
+
     }
 
     index() {
@@ -284,8 +284,11 @@ class BaseCart extends BaseGameObject {
 
         if (this.data.name) {
             let target = this.game.items.findAsTask(this.data.name, 'cart_name');
-            if (target)
+            if (target) {
+                setTimeout(()=> target.blink(0.8, 4, new THREE.Color(0x888888)), 500);
+
                 this.game.showTargetEffect(this.getWorldPosition(), target.getWorldPosition());
+            }
         }
     }
 
@@ -317,6 +320,16 @@ class BaseCart extends BaseGameObject {
 
     allowedToJoin(train) {
         return !this.data.fixed;
+    }
+
+    dispose() {
+
+        let idx = this.game.items.carts.indexOf(this);
+        if (idx > -1) 
+            this.game.items.carts.splice(idx, 1);
+
+        this.deChain();
+        super.dispose();
     }
 }
 

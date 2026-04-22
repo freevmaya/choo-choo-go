@@ -105,7 +105,8 @@ const DEFAULT_LEVEL = {
         AMBIENT_LIGHT_INTENSITY: 1,
         KEY_LIGHT_INTENSITY: 150,
         FILL_LIGHT_INTENSITY: 2,
-        RIM_LIGHT_INTENSITY: 0.6
+        RIM_LIGHT_INTENSITY: 0.6,
+        GAME_MODE: 'Play'
     },
     items: [],
     tracks: [],
@@ -157,5 +158,6 @@ const GAME_SETTINGS = {
     START_CELL: {x: 0, y: 0},
     CAMERA_FOCUS: [25, 15],
 
-    DEFAULT_TASK_SCORE: 100
+    DEFAULT_TASK_SCORE: 100,
+    GAME_MODE: 'Play'
 };

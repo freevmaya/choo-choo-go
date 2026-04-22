@@ -1,5 +1,7 @@
 // scripts/effects/ParticleSystem.js
 
+// scripts/effects/ParticleSystem.js
+
 class ParticleSystem {
   constructor(scene, options = {}) {
     this.scene = scene;
@@ -52,6 +54,15 @@ class ParticleSystem {
       spriteTexture: null,
       spriteAtlas: null,
       
+      // Текст-специфичные
+      textValue: null,           // Текст для отображения (строка или функция)
+      textFont: "Bold 60px Arial", // Шрифт
+      textColor: "#FFFFFF",      // Цвет текста
+      textStrokeColor: null,     // Цвет обводки
+      textStrokeWidth: 0,        // Ширина обводки
+      textBackgroundColor: null, // Цвет фона
+      textPadding: 10,           // Отступ вокруг текста
+      
       // 3D объект-специфичные
       geometryRadius: 0.15,
       geometrySegments: 8,
@@ -102,6 +113,9 @@ class ParticleSystem {
       case 'cube':
         particle = this.createCubeParticle();
         break;
+      case 'text':
+        particle = this.createTextParticle();
+        break;
       default:
         particle = this.createSpriteParticle();
     }
@@ -126,7 +140,11 @@ class ParticleSystem {
       endSize: this.options.sizeEnd,
       rotationSpeed: rotationSpeed,
       twinkleSpeed: this.options.twinkleSpeed,
-      initialPosition: null
+      initialPosition: null,
+      // Для текстовых частиц
+      textValue: this.options.textValue,
+      textCanvas: null,
+      textTexture: null
     };
     
     return particle;
@@ -136,6 +154,162 @@ class ParticleSystem {
     if (typeof this.options.shapeColor == 'function')
       return this.options.shapeColor(idx);
     return new THREE.Color(this.options.shapeColor);
+  }
+
+  /**
+   * Создает текстовую частицу (3D текст на плоскости)
+   */
+  createTextParticle() {
+    // Создаем временный canvas для текста
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Получаем текст
+    let text = this.options.textValue;
+    if (typeof text === 'function') {
+      text = text();
+    }
+    text = text !== null && text !== undefined ? String(text) : '';
+    
+    // Настройки шрифта
+    ctx.font = this.options.textFont;
+    
+    // Измеряем текст для определения размера canvas
+    const textMetrics = ctx.measureText(text);
+    const textWidth = textMetrics.width;
+    const textHeight = parseInt(this.options.textFont.match(/\d+/)?.[0] || 60);
+    
+    // Устанавливаем размер canvas с отступами
+    const padding = this.options.textPadding;
+    canvas.width = textWidth + padding * 2;
+    canvas.height = textHeight + padding * 2;
+    
+    // Обновляем контекст с новыми размерами
+    ctx.font = this.options.textFont;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Рисуем фон если указан
+    if (this.options.textBackgroundColor) {
+      ctx.fillStyle = this.options.textBackgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Скругленные углы для фона
+      const radius = 10;
+      ctx.fillStyle = this.options.textBackgroundColor;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(canvas.width - radius, 0);
+      ctx.quadraticCurveTo(canvas.width, 0, canvas.width, radius);
+      ctx.lineTo(canvas.width, canvas.height - radius);
+      ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - radius, canvas.height);
+      ctx.lineTo(radius, canvas.height);
+      ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+    }
+    
+    // Рисуем обводку если указана
+    if (this.options.textStrokeColor && this.options.textStrokeWidth > 0) {
+      ctx.strokeStyle = this.options.textStrokeColor;
+      ctx.lineWidth = this.options.textStrokeWidth;
+      ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+    }
+    
+    // Рисуем текст
+    ctx.fillStyle = this.options.textColor;
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+    
+    // Создаем текстуру
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    
+    // Создаем спрайт с текстурой
+    const material = new THREE.SpriteMaterial({
+      map: texture,
+      blending: this.options.blending,
+      transparent: true,
+      depthTest: !this.options.forceTopLayer,
+      depthWrite: !this.options.forceTopLayer
+    });
+    
+    const sprite = new THREE.Sprite(material);
+    
+    // Масштабируем спрайт пропорционально размеру canvas
+    const aspectRatio = canvas.width / canvas.height;
+    const baseSize = this.options.sizeStart;
+    sprite.scale.set(baseSize * aspectRatio, baseSize, 1);
+    
+    if (this.options.forceTopLayer) {
+      sprite.renderOrder = 999;
+    }
+    
+    // Сохраняем canvas и текстуру для обновления
+    sprite.userData.textCanvas = canvas;
+    sprite.userData.textTexture = texture;
+    
+    return sprite;
+  }
+  
+  /**
+   * Обновляет текст существующей текстовой частицы
+   * @param {THREE.Sprite} particle - частица
+   * @param {string} newText - новый текст
+   */
+  updateTextParticle(particle, newText) {
+    if (!particle.material || !particle.material.map) return;
+    
+    const canvas = particle.userData.textCanvas;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Очищаем canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Настройки шрифта
+    ctx.font = this.options.textFont;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Рисуем фон если указан
+    if (this.options.textBackgroundColor) {
+      ctx.fillStyle = this.options.textBackgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Скругленные углы
+      const radius = 10;
+      ctx.fillStyle = this.options.textBackgroundColor;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(canvas.width - radius, 0);
+      ctx.quadraticCurveTo(canvas.width, 0, canvas.width, radius);
+      ctx.lineTo(canvas.width, canvas.height - radius);
+      ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - radius, canvas.height);
+      ctx.lineTo(radius, canvas.height);
+      ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+    }
+    
+    // Рисуем обводку
+    if (this.options.textStrokeColor && this.options.textStrokeWidth > 0) {
+      ctx.strokeStyle = this.options.textStrokeColor;
+      ctx.lineWidth = this.options.textStrokeWidth;
+      ctx.strokeText(newText, canvas.width / 2, canvas.height / 2);
+    }
+    
+    // Рисуем текст
+    ctx.fillStyle = this.options.textColor;
+    ctx.fillText(newText, canvas.width / 2, canvas.height / 2);
+    
+    // Обновляем текстуру
+    particle.material.map.needsUpdate = true;
+    particle.userData.textValue = newText;
   }
 
   /**
@@ -391,6 +565,17 @@ class ParticleSystem {
     Object.assign(inactiveParticle.userData, customData);
     inactiveParticle.position.copy(finalPos);
     
+    // Для текстовых частиц - обновляем текст если он динамический
+    if (this.options.particleType === 'text' && inactiveParticle.userData.textValue) {
+      let textValue = inactiveParticle.userData.textValue;
+      if (typeof textValue === 'function') {
+        textValue = textValue();
+      }
+      if (textValue !== undefined && textValue !== null) {
+        this.updateTextParticle(inactiveParticle, String(textValue));
+      }
+    }
+    
     this.updateParticleVisuals(inactiveParticle, 0);
     inactiveParticle.visible = true;
     
@@ -439,6 +624,20 @@ class ParticleSystem {
         particle.material.opacity = opacity;
         break;
         
+      case 'text':
+        // Для текстовых частиц сохраняем пропорции
+        const aspectRatio = particle.userData.textCanvas 
+          ? particle.userData.textCanvas.width / particle.userData.textCanvas.height 
+          : 1;
+        particle.scale.set(size * aspectRatio, size, 1);
+        if (particle.material) {
+          particle.material.opacity = opacity;
+          if (particle.material.color) {
+            particle.material.color.set(color);
+          }
+        }
+        break;
+        
       case 'sphere':
       case 'cube':
         particle.material.color.set(color);
@@ -451,7 +650,7 @@ class ParticleSystem {
     
     if (data.twinkleSpeed > 0) {
       const twinkle = 0.5 + Math.sin(Date.now() * data.twinkleSpeed) * 0.5;
-      if (this.options.particleType === 'sprite' || this.options.particleType === 'star') {
+      if (this.options.particleType === 'sprite' || this.options.particleType === 'star' || this.options.particleType === 'text') {
         particle.material.opacity = opacity * (0.7 + twinkle * 0.3);
       } else {
         particle.material.emissiveIntensity = 0.5 * (1 - progress) * (0.7 + twinkle * 0.3);
@@ -483,7 +682,7 @@ class ParticleSystem {
     
     // Вращение
     if (data.rotationSpeed > 0) {
-      if (this.options.particleType === 'sprite' || this.options.particleType === 'star') {
+      if (this.options.particleType === 'sprite' || this.options.particleType === 'star' || this.options.particleType === 'text') {
         particle.material.rotation += data.rotationSpeed * dt;
       } else {
         // Для 3D объектов вращаем mesh
@@ -588,6 +787,15 @@ class ParticleSystem {
         particle.material.dispose();
       }
       if (particle.geometry) particle.geometry.dispose();
+      
+      // Очищаем canvas текстовых частиц
+      if (particle.userData.textCanvas) {
+        particle.userData.textCanvas = null;
+      }
+      if (particle.userData.textTexture) {
+        particle.userData.textTexture.dispose();
+        particle.userData.textTexture = null;
+      }
     }
     
     this.particles = [];
@@ -932,6 +1140,67 @@ class ShowTargetEffect extends ParticleSystemObject {
           attractionStrength: 50,
           twinkleSpeed: 30,
           rotationSpeed: [-16, 16]
+        })
+    ];
+  }
+}
+
+class AppearParticles extends ParticleSystemObject {
+  createPS() {
+    return [
+        new ParticleSystem(this.game.scene, {
+          particleType: 'sprite',
+          particleCount: 80,
+          lifetime: 0.4,
+          fade: (v) => Math.sin(v * Math.PI),
+          airResistance: 0.99,
+          speedMin: 1,
+          speedMax: 2,
+          colorStart: 0xFFFFFF,
+          colorEnd: 0xFFFFFF,
+          sizeStart: 0.8,
+          sizeEnd: 0.8,
+          emissionRate: 80,
+          emissionDuration: 300,
+          emitDirection: new THREE.Vector3(0, 1, 0),
+          emitConeAngle: Math.PI,
+          spreadRadius: 0.8,
+          position: this.options.position || this.getPosition(),
+          blending: THREE.AdditiveBlending,
+          twinkleSpeed: 30
+        })
+    ];
+  }
+}
+
+class AddScoreParticles extends ParticleSystemObject {
+  createPS() {
+    return [
+        new DirectParticleSystem(this.game.scene, {
+          particleType: 'text',
+          particleCount: 10,
+          lifetime: 1.5,
+          fade: true,
+          gravity: 0.5,
+          speedMin: 1,
+          speedMax: 3,
+          textValue: this.options.text || 'X',
+          textFont: this.options.font || 'Bold 40px Arial',
+          textColor: this.options.color || '#FFD700',
+          textStrokeColor: '#FF6600',
+          textStrokeWidth: 2,
+          textBackgroundColor: 'rgba(0,0,0,0.5)',
+          textPadding: 8,
+          sizeStart: 0.5,
+          sizeEnd: 0.1,
+          emissionRate: 80,
+          emissionDuration: 300,
+          emitConeAngle: Math.PI / 2,
+          position: this.options.position || this.getPosition(),
+          target: this.options.target || this.getPosition(),
+          attractionStrength: 80,
+          spreadRadius: 1,
+          blending: THREE.AdditiveBlending
         })
     ];
   }

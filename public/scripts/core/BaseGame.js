@@ -233,6 +233,7 @@ class BaseGame {
     this.initVictoryModal();
     this.initPauseModal();
     this.initLevelsModal();
+    this.initShopModal();
     
     // Настройка обработчика нажатия клавиш
     $(window).on('keydown', (e) => {
@@ -378,6 +379,7 @@ class BaseGame {
     this.paramsIndex = Object.keys(GAME_PARAMS)[0];
 
     this.updateStateView();
+    this.updateScoreIndicator();
   }
 
   Victory() {
@@ -441,117 +443,172 @@ class BaseGame {
   
   initStartModal() {
     // Получаем элемент модального окна Start
-    this.startModalElement = $('#startModal');
+    let d = this.initDialog(`
+      <p>
+        <i class="bi bi-info-circle"></i> <span data-lang="start_info_1"></span>
+      </p>
+      <p>
+        <i class="bi bi-exclamation-triangle-fill"></i> <span data-lang="start_info_2"></span>
+      </p>
+      <p style="display:none" class="devBlock">
+        <span data-lang="gpu_speed">GPU speed:</span> <span class="testResult"></span>. 
+        <span data-lang="version">Version:</span> <span><?=APP_VERSION?></span>
+      </p>
+      <div class="text-center buttons">
+        <button type="button" class="btn" id="startGameButton" data-lang="start_button">Начать</button>
+      </div>
+    `);
+
+    this.startModalElement = d.dialog;
+    this.startModal = d.modal;
 
     if (DEV) {
       this.startModalElement.find('.devBlock').css('display', 'block');
       this.startModalElement.find('.testResult').text(Math.round(this.testResult));
     }
     
-    if (this.startModalElement && bootstrap) {
-      // Создаем экземпляр Bootstrap модального окна
-      this.startModal = new bootstrap.Modal(this.startModalElement, {
-        backdrop: 'static',
-        keyboard: false
-      });
-      
-      // Обработчик для кнопки старта
-      btnOnClick('#startGameButton', this.gameState.start.bind(this.gameState));
-    }
+    // Обработчик для кнопки старта
+    btnOnClick(this.startModalElement.find('.btn'), this.gameState.start.bind(this.gameState));
   }
   
   initGameOverModal() {
     // Получаем элемент модального окна Game Over
-    this.gameOverModalElement = $('#gameOverModal');
+
+    let d = this.initDialog(`<p class="status" data-lang="game_over_title">Неудача!</p>
+      <div class="stats-container">
+        <div class="row">
+          <div class="col-12">
+            <div class="stat-value"></div>
+          </div>
+        </div>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn" data-lang="game_over_button">Продолжить</button>
+      </div>      
+    `);
+    this.gameOverModalElement = d.dialog;
+    this.gameOverModal = d.modal;
+      
+    // Обработчик для кнопки рестарта в Game Over
+    btnOnClick(this.gameOverModalElement.find('.btn'), ()=>{
+      this.doAfterGameOver();
+    });
     
-    if (this.gameOverModalElement && bootstrap) {
-      // Создаем экземпляр Bootstrap модального окна
-      this.gameOverModal = new bootstrap.Modal(this.gameOverModalElement, {
-        backdrop: 'static',
-        keyboard: false
-      });
-      
-      // Обработчик для кнопки рестарта в Game Over
-      btnOnClick('#restartButton', ()=>{
-        this.doAfterGameOver();
-      });
-      
-      // Обработчик для закрытия модального окна
-      this.gameOverModalElement.on('hidden.bs.modal', () => {
-        if (this.gameState.isGameOver()) {
-          this.resetGame();
-        }
-      });
-    }
+    // Обработчик для закрытия модального окна
+    this.gameOverModalElement.on('hidden.bs.modal', () => {
+      if (this.gameState.isGameOver()) {
+        this.resetGame();
+      }
+    });
+  }
+
+  initDialog(content) {
+    let template = $('.modal.template');
+    let dialog = template.clone();
+    dialog.removeClass('template');
+
+    dialog.find('.dialog-content').append(content);
+    lang.applyToDOM(dialog);
+    $('body').append(dialog);
+
+    let modal = new bootstrap.Modal(dialog, {
+      backdrop: 'static',
+      keyboard: false
+    });
+    return {dialog, modal};
   }
   
   initVictoryModal() {
     // Получаем элемент модального окна Victory
-    this.victoryModalElement = $('#victoryModal');
+
+    let d = this.initDialog(`<p class="modal-subtitle status" data-lang="victory_title">Вы достигли вершины дерева!</p>
+      <p class="new-title status" data-lang="new_rank"></p>
+      <!-- Статистика игры -->
+      <div class="stats-container victory-stats">
+        <div class="row">
+          <div class="stat-value" id="victoryScore">0</div>
+          <div class="stat-label" data-lang="victory_score">Очки</div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button type="button" class="btn victoryRestartButton" data-lang="victory_button">Продолжить</button>
+      </div>`);
     
-    if (this.victoryModalElement && bootstrap) {
-      // Создаем экземпляр Bootstrap модального окна
-      this.victoryModal = new bootstrap.Modal(this.victoryModalElement, {
-        backdrop: 'static',
-        keyboard: false
-      });
+    this.victoryModalElement = d.dialog;
+    this.victoryModal = d.modal;
       
-      // Обработчик для кнопки рестарта в Victory
-      btnOnClick('#victoryRestartButton', this.doNextLevel.bind(this));
-      
-      // Обработчик для закрытия модального окна
-      this.victoryModalElement.on('hidden.bs.modal', () => {
-        if (this.gameState.isVictory()) {
-          this.resetGame();
-        }
-      });
-    }
+    // Обработчик для кнопки рестарта в Victory
+    btnOnClick(this.victoryModalElement.find('.btn'), this.doNextLevel.bind(this));
+    
+    // Обработчик для закрытия модального окна
+    this.victoryModalElement.on('hidden.bs.modal', () => {
+      if (this.gameState.isVictory()) {
+        this.resetGame();
+      }
+    });
   }
   
   initPauseModal() {
     // Получаем элемент модального окна Pause
-    this.pauseModalElement = $('#pauseModal');
-    
-    if (this.pauseModalElement && bootstrap) {
-      // Создаем экземпляр Bootstrap модального окна
-      this.pauseModal = new bootstrap.Modal(this.pauseModalElement, {
-        backdrop: 'static',
-        keyboard: false
-      });
-      
-      // Обработчик для кнопки продолжения
-      //btnOnClick('#resumeButton', this.doResume.bind(this));
-      
-      // Обработчик для кнопки рестарта в паузе
-      btnOnClick('#pauseRestartButton', () => {
-        this.hidePauseModal();
-        this.resetGame();
-      });
-    }
+    let d = this.initDialog(`<p class="status" data-lang="pause_title">Игра приостановлена</p>
+      <p><span data-lang="current_rank">Ваше текущее звание:</span> <span class="title"></span></p>
+      <div class="title-image"></div>
+      <div class="text-center">
+        <button type="button" class="btn" data-bs-dismiss="modal" data-lang="pause_resume">Продолжить</button>
+        <button type="button" class="btn pauseRestartButton" data-lang="pause_restart">Новая игра</button>
+      </div>`);
+    this.pauseModalElement = d.dialog;
+    this.pauseModal = d.modal;
+
+    btnOnClick(this.pauseModalElement.find('.pauseRestartButton'), () => {
+      this.hidePauseModal();
+      this.resetGame();
+    });
   }
   
   initLevelsModal() {
-    // Получаем элемент модального окна Pause
-    this.levelsModalElement = $('#levelsModal');
-    
-    if (this.levelsModalElement && bootstrap) {
-      // Создаем экземпляр Bootstrap модального окна
-      this.levelsModal = new bootstrap.Modal(this.levelsModalElement, {
-        backdrop: 'static',
-        keyboard: false
-      });
-      
-      //btnOnClick(this.levelsModalElement.find('#resumeButton'), this.doResume.bind(this));
+
+    let d = this.initDialog(`<p class="status" data-lang="levels">Уровни</p>
+      <div class="list">
+        <div class="list-content">
+          
+        </div>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn" data-bs-dismiss="modal" data-lang="pause_resume">Продолжить</button>
+      </div>`);
+    this.levelsModalElement = d.dialog;
+    this.levelsModal = d.modal;
+  }
+  
+  initShopModal() {
+
+    this.shop = new Shop(this, this.shopItems());
+  }
+
+  shopItems() {
+    return [];
+  }
+
+  Purchase(item) {
+
+  }
+
+  showShop() {
+    if (this.shop) {
+      this.shop.show();
     }
   }
 
   showLevelsModal() {
     if (this.levelsModal) {
+
       let content = this.levelsModalElement.find('.list-content');
       content.empty();
 
       Object.keys(GAME_PARAMS).forEach((k, i) => {
-        let item = $(`<div class="item"><span class="num">${i}</span><span class="name">${lang.get(k)}</span></div>`);
+        let item = $(`<div class="item" data-key="${k}"><span class="num">${i}</span><span class="name">${lang.get(k)}</span></div>`);
         item.click(()=>{
           this.levelsModal.hide();
           this.GoToLevel(k);
@@ -574,16 +631,17 @@ class BaseGame {
       this.startModal.hide();
     }
   }
+
+  waitBtn(btn, sec=3) {
+
+    btn[0].disabled = true;
+    setTimeout(()=>{
+      btn[0].disabled = false;
+    }, sec * 1000);
+  }
   
   showGameOverModal() {
-
-    let restartButton = $('#restartButton')[0];
-
-    restartButton.disabled = true;
-    setTimeout(()=>{
-      restartButton.disabled = false;
-    }, 3000);
-
+    this.waitBtn(this.gameOverModalElement.find('.btn'), 2);
     this.gameOverModal.show();
   }
 
@@ -593,19 +651,9 @@ class BaseGame {
   
   showVictoryModal(lastScore, newScore, newTitle) {
     // Обновляем статистику в модальном окне победы
-    const victoryBounceElement = $('#victoryBounceCount');
     const victoryScoreElement = $('#victoryScore');
-    
-    if (victoryBounceElement && this.ball) {
-      victoryBounceElement.text(this.ball.getBounceCount());
-    }
 
-    const victoryRestartBtn = $('#victoryRestartButton')[0];
-
-    victoryRestartBtn.disabled = true;
-    setTimeout(()=>{
-      victoryRestartBtn.disabled = false;
-    }, 4000);
+    this.waitBtn(this.victoryModalElement.find('.victoryRestartButton'), 3);    
 
     let newTitleElem = this.victoryModalElement.find('.new-title');
     if (newTitle) {
@@ -622,7 +670,7 @@ class BaseGame {
       victoryScoreElement.text(Math.round(score));
     }, ()=>{
 
-      let coord = $('#victoryState')[0].getBoundingClientRect();
+      let coord = this.victoryModalElement.find('.victory-stats')[0].getBoundingClientRect();
       new SparkEffect({
         x: coord.x + coord.width / 2,
         y: coord.y + coord.height / 2,
@@ -681,8 +729,30 @@ class BaseGame {
   }
   
   updateScoreIndicator() {
-    this.currentScoreElem.css('display', this.currentScore == 0 ? 'none' : 'inline-flex');
-    this.currentScoreElem.find('.current-score').text(this.currentScore);
+    let valueElem = this.currentScoreElem.find('.current-score');
+    let prevValue = Number(valueElem.text());
+
+    let diff = this.currentScore - prevValue;
+    this.currentScoreElem.toggleClass('hide', this.currentScore == 0);
+
+    if (diff > 0) {
+      enumerateTo(prevValue, this.currentScore, 1000, (score)=>{
+        valueElem.text(Math.round(score));
+      }, ()=>{
+
+        let coord = this.currentScoreElem[0].getBoundingClientRect();
+        new SparkEffect({
+          x: coord.x + coord.width / 2,
+          y: coord.y + coord.height / 2,
+          count: this.testResult > 30 ? 60 : 30,
+          colors: ['#FFF', '#F8F', '#FF8', '#8FF'],
+          sizes: [4, 8],
+          speeds: [1, 3],
+          gravity: 0.04,
+          baseRadius: coord.width * 0.4
+        });
+      });
+    } else valueElem.text(0);
   }
   
   calculateScore() {

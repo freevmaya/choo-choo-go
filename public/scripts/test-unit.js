@@ -69,3 +69,10 @@ function DevKeySupport() {
 
 NextLevelSupport();
 DevKeySupport();
+/*
+setTimeout(()=>{
+	eventBus.on('gameObject:click', (e)=>{
+		window.game.achiveGa(e.intersects[0].object.userData.gameObject);
+	});
+}, 500)
+*/

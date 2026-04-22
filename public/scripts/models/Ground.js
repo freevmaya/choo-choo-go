@@ -141,14 +141,14 @@ class Ground extends BaseGameObject {
   }
 
   _onMouseMove(event) {
-    this._updateHoverPlane(event.clientX, event.clientY);
+    this.updateHoverPlane(event.clientX, event.clientY);
   }
 
   _onTouchMove(event) {
     event.preventDefault();
     const touch = event.touches[0];
     if (touch) {
-      this._updateHoverPlane(touch.clientX, touch.clientY);
+      this.updateHoverPlane(touch.clientX, touch.clientY);
     }
   }
 
@@ -171,7 +171,7 @@ class Ground extends BaseGameObject {
   /**
    * Обновляет позицию плоскости подсветки в зависимости от положения курсора
    */
-  _updateHoverPlane(clientX, clientY) {
+  updateHoverPlane(clientX, clientY) {
     if (!this.game.raycasterManager || !this._hoverPlane.visible) return;
     
     
@@ -206,24 +206,26 @@ class Ground extends BaseGameObject {
     }
   }
 
-  hoverShow(visible, accessVis, colors = ['#00FF00', '#FF0000']) {
-    let is_mobile = window.matchMedia("(pointer: coarse)").matches;
-    this._hoverPlane.visible = visible && !is_mobile;
+  hoverShowE(visible, accessVis, colors = ['#00FF00', '#FF0000']) {
+    this._hoverPlane.visible = visible;
     this._materialHover.color.setStyle(accessVis ? colors[0] : colors[1]);
   }
 
-  onClick(hit, eventData) {
+  hoverShow(visible, accessVis, colors = ['#00FF00', '#FF0000']) {
+    let is_mobile = window.matchMedia("(pointer: coarse)").matches;
+    this.hoverShowE(visible && !is_mobile, accessVis, colors);
+  }
+
+  hitPointToCell(point) {
 
     const c = GAME_SETTINGS.CELL_SIZE / 2;
-    const p = new Vector2Int(Math.round((hit.point.x - c) / GAME_SETTINGS.CELL_SIZE), Math.round((hit.point.z - c) / GAME_SETTINGS.CELL_SIZE));
-    
-    //if (DEV) 
-      //this.game.cameraController.setLookCell(p);
+    return new Vector2Int(Math.round((point.x - c) / GAME_SETTINGS.CELL_SIZE), Math.round((point.z - c) / GAME_SETTINGS.CELL_SIZE));;
+  }
+
+  onClick(hit, eventData) {
+    const p = this.hitPointToCell(hit.point);
     tracer.log(p);
     eventBus.emit('ground-click', p);
-
-    //this.game.showTargetEffect(hit.point, new THREE.Vector3(5, 0, 5));
-    //this.game.showAchievEffect(hit.point.x, hit.point.y, hit.point.z);
   }
 
   /**

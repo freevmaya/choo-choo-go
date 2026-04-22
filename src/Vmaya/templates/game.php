@@ -59,6 +59,7 @@
       'UI/Swipeable',
       'UI/RailwaySpawner',
       'UI/Library',
+      'UI/Shop',
       'UI/ToastMessage',
       'modes/BaseModeModule',
       'modes/Play',
@@ -66,6 +67,7 @@
       'modes/Delete',
       'modes/PlayAndEdit',
       'modes/DropGame',
+      'modes/GenCycle',
       'main'
     ];
 

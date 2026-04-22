@@ -382,3 +382,35 @@ function formatTime(seconds) {
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
+
+function createText(text, color = '#FFFFFF', font="Bold 60px Arial") {
+  // Создаем canvas элемент
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  canvas.width = 512;
+  canvas.height = 512;
+
+  // Рисуем текст на canvas
+  context.font = font;
+  context.fillStyle = color;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+  // Создаем текстуру из canvas
+  const texture = new THREE.CanvasTexture(canvas);
+
+  // Создаем материал с текстурой
+  const text_material = new THREE.MeshBasicMaterial({ 
+      map: texture,
+      side: THREE.DoubleSide,
+      transparent: true
+  });
+
+  // Создаем плоскость и накладываем текст
+  const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(3, 3),
+      text_material
+  );
+  return plane;
+}

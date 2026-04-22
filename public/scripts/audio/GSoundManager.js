@@ -131,6 +131,14 @@ class GSoundManager extends SoundManager {
     eventBus.on('wrong', () => {
       this.Play('wrong');
     });
+
+    eventBus.on('add-score', () => {
+      this.Play('add-score');
+    });
+
+    eventBus.on('spawn', () => {
+      this.Play('show-up');
+    });
   }
 
   loadAllSounds() {
@@ -144,7 +152,9 @@ class GSoundManager extends SoundManager {
         { id: 'phuf', url: 'sounds/phuf.mp3' },
         { id: 'train-add-chain', url: 'sounds/train-add-chain.mp3' },
         { id: 'fork-change', url: 'sounds/fork-change.mp3' },
-        { id: 'wrong', url: 'sounds/wrong.mp3' }
+        { id: 'wrong', url: 'sounds/wrong.mp3' },
+        { id: 'add-score', url: 'sounds/add-score.mp3' },
+        { id: 'show-up', url: 'sounds/show-up.mp3' }
     ];
     const promises = sounds.map(sound => this.loadSound(sound.id, sound.url));
     return Promise.allSettled(promises);

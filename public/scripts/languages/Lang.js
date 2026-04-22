@@ -117,11 +117,16 @@ class Lang {
     /**
      * Применение переводов к DOM элементам
      */
-    applyToDOM() {
+    applyToDOM(parent=null) {
         if (!this.loaded) return;
 
+        if (!parent) {
+            parent = $('body');
+            $('html').attr('lang', this.currentLanguage);
+        }
+
         // Обрабатываем элементы с data-lang атрибутом
-        $('[data-lang]').each((index, element) => {
+        parent.find('[data-lang]').each((index, element) => {
             const $el = $(element);
             const key = $el.data('lang');
             const text = this.get(key);
@@ -135,21 +140,18 @@ class Lang {
         });
 
         // Обрабатываем элементы с data-lang-title
-        $('[data-lang-title]').each((index, element) => {
+        parent.find('[data-lang-title]').each((index, element) => {
             const $el = $(element);
             const key = $el.data('lang-title');
             $el.attr('title', this.get(key));
         });
 
         // Обрабатываем элементы с data-lang-placeholder
-        $('[data-lang-placeholder]').each((index, element) => {
+        parent.find('[data-lang-placeholder]').each((index, element) => {
             const $el = $(element);
             const key = $el.data('lang-placeholder');
             $el.attr('placeholder', this.get(key));
         });
-
-        // Обновляем язык в HTML теге
-        $('html').attr('lang', this.currentLanguage);
     }
 
     /**

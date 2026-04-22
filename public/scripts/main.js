@@ -4,8 +4,7 @@ class RailGame extends BaseGame {
     this.scene = new THREE.Scene();
     this.rendererManager = new RendererManager(this.container);
     this.rendererManager.init();
-
-
+    
     this.camera = new THREE.PerspectiveCamera(40, this.rendererManager.getAspectRatio(), 0.1, 100);
     this.cameraController = new CameraController(this);
     this.levelLoader = new LevelLoader(this);
@@ -18,7 +17,7 @@ class RailGame extends BaseGame {
     eventBus.on('user-action', this.onUserAction.bind(this));
     eventBus.on('wrong', this.onWrong.bind(this));
 
-    this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame'];
+    this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame', 'GenCycle'];
     this.gameMode('Play');
   }
 
@@ -63,6 +62,12 @@ class RailGame extends BaseGame {
     }, 2000);
   }
 
+  init() {
+    super.init();
+
+    this.refreshInventory();
+  }
+
   initUI() {
 
     super.initUI();
@@ -70,9 +75,36 @@ class RailGame extends BaseGame {
     this.toast = new ToastMessage(this);
     this.handTouch = new HandTouch(this);
     this.timerElem = $('#time');
+    this.btnInventory = $('#inventory');
+    this.btnInventory.click(this.onClickInventory.bind(this));
 
     if (DEV)
       this.initDevTools();
+  }
+
+  onClickInventory() {
+    if (this.gameMode() == 'Editor')
+      this.gameMode(this.getConst('GAME_MODE'));
+    else {
+      let inventory = this.stateManager.get('inventory', null);
+      if (inventory) {
+        this.gameMode('Editor');
+        this.modeModule.library.loadClasses(inventory);
+        this.modeModule.library.setCloseButton(()=>{
+          this.gameMode(this.getConst('GAME_MODE'));
+        });
+      }
+    }
+  }
+
+  refreshInventory() {
+    let inventory = this.stateManager.get('inventory', null);
+    let have = inventory !== null;
+
+    this.btnInventory.toggleClass('show', have);
+    this.btnInventory.toggleClass('hide', !have);
+
+    eventBus.emit('refreshInventory', inventory);
   }
 
   getConst(name, defaultValue = null) {
@@ -173,18 +205,26 @@ class RailGame extends BaseGame {
       return this.taskCompleted.includes(task);
   }
 
+  achiveGa(ga) {
+
+    let addScore = ga && ga.data?.score ? ga.data.score : this.getConst("DEFAULT_TASK_SCORE");
+    this.addCurrentScore(addScore);
+
+    if (ga) {
+      this.showAchievEffect(ga.getWorldPosition());
+      this.showAddScoreEffect(ga, addScore);
+    }
+    eventBus.emit('add-score', addScore);
+  }
+
   completedTask(task, ga) {
 
     if (!this.isCompletedTask(task)) {
       this.taskCompleted.push(task);
-      console.log('Tasks completed: ' + JSON.stringify(this.taskCompleted));
+      tracer.log('Tasks completed: ' + JSON.stringify(this.taskCompleted));
+      this.achiveGa(ga);
 
-      this.addCurrentScore(ga && ga.data.score ? ga.data.score : this.getConst("DEFAULT_TASK_SCORE"));
-
-      if (ga)
-        this.showAchievEffect(ga.getPosition());
-
-      eventBus.emit('complete-task', task);
+      eventBus.emit('complete-task', ga);
     }
 
     if (this.task) {
@@ -236,7 +276,35 @@ class RailGame extends BaseGame {
     effect.play();
   }
 
-  showAchievEffect(x, y, z) {
+  showAppearEffect(pos) {
+    let effect = new AppearParticles(this, {
+      position: pos
+    });
+    effect.play();
+  }
+
+  showAddScoreEffect(ga, addScore) {
+    
+    let pos = ga.getWorldPosition();
+    let rect = this.currentScoreElem[0].getBoundingClientRect();
+    pos.y = 2;
+    let mid = addScore / 10;
+    let effect = new AddScoreParticles(this, {
+      position: pos,
+      text: () => {
+        return '+' + Math.round(mid + (Math.random() - 0.5) * mid);
+      },
+      target: this.cameraController.screenToWorldPoint({x: rect.left + rect.width / 2, y: rect.top + rect.height / 2})
+    });
+    effect.play();
+  }
+
+  showAchievEffect(x, y = 0, z = 0) {
+    if (typeof x == 'object') {
+      y = x.y;
+      z = x.z;
+      x = x.x;
+    }
     let effect = new TaskAchievParticles(this, {
       position: new THREE.Vector3(x, y, z)
     });
@@ -300,7 +368,7 @@ class RailGame extends BaseGame {
         this.getConst('KEY_LIGHT_INTENSITY')
     );
     keyLight.position.set(0, 10, 0);
-    keyLight.distance = 20;      // На расстоянии 30 интенсивность станет 0
+    keyLight.distance = 15;      // На расстоянии интенсивность станет 0
     keyLight.decay = 1.5;        // Плавность затухания
 
     keyLight.castShadow = true;
@@ -326,6 +394,57 @@ class RailGame extends BaseGame {
     this.scene.add(rimLight);
     this.lights.push(rimLight);
     */
+  }
+
+  shopItems() {
+    let list = [
+        {
+            type: StraightTrack,
+            k: 0.1
+        },{
+            type: EndTrack,
+            k: 0.3
+        },{
+            type: CurvedTrack,
+            k: 0.1
+        },{
+            type: ForkTrack,
+            k: 0.15
+        },{
+            type: ForkRStTrack,
+            k: 0.15
+        },{
+            type: ForkLStTrack,
+            k: 0.15
+        },{
+            type: CrossTrack,
+            k: 0.15
+        },{
+            type: PointTrack,
+            k: 0.15
+        },{
+            type: Train,
+            k: 0.7
+        },{
+            type: SimpleTree,
+            k: 0.1
+        },{
+            type: DeciduousTree,
+            k: 0.1
+        },{
+            type: Snow,
+            k: 0.1
+        },{
+            type: RailwayPlatform,
+            k: 0.9
+        }
+    ];
+
+    let totalScore = Math.max(this.stateManager.get('score', this.currentScore), 200);
+    list.forEach((t, i) => {
+      list[i].price = Math.round(list[i].k * totalScore)
+    })
+    return list;
   }
 
   loadCells(cells) {
@@ -461,6 +580,41 @@ class RailGame extends BaseGame {
     if (this.cameraController)
       this.cameraController.update(dt);
     this.rendererManager.render(this.scene, this.camera);
+  }
+
+  userScore(value = null) {
+    if (value !== null)
+      this.stateManager.set('score', value);
+    else
+      value = this.stateManager.get('score', 0);
+
+    return value;
+  }
+
+  accountAddScore(requireScore) {
+    return new Promise((resolve, reject) => {
+      if (DEV) {
+        this.userScore(this.userScore() + requireScore);
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+  }
+
+  addPurchased(items) {
+
+    let inventory = this.stateManager.get('inventory', null);
+    if (inventory) {
+      Object.keys(items).forEach((k, i)=>{
+        if (inventory[k])
+          inventory[k] += items[k];
+        else inventory[k] = items[k];
+      });
+    } else inventory = items;
+
+    this.stateManager.set('inventory', inventory);
+    this.refreshInventory();
   }
 }
 

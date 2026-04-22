@@ -193,8 +193,12 @@ class CameraController extends BaseCameraController {
     }
   }
 
+  _checkEvent(event) {
+    return this.enabled && (this.game.game_container[0].contains(event.target));
+  }
+
   onTouchStart(event) {
-    if (this.enabled) {
+    if (this._checkEvent(event)) {
       event.preventDefault();
       const touches = event.touches;
       
@@ -237,7 +241,7 @@ class CameraController extends BaseCameraController {
   }
 
   onTouchMove(event) {
-    if (this.enabled) {
+    if (this._checkEvent(event)) {
       event.preventDefault();
       const touches = event.touches;
       

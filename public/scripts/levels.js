@@ -813,7 +813,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "Play",
+            "GAME_MODE": "GenCycle",
             "AMOUNT_TIME": 800,
             "DESCRIPTION": "three-wagon-description",
             "task": [
@@ -2995,43 +2995,52 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "Play",
-            "task": [
-                "green-placed", "blue-placed", "magenta-placed", "red-placed"
-            ]
+            "GAME_MODE": "GenCycle"
         },
         "items": [
             {
-                "type": "CrossTrack",
+                "type": "EndTrack",
                 "location": [
-                    0,
-                    0,
-                    0
-                ]
+                    -4,
+                    1,
+                    3
+                ],
+                "period": 30,
+                "spawner": "blue",
+                "color": "magenta",
+                "cart_name": "magenta"
             },
             {
-                "type": "ForkTrack",
+                "type": "EndTrack",
                 "location": [
-                    1,
-                    0,
-                    1
-                ]
-            },
-            {
-                "type": "ForkLStTrack",
-                "location": [
-                    1,
+                    -4,
                     -1,
-                    0
-                ]
+                    3
+                ],
+                "period": 30,
+                "spawner": "magenta",
+                "color": "blue",
+                "cart_name": "blue"
             },
             {
-                "type": "ForkRStTrack",
+                "type": "EndTrack",
                 "location": [
-                    1,
-                    1,
+                    0,
+                    4,
+                    0
+                ],
+                "period": 30,
+                "spawner": "green"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -4,
                     2
-                ]
+                ],
+                "period": 30,
+                "spawner": "red"
             },
             {
                 "type": "StraightTrack",
@@ -3056,7 +3065,6 @@ var GAME_PARAMS = {
                     -1,
                     1
                 ],
-                "taskName": "green-placed",
                 "cart_name": "green",
                 "color": "green"
             },
@@ -3067,33 +3075,9 @@ var GAME_PARAMS = {
                     1,
                     1
                 ],
-                "taskName": "red-placed",
+                "period": 5,
                 "cart_name": "red",
                 "color": "red"
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    1,
-                    2,
-                    0
-                ]
-            },
-            {
-                "type": "ForkRStTrack",
-                "location": [
-                    0,
-                    2,
-                    2
-                ]
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    0,
-                    4,
-                    0
-                ]
             },
             {
                 "type": "StraightTrack",
@@ -3104,35 +3088,11 @@ var GAME_PARAMS = {
                 ]
             },
             {
-                "type": "CurvedTrack",
-                "location": [
-                    1,
-                    -2,
-                    1
-                ]
-            },
-            {
-                "type": "ForkLStTrack",
-                "location": [
-                    0,
-                    -2,
-                    0
-                ]
-            },
-            {
                 "type": "StraightTrack",
                 "location": [
                     0,
                     -3,
                     0
-                ]
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    0,
-                    -4,
-                    2
                 ]
             },
             {
@@ -3168,72 +3128,74 @@ var GAME_PARAMS = {
                 ]
             },
             {
-                "type": "EndTrack",
+                "type": "CurvedTrack",
                 "location": [
-                    -4,
-                    1,
-                    3
-                ],
-                "color": "magenta",
-                "cart_name": "magenta",
-                "taskName": "magenta-placed"
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    -4,
+                    -2,
                     -1,
-                    3
-                ],
-                "color": "blue",
-                "cart_name": "blue",
-                "taskName": "blue-placed"
-            },
-            {
-                "type": "ForkLStTrack",
-                "location": [
-                    0,
-                    1,
-                    2
+                    1
                 ]
             },
             {
-                "type": "ForkLStTrack",
+                "type": "CurvedTrack",
                 "location": [
                     -2,
                     1,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    0,
+                    0,
                     1
                 ]
             },
             {
                 "type": "StraightTrack",
                 "location": [
-                    -1,
                     1,
-                    1
-                ]
-            },
-            {
-                "type": "ForkRStTrack",
-                "location": [
-                    -2,
                     -1,
                     1
                 ]
             },
             {
-                "type": "ForkRStTrack",
+                "type": "StraightTrack",
                 "location": [
                     0,
-                    -1,
+                    -2,
                     0
                 ]
             },
             {
                 "type": "StraightTrack",
                 "location": [
+                    0,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    0,
                     -1,
-                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    1,
                     1
                 ]
             }
@@ -3335,12 +3297,12 @@ var GAME_PARAMS = {
                 "location": [
                     -1,
                     0,
-                    true
+                    false
                 ],
                 "trackPos": {
                     "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
+                    "indexPosInChain": -0.21977322444642639,
+                    "forwardInTrack": false
                 },
                 "chain": []
             },
@@ -3378,7 +3340,89 @@ var GAME_PARAMS = {
                 "type": "Wagon",
                 "location": [
                     -4,
+                    -1,
+                    true
+                ],
+                "color": "magenta",
+                "name": "magenta"
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -4,
                     1,
+                    true
+                ],
+                "color": "blue",
+                "name": "blue"
+            }
+        ]
+    },
+    "MIN_GEN": {
+        "ENV": {
+            "BACKGROUND_COLOR": 12303359,
+            "GROUND_COLOR": 8930389,
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": "GenCycle"
+        },
+        "items": [
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -2,
+                    2
+                ],
+                "spawner": "wagon"
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    0,
+                    -1,
+                    3
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    0,
+                    0
+                ],
+                "cart_name": "wagon"
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    -1,
+                    1
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    2,
+                    -1,
+                    1
+                ]
+            }
+        ],
+        "tracks": [],
+        "objects": [],
+        "carts": [
+            {
+                "type": "Wagon",
+                "location": [
+                    0,
+                    -2,
                     true
                 ],
                 "trackPos": {
@@ -3386,13 +3430,12 @@ var GAME_PARAMS = {
                     "indexPosInChain": 0,
                     "forwardInTrack": true
                 },
-                "color": "blue",
-                "name": "blue"
+                "name": "wagon"
             },
             {
-                "type": "Wagon",
+                "type": "Train",
                 "location": [
-                    -4,
+                    2,
                     -1,
                     true
                 ],
@@ -3401,8 +3444,7 @@ var GAME_PARAMS = {
                     "indexPosInChain": 0,
                     "forwardInTrack": true
                 },
-                "color": "magenta",
-                "name": "magenta"
+                "chain": []
             }
         ]
     }

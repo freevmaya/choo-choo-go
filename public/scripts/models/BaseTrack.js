@@ -94,7 +94,6 @@ class BaseTrack extends BaseCellObject {
             if (train && (train.State() == 'run')) {
                 train.State('braking');
                 eventBus.once('change_mashine_state', (data)=>{
-                    tracer.log(data);
                     this.game.completedTask(this.data.taskName, this);
                 });
             } else this.game.completedTask(this.data.taskName, this);

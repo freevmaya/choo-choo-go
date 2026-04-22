@@ -42,7 +42,7 @@ class PositionCart {
         return this.currentTrack.getPathSector(this.pathIndex, this.forwardInTrack);
     }
 
-    swithToNextTrack() {
+    swithToNextTrack(new_indexPosInChain) {
 
         let nextIndex = this.currentTrack.getNearestTrackItem(this.pathIndex, this.forwardInTrack);
 
@@ -68,14 +68,14 @@ class PositionCart {
                         return false;
                 }
 
-                let enterSector = nextTrack.getPath(index)[paths[index].forward ? 0 : 1];
                 /*
+                let enterSector = nextTrack.getPath(index)[paths[index].forward ? 0 : 1];
                 console.log(paths.map(path => path.pathIndex).join(', ') + 
                     ', EnterSector = ' + enterSector);*/
 
                 let path = paths[index];
 
-                let indexPosInChain = 2 - Math.abs(this.indexPosInChain);
+                let indexPosInChain = 2 - Math.abs(new_indexPosInChain);
                 indexPosInChain = path.forward ? -indexPosInChain : indexPosInChain
 
                 let edge = nextTrack.checkEdge(this.cart, indexPosInChain);
@@ -103,20 +103,21 @@ class PositionCart {
 
     applyVelocity(velocity, cart, dt = 1, chain = []) {
 
-        this.indexPosInChain += velocity * dt * (this.forwardInTrack ? 1 : -1);
-
-        let limits = [-1, 1];
+        let indexPosInChain = this.indexPosInChain + velocity * dt * (this.forwardInTrack ? 1 : -1);
 
         if (this.currentTrack && this.cart) {
-            let edge = this.currentTrack.checkEdge(this.cart, this.indexPosInChain);
-            if (edge) return edge;
+            let edge = this.currentTrack.checkEdge(this.cart, indexPosInChain);
+            if (edge) 
+                return edge;
         }
 
-        if ((this.indexPosInChain > limits[1]) || (this.indexPosInChain < limits[0]))
-            if (!this.swithToNextTrack())
+        if ((indexPosInChain > 1) || (indexPosInChain < -1)) {
+            if (!this.swithToNextTrack(indexPosInChain)) {
                 return {
                     edgeTrack: true
                 };
+            }
+        } else this.indexPosInChain = indexPosInChain;
 
         return this.checkCollistion(cart, chain);
     }

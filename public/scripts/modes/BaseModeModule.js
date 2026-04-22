@@ -32,4 +32,8 @@ class BaseModeModule extends BaseStateMashine {
 		if (this._start)
 	    	this.game.gameState.off(GAME_STATE.PLAYING, this._start);
 	}
+
+	addPurchased(items) {
+
+	}
 }

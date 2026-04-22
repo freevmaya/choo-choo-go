@@ -1,42 +1,45 @@
 class Editor extends BaseModeModule {
 
-	constructor(game) {
+	constructor(game, inventory=null) {
 		super(game);
 
-	    this.library = new Library(game, $('#game-container'), $('#canvas-container'), [
-	      {
-	        type: StraightTrack
-	      },{
-	        type: EndTrack
-	      },{
-	        type: CurvedTrack
-	      },{
-	        type: ForkTrack
-	      },{
-	        type: ForkRStTrack
-	      },{
-	        type: ForkLStTrack
-	      },{
-	        type: CrossTrack
-	      },{
-	        type: PointTrack
-	      },{
-	        type: Train
-	      },{
-	        type: Wagon
-	      },{
-	        type: PassengerWagon
-	      },{
-	        type: SimpleTree
-	      },{
-	        type: DeciduousTree
-	      },{
-	        type: Snow
-	      },{
-	        type: RailwayPlatform
-	      }
-	    ]);
+		if (inventory === null) {
+			inventory = [
+		      {
+		        type: StraightTrack
+		      },{
+		        type: EndTrack
+		      },{
+		        type: CurvedTrack
+		      },{
+		        type: ForkTrack
+		      },{
+		        type: ForkRStTrack
+		      },{
+		        type: ForkLStTrack
+		      },{
+		        type: CrossTrack
+		      },{
+		        type: PointTrack
+		      },{
+		        type: Train
+		      },{
+		        type: Wagon
+		      },{
+		        type: PassengerWagon
+		      },{
+		        type: SimpleTree
+		      },{
+		        type: DeciduousTree
+		      },{
+		        type: Snow
+		      },{
+		        type: RailwayPlatform
+		      }
+		    ]
+		}
 
+	    this.library = new Library(game, $('#game-container'), $('#canvas-container'), inventory);
 	    this.initListeners();
 	}
 
