@@ -403,7 +403,7 @@ class CameraController extends BaseCameraController {
 
   update(dt) {
     super.update(dt);
-    if (!this.userDraggedTimer && this.isTrainOutside())
+    if (!this.userDraggedTimer && this.isTrainOutside() && this.game.isPlaying())
       this.trainToVisibility();
   }
 
