@@ -2,6 +2,9 @@
 
 class BaseGame {
   constructor() {
+
+    this.levels = structuredClone(GAME_PARAMS);
+    this.timers = [];
     this.mouseControl = null;
     this.lastTime = performance.now();
     this.frame_num = 0; 
@@ -45,6 +48,27 @@ class BaseGame {
             this.init();
           });
       });
+  }
+
+  setTimeout(afterFunc, time) {
+    this.timers.push({
+      count: 0,
+      time: time,
+      after: afterFunc
+    });
+  }
+
+  getConst(name, defaultValue = null) {
+      return this.getEnv()[name] ? this.getEnv()[name] : 
+            (typeof GAME_SETTINGS[name] != 'undefined' ? GAME_SETTINGS[name] : defaultValue);
+  }
+
+  getEnv() {
+    return this.getLevel()?.ENV || DEFAULT_LEVEL.ENV;
+  }
+
+  getLevel() {
+    return this.levels[this.paramsIndex];
   }
 
   doAfterFrame(call) {
@@ -136,6 +160,10 @@ class BaseGame {
     if ((typeof DEV == 'undefined') || !DEV) {
       $(window).on('blur', () => {
         this.gameState.pause();
+      });
+
+      $(window).on('focus', () => {
+        this.gameState.resume();
       });
     }
   }
@@ -376,7 +404,7 @@ class BaseGame {
     this.currentScore = 0;
     this.stateManager.clear();
 
-    this.paramsIndex = Object.keys(GAME_PARAMS)[0];
+    this.paramsIndex = Object.keys(this.levels)[0];
 
     this.updateStateView();
     this.updateScoreIndicator();
@@ -397,18 +425,18 @@ class BaseGame {
   }
 
   nextGameIndex() {
-    let keys = Object.keys(GAME_PARAMS);
+    let keys = Object.keys(this.levels);
     return this.setGameIndex(keys[(keys.indexOf(this.paramsIndex) + 1) % keys.length]);
   }
 
   prevGameIndex() {
-    let keys = Object.keys(GAME_PARAMS);
+    let keys = Object.keys(this.levels);
     return this.setGameIndex(keys[Math.max(keys.indexOf(this.paramsIndex) - 1, 0)]);
   }
 
   setGameIndex(value) {
-    let keys = Object.keys(GAME_PARAMS);
-    this.paramsIndex = GAME_PARAMS[value] ? value : keys[0];
+    let keys = Object.keys(this.levels);
+    this.paramsIndex = this.levels[value] ? value : keys[0];
     this.stateManager.set('paramsIndex', this.paramsIndex);
 
     let index = keys.indexOf(this.paramsIndex);
@@ -424,7 +452,7 @@ class BaseGame {
 
   loadLevelTextures() {
     return new Promise((resolve, reject)=>{
-      let textures = collectPaths(GAME_PARAMS[this.paramsIndex]);
+      let textures = collectPaths(this.levels[this.paramsIndex]);
       if (textures.length > 0) {
         this.visibleLoader(true);
         textureLoader.loadTexturesParallel(textures, (result)=>{
@@ -607,7 +635,7 @@ class BaseGame {
       let content = this.levelsModalElement.find('.list-content');
       content.empty();
 
-      Object.keys(GAME_PARAMS).forEach((k, i) => {
+      Object.keys(this.levels).forEach((k, i) => {
         let item = $(`<div class="item" data-key="${k}"><span class="num">${i}</span><span class="name">${lang.get(k)}</span></div>`);
         item.click(()=>{
           this.levelsModal.hide();
@@ -910,6 +938,15 @@ class BaseGame {
 
     this.afterFrame.forEach(c=>c());
     this.afterFrame.length = 0;
+    //eventBus.emit('after-frame', dt);
+
+    this.timers.forEach((t, i) => {
+      t.count += dt * 1000;
+      if (t.count >= t.time) {
+        this.timers.splice(i, 1);
+        t.after();
+      }
+    })
   }
   
   animate() {

@@ -4,7 +4,7 @@ class RailGame extends BaseGame {
     this.scene = new THREE.Scene();
     this.rendererManager = new RendererManager(this.container);
     this.rendererManager.init();
-    
+
     this.camera = new THREE.PerspectiveCamera(40, this.rendererManager.getAspectRatio(), 0.1, 100);
     this.cameraController = new CameraController(this);
     this.levelLoader = new LevelLoader(this);
@@ -64,7 +64,6 @@ class RailGame extends BaseGame {
 
   init() {
     super.init();
-
     this.refreshInventory();
   }
 
@@ -82,6 +81,24 @@ class RailGame extends BaseGame {
       this.initDevTools();
   }
 
+  saveCustom() {
+    let data = {
+      items: this.items.items.map(item => (item.toSaveData())),
+      objects: this.items.objects.map(item => (item.toSaveData()))
+    }
+    this.stateManager.set(this.paramsIndex, data);
+  }
+
+  resetLevelCustom() {
+    let custom = this.stateManager.get(this.paramsIndex);
+    if (custom) {
+      let level = this.levels[this.paramsIndex];
+      level.items = custom.items;
+      //level.carts = custom.carts;
+      level.objects = custom.objects;
+    }
+  }
+
   onClickInventory() {
     if (this.gameMode() == 'Editor')
       this.gameMode(this.getConst('GAME_MODE'));
@@ -92,6 +109,7 @@ class RailGame extends BaseGame {
         this.modeModule.library.loadClasses(inventory);
         this.modeModule.library.setCloseButton(()=>{
           this.gameMode(this.getConst('GAME_MODE'));
+          this.saveCustom();
         });
       }
     }
@@ -105,11 +123,6 @@ class RailGame extends BaseGame {
     this.btnInventory.toggleClass('hide', !have);
 
     eventBus.emit('refreshInventory', inventory);
-  }
-
-  getConst(name, defaultValue = null) {
-      return this.getEnv()[name] ? this.getEnv()[name] : 
-            (typeof GAME_SETTINGS[name] != 'undefined' ? GAME_SETTINGS[name] : defaultValue);
   }
 
   isPlaying() {
@@ -251,11 +264,11 @@ class RailGame extends BaseGame {
 
       if (DEV) {
         Object.keys(data).forEach(k=>{
-          GAME_PARAMS[this.paramsIndex][k] = data[k];
+          this.levels[this.paramsIndex][k] = data[k];
         });
 
-        this.stateManager.set('levels', GAME_PARAMS);
-        console.log(GAME_PARAMS);
+        this.stateManager.set('levels', this.levels);
+        console.log(this.levels);
       } else {
         this.stateManager.set('cells', data);
       }
@@ -341,7 +354,7 @@ class RailGame extends BaseGame {
   createGameUI() {
     this.clearGameUI();
 
-    let ui = GAME_PARAMS[this.paramsIndex].UI;
+    let ui = this.levels[this.paramsIndex].UI;
     if (ui)
       Object.keys(ui).forEach(key => {
         let obj = createObject(key, ui[key]);
@@ -353,7 +366,7 @@ class RailGame extends BaseGame {
   createLights() {
 
     this.clearLights();
-    let env = GAME_PARAMS[this.paramsIndex].ENV;
+    let env = this.levels[this.paramsIndex].ENV;
 
     this.scene.background = toThreeColor(env.BACKGROUND_COLOR);
     let distance = CAMERA_HEIGHT_OFFSET * 1.5;
@@ -498,14 +511,12 @@ class RailGame extends BaseGame {
     }]);
   }
 
-  getEnv() {
-    return GAME_PARAMS[this.paramsIndex] ? GAME_PARAMS[this.paramsIndex].ENV : DEFAULT_LEVEL.ENV;
-  }
-
   createGameObjects() {
     let env = this.getEnv();
 
     this.gameMode(env.GAME_MODE || 'Play');
+
+    this.resetLevelCustom();
 
     this._resetTimer();
     this.createLights();
@@ -520,13 +531,13 @@ class RailGame extends BaseGame {
       let levels = this.stateManager.get('levels');
       if (levels) {
         Object.keys(levels).forEach(k => {
-          GAME_PARAMS[k] = levels[k];
+          this.levels[k] = levels[k];
         });
       }*/
     }
 
     if (this.paramsIndex) {
-      this.loadCells(GAME_PARAMS[this.paramsIndex]);
+      this.loadCells(this.levels[this.paramsIndex]);
     } else {
       let cells = this.stateManager.get('cells');
       if (cells)
@@ -542,10 +553,10 @@ class RailGame extends BaseGame {
   }
 
   createNewLevel() {
-    let keys = Object.keys(GAME_PARAMS);
+    let keys = Object.keys(this.levels);
 
     let newName = START_GAME + '-' + keys.length;
-    GAME_PARAMS[newName] = $.extend({}, DEFAULT_LEVEL);
+    this.levels[newName] = $.extend({}, DEFAULT_LEVEL);
     this.GoToLevel(newName);
   }
 
@@ -584,7 +595,7 @@ class RailGame extends BaseGame {
 
   userScore(value = null) {
     if (value !== null)
-      this.stateManager.set('score', value);
+      this.setState('score', value);
     else
       value = this.stateManager.get('score', 0);
 
@@ -602,7 +613,7 @@ class RailGame extends BaseGame {
     });
   }
 
-  addPurchased(items) {
+  addPurchased(items, spendScore) {
 
     let inventory = this.stateManager.get('inventory', null);
     if (inventory) {
@@ -612,6 +623,12 @@ class RailGame extends BaseGame {
         else inventory[k] = items[k];
       });
     } else inventory = items;
+
+    let spendCurrentScore = Math.min(this.currentScore, spendScore);
+    let spendTotalScore = spendScore - spendCurrentScore;
+
+    this.addCurrentScore(-spendCurrentScore);
+    this.userScore(this.stateManager.get('score', 0) - spendTotalScore);
 
     this.stateManager.set('inventory', inventory);
     this.refreshInventory();

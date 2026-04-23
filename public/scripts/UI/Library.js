@@ -259,7 +259,7 @@ class Library {
 
 		    if (dropItem) {
 			    if (!Array.isArray(this.classes)) {
-			    	this.changeCount(this.currentItem.type.name, -1)
+			    	this.changeCount(this.currentItem.type.name, -1);
 			    }
 			    this.created.push(dropItem);
 			    if (this.deleteMode)

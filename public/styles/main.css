@@ -9,15 +9,21 @@
 
 /*
 @font-face {
-  font-family: 'game-font';
-  src: url('fonts/19510.otf') format('opentype');
+  font-family: 'game-font-b';
+  src: url('fonts/21063.otf') format('opentype');
   font-display: swap;
-}
-*/
+}*/
 
 @font-face {
   font-family: 'game-font';
   src: url('fonts/20686.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'game-font-a';
+  src: url('fonts/21063.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
@@ -55,6 +61,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: min(24px, 4dvw);
+  font-family: 'game-font-a', sans-serif;
 }
 
 .modal-open #game-container {
@@ -423,6 +430,8 @@ body {
 }
 
 .status {
+
+  font-family: 'game-font-a', sans-serif;
   font-size: 26px;
   text-align: center;
   text-shadow: 2px 2px 2px #000000c4;
@@ -621,6 +630,7 @@ body {
 }
 
 .toast-message.hide {
+  display: block;
   transform: translateX(calc(100vw + 100%));
 }
 
@@ -628,6 +638,7 @@ body {
   padding: 10px;
   border-radius: 15px;
   background: white;
+  font-family: 'game-font-a', sans-serif;
 }
 
 .toast-message .head {
@@ -635,6 +646,28 @@ body {
   flex-direction: column;
   align-items: end;
   justify-content: space-between;
+}
+
+.toast-message .actor-icon {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
+  background: var(--tools-bg-color);
+  margin-top: -50px;
+  margin-left: -50px;
+  box-shadow: 2px 2px 6px black;
+}
+
+.toast-message .actor-icon .frame {
+  border-radius: 45px;
+  height: calc(100% - 10px);
+  background-image: url(images/actor-1.png);
+  background-position: center;
+}
+
+.toast-message.border-block {
+  overflow: unset !important;
 }
 
 
@@ -1312,6 +1345,16 @@ body {
 
 .list.shop, .list.basket {
   height: 200px;
+}
+
+.empty .basket_placeholder {
+  display: grid !important;
+  place-items: center;
+  height: 80%;
+}
+
+.basket_placeholder {
+  display: none
 }
 
 .list-content {

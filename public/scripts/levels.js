@@ -814,7 +814,7 @@ var GAME_PARAMS = {
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "GenCycle",
-            "AMOUNT_TIME": 800,
+            "AMOUNT_TIME": 200,
             "DESCRIPTION": "three-wagon-description",
             "task": [
                 "green-placed",
@@ -3445,6 +3445,182 @@ var GAME_PARAMS = {
                     "forwardInTrack": true
                 },
                 "chain": []
+            }
+        ]
+    },
+    "CONSTUCTOR": {
+        "ENV": {
+            "BACKGROUND_COLOR": '#336622',
+            "GROUND_COLOR": '#336622',
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "AMOUNT_TIME": 260,
+            "DESCRIPTION": "repare-way-and-place-wagons",
+            "GAME_MODE": "GenCycle",
+            "task": ["green", "red"]
+        },
+        "items": [
+            {
+                "type": "CrossTrack",
+                "location": [
+                    0,
+                    0,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    0,
+                    1
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    2,
+                    0,
+                    1
+                ],
+                "period": 15
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -3,
+                    2
+                ],
+                "period": 15
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    3,
+                    0
+                ],
+                "color": "#228800",
+                "cart_name": "green",
+                "taskName": "green"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -3,
+                    0,
+                    3
+                ],
+                "color": "#880022",
+                "cart_name": "red",
+                "taskName": "red"
+            }
+        ],
+        "objects": [
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    -2,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Train",
+                "location": [
+                    -3,
+                    0,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": false
+                },
+                "chain": []
+            }, {
+                "location": [
+                    0,
+                    -3,
+                    true
+                ],
+                "type": "Wagon",
+                "color": "#228800",
+                "name": "green"
+            },
+            {
+                "location": [
+                    0,
+                    3,
+                    true
+                ],
+                "type": "Wagon",
+                "color": "#880022",
+                "name": "red"
             }
         ]
     }

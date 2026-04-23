@@ -4,6 +4,10 @@ class ToastMessage extends Swipeable {
   constructor(game) {
     const element = $(
       `<div class="toast-message border-block hide">
+        <div class="actor-icon">
+          <div class="frame padding">
+          </div>
+        </div>
         <div class="frame padding">
           <div class="head">
             <div class="title"></div>

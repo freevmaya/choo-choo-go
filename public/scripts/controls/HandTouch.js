@@ -29,6 +29,10 @@ class HandTouch {
 
 	onTask(task) {
 		if (this.game.isPlaying()) {
+
+			if ((task instanceof BaseGameObject) && task.data.taskName)
+				task = task.data.taskName;
+			
 			let focus = this.game.items.findAsTask(task, 'expect');
 			if (focus)
 				this.setFocus(focus, task);

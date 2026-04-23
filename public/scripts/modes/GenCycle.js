@@ -11,7 +11,12 @@ class GenCycle extends BaseModeModule {
 		//eventBus.on('ground-click', this._onGroundClick = this.onGroundClick.bind(this));
 	}
 
-	/*
+	start(showToast = true) {
+		super.start(showToast);
+		this.game.setTimeout(()=>{this.initFreeTracks()}, 1000);
+	}
+
+	/* Для разработки, генерирует вагон при клике
 	onGroundClick(cell) {
 	    let trackIndex = this.game.items.find(cell);
 		if (trackIndex > -1) {
@@ -31,11 +36,21 @@ class GenCycle extends BaseModeModule {
 	    }
 	}*/
 
+	initFreeTracks() {
+		this.game.items.items.forEach(t => {
+			if (t.data.spawner && !t.isBusy())
+				this.startWaitGenerate(t);
+		});
+	}
+
 	onRunOut(data) {
 		let cart = data.positionCart.cart;
 		let track = data.track;
-		if (track.data.spawner && cart && (track.data.spawner == cart.data.name))
-			this.startWaitGenerate(track, cart.toSaveData());
+		if (track.data.spawner && cart) {
+			if (track.data.spawner == cart.data.name)
+				this.startWaitGenerate(track, cart.toSaveData());
+			else this.startWaitGenerate(track);
+		}
 	}
 
 	onRunOver(data) {
@@ -54,8 +69,6 @@ class GenCycle extends BaseModeModule {
 		else this.lastTaskCart = null;
 	}
 
-
-
 	onRemoveChain(cart) {
 		if (this.lastTaskCart == cart) {
 
@@ -68,10 +81,15 @@ class GenCycle extends BaseModeModule {
 		}
 	}
 
-	startWaitGenerate(track, template) {
-		setTimeout(()=>{
-			this.Spawn(track, template);
-		}, (track.data.period ? track.data.period : 5) * 1000);
+	startWaitGenerate(track, template = null) {
+		if (template == null) {
+			template = this.game.getLevel()['templates']?.find(t => t.name == track.data.spawner);
+		}
+
+		if (template)
+			this.game.setTimeout(()=>{
+				this.Spawn(track, template);
+			}, (track.data.period ? track.data.period : 5) * 1000);
 	}
 
 	Spawn(track, template) {
@@ -81,14 +99,17 @@ class GenCycle extends BaseModeModule {
 			pos.y += 1;
 			this.game.showAppearEffect(pos);
 
-			setTimeout(()=>{
+			this.game.setTimeout(()=>{
 
 				let cell = track.getCellPosition();
-				template.location[0] = cell.x;
-				template.location[1] = cell.y;
+				if (!template.location)
+					template.location = [cell.x, cell.y, 0];
+				else {
+					template.location[0] = cell.x;
+					template.location[1] = cell.y;
+				}
 				delete(template.trackPos);
 				let cart = this.game.items.addCart(template);
-
 
 				cart.bounce(0.4, 0.5);
 

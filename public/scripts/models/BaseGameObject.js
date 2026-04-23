@@ -41,9 +41,6 @@ class BaseGameObject extends BaseStateMashine {
 
         //this.model = this.createModel();
         this.loadModel(this.game.scene);
-
-        if (DEV)
-            console.log(`Init object '${this.constructor.name}'`);
         return this;
     }
 

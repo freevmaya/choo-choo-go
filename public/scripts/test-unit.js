@@ -25,10 +25,6 @@ function sparkTest() {
 	});
 }
 
-function MoreKiller() {
-	GAME_PARAMS[START_GAME].TREE.KILLER_DENSITY = 0.5;
-}
-
 function NextLevelSupport() {
 	$(document).on('keydown', (event) => {
 	  if (event.key === 'n' || event.key === 'N') {
@@ -54,7 +50,7 @@ function DevKeySupport() {
 
 	  } else if (MathUtils.isNumeric(event.key)) {
 
-	  	let keys = Object.keys(GAME_PARAMS);
+	  	let keys = Object.keys(window.game.levels);
 	  	let level = (event.key - 1) % keys.length;
 	  	window.game.GoToLevel(keys[level]);
 

@@ -126,26 +126,36 @@ class Cells {
 	}
 
 	addCart(data) {
-    	let item = createObject(data.type, data).init(this.game, data);
-		this.carts.push(item);
+    	let item = createObject(data.type, data);
+		if (item) {
+			item.init(this.game, data);
+			this.carts.push(item);
 
-		this.doAfterChange();
+			this.doAfterChange();
+		} else tracer.error(data);
 		return item;
 	}
 
 	addTrackItem(data) {
-		let item = createObject(data.type, data).init(this.game);
-		this.items.push(item);
 
-		this.doAfterChange();
+		let item = createObject(data.type, data);
+		if (item) {
+			item.init(this.game);
+			this.items.push(item);
+
+			this.doAfterChange();
+		} else tracer.error(data);
 		return item;
 	}
 
 	addObject(data) {
-		let item = createObject(data.type, data).init(this.game);
-		this.objects.push(item);
+		let item = createObject(data.type, data);
+		if (item) {
+			item.init(this.game);
+			this.objects.push(item);
 
-		this.doAfterChange();
+			this.doAfterChange();
+		} else tracer.error(data);
 		return item;
 	}
 

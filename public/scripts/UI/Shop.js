@@ -23,11 +23,13 @@ class Shop {
 	        </div>
 	      </div>
 
-	      <div class="basket">
+	      <div class="basket empty">
 	        <div class="status" data-lang="basket">Корзина</div>
 	        <div class="list basket">
-	          <div class="list-content">
-	          </div>
+	        	<div class="basket_placeholder">Выберите элемент выше</div>
+				<div class="list-content">
+
+				</div>
 	        </div>
 	      </div>
 
@@ -71,18 +73,18 @@ class Shop {
 	}
 
 	onPayClick() {
-		let spend = this.calcSpend();
-		if (spend > this.totalScore) {
-			this.game.accountAddScore(spend - this.totalScore)
+		let spendScore = this.calcSpend();
+		if (spendScore > this.totalScore) {
+			this.game.accountAddScore(spendScore - this.totalScore)
 				.then((result)=>{
 					if (result)
-						this.purchase();
+						this.purchase(spendScore);
 				});
-		} else this.purchase();
+		} else this.purchase(spendScore);
 	}
 
-	purchase() {
-		this.game.addPurchased(this.spend);
+	purchase(spendScore) {
+		this.game.addPurchased(this.spend, spendScore);
 		this.modal.hide();
 	}
 
@@ -92,6 +94,7 @@ class Shop {
 		if (count !== null) {
 			if (count <= 0) {
 				item.remove();
+				this.refreshBasket();
 			} else {
 				if (counter.length == 0) {
 					item.append(counter = $(`<div class="counter"><span data-lang="count"></span>: <span class="value"></span></div>`));
@@ -132,6 +135,10 @@ class Shop {
 		this.elem.find('.spend .value').text(Math.round(spend));
 	}
 
+	refreshBasket() {
+		this.elem.find('.basket').toggleClass('empty', this.basket.find('.item').length == 0);
+	}
+
 	toBasket(itm) {
 		let type = itm.type.name;
 		let item = this.basket.find(`[data-type="${type}"]`);
@@ -146,5 +153,6 @@ class Shop {
 	        });
 			this.itemCount(item, 1);
 	    }
+		this.refreshBasket();
 	}
 }

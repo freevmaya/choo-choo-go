@@ -43,7 +43,7 @@ class BaseCart extends BaseGameObject {
         return {...this.data, ...{
             type: this.constructor.name,
             location: [cellPos.x, cellPos.y, this.forwardTrain],
-            trackPos: this.trackPos.toSaveData()
+            //trackPos: this.trackPos.toSaveData()
         }};
     }
 
