@@ -41,7 +41,7 @@ class RailGame extends BaseGame {
     eventBus.emit('pre-victory');
 
     setTimeout(()=>{
-        this.gameState.set(GAME_STATE.VICTORY);
+      this.gameState.set(GAME_STATE.VICTORY);
     }, 2000);
   }
 

@@ -574,15 +574,105 @@ var GAME_PARAMS = {
                 ]
             }
         ],
-        "objects": [],
+        "objects": [
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -4,
+                    0
+                ]
+            }
+        ],
         "carts": [
             {
                 "type": "Train",
                 "location": [
                     0,
-                    -2,
-                    false
-                ]
+                    -1,
+                    true
+                ],
+                "chain": []
             },
             {
                 "type": "Wagon",

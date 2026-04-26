@@ -616,6 +616,12 @@ body {
   bottom: 70px;
   transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   max-width: calc(100% - 50px);
+  line-height: 20px;
+}
+
+.toast-message i {
+  display: block;
+  line-height: 18px !important;
 }
 
 .over-modal {
@@ -664,7 +670,7 @@ body {
   text-shadow: 2px 2px 3px black;
 }
 
-.toast-message .actor-icon {
+.actor-icon {
   position: absolute;
   width: 100px;
   height: 100px;
@@ -675,7 +681,7 @@ body {
   box-shadow: 2px 2px 6px black;
 }
 
-.toast-message .actor-icon .frame {
+.actor-icon .frame {
   border-radius: 45px;
   height: calc(100% - 10px);
   background-image: url(images/actor-1.png);
@@ -1265,6 +1271,16 @@ body {
 
 [data-lang="victory_title"] {
   background-image: url(images/ribbon-red.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: bottom;
+  aspect-ratio: 3 / 1;
+  min-width: 300px;
+  padding-bottom: 0.5em;
+}
+
+[data-lang="game_over_title"] {
+  background-image: url(images/ribbon-blue.png);
   background-repeat: no-repeat;
   background-size: contain;
   background-position: bottom;
