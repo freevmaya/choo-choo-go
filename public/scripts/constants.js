@@ -121,6 +121,10 @@ const CAMERA_FOLLOW_SPEED = 6;
 const CAMERA_HEIGHT_OFFSET = 40;
 const MAXSCREENSIZE = 1024;
 
+const PRICES = {
+    UNLOCK_LEVEL: 400
+}
+
 // Настройки игры
 const GAME_SETTINGS = {
     TRAIN_FORCE: 3,               // Мощность паровозика 
@@ -128,7 +132,7 @@ const GAME_SETTINGS = {
     TRAIN_WEIGHT: 0.5,
     TRAIN_WHEEL_RADIUS : 0.18,
     TRAIN_LEIGHT: 1.5,
-    MAX_VELOCITY: 1.5,
+    MAX_VELOCITY: DEV ? 3 : 1.5,
 
     WAGON_WEIGHT: 0.1,
 
@@ -158,6 +162,6 @@ const GAME_SETTINGS = {
     START_CELL: {x: 0, y: 0},
     CAMERA_FOCUS: [25, 15],
 
-    DEFAULT_TASK_SCORE: 100,
+    DEFAULT_TASK_SCORE: 20,
     GAME_MODE: 'Play'
 };

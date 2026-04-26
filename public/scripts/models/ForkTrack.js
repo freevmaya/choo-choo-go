@@ -1,4 +1,18 @@
 class ForkTrack extends BaseCurveTrack {
+
+    constructor(data = null) {
+        super(data);
+        this.onHandleClick = debounce(()=>{
+            if (this.game.isPlaying()) {
+                if (this.carts.length == 0) {
+                    this.setCurrentPath((this._currentPath + 1) % this.getPathCount());
+                    eventBus.emit(this.getUserActionEvent(0), this);
+                    eventBus.emit('fork-change');
+                }
+                else this.doBusy();
+            }
+        }, 100);
+    }
     
     createModel() {
         const group = new THREE.Group();
@@ -10,8 +24,23 @@ class ForkTrack extends BaseCurveTrack {
         this.createSleepers(group, false, 3);
 
         this.createLever(group);
+
+        this.createMainCollider(group);
         
         return group;
+    }
+
+    createMainCollider(group) {        
+
+        let h = 0.02;
+
+        let collider = this.createColliderBox(GAME_SETTINGS.CELL_SIZE, h, GAME_SETTINGS.CELL_SIZE);
+        collider.position.set(0, h / 2, 0);
+
+        this._registerClickable(collider, this.onHandleClick);
+        group.add(collider);
+
+        return collider;
     }
 
     /* relPathPos от -1 до 1 */
@@ -72,20 +101,10 @@ class ForkTrack extends BaseCurveTrack {
 
     	this.handleGroup.add(lever);
 
-    	this._registerClickable(this.collider, this.onHandleClick.bind(this));
+    	this._registerClickable(this.collider, this.onHandleClick);
 
     	group.add(this.handleGroup);
 	    this._updateHandle();
-    }
-
-    onHandleClick(collider) {
-
-        if (this.carts.length == 0) {
-            this.setCurrentPath((this._currentPath + 1) % this.getPathCount());
-            eventBus.emit(this.getUserActionEvent(0), this);
-            eventBus.emit('fork-change');
-        }
-        else this.doBusy();
     }
 
     getUserActionEvent(index) {

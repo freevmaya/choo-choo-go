@@ -26,6 +26,8 @@ class Library {
 		
 		// Подписываемся на события отпускания для обработки drop
 		this._setupDropListeners();
+
+		eventBus.emit("created-library", this);
 	}
 
 	_setupDropListeners() {

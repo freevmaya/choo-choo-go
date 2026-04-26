@@ -8,6 +8,8 @@ class ForkLStTrack extends ForkTrack {
         this.createStRail(group);
 
         this.createLever(group);
+
+        this.createMainCollider(group);
         
         return group;
     }

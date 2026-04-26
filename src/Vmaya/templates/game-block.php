@@ -59,9 +59,9 @@
           </div>
         </div>
 
-        <div id="levels" class="tools-panel border-block">
+        <div id="inventory" class="tools-panel border-block hide">
           <div class="frame padding">
-             <span onclick="window.game.showLevelsModal()" data-lang="levels">Уровни</span>
+             <span onclick="" data-lang="inventory">Инвентарь</span>
           </div>
         </div>
 
@@ -71,9 +71,9 @@
           </div>
         </div>
 
-        <div id="inventory" class="tools-panel border-block hide">
+        <div id="levels" class="tools-panel border-block">
           <div class="frame padding">
-             <span onclick="" data-lang="inventory">Инвентарь</span>
+             <span onclick="window.game.showLevelsModal()" data-lang="levels">Уровни</span>
           </div>
         </div>
       </div>
@@ -84,6 +84,26 @@
     </div>
   </div>
 
+
+  <div class="modal fade template" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="border-block tools-panel modal-content">
+        <div class="frame">
+          <div class="wrapper">
+            <div class="top">
+            </div>
+            <div class="middle">
+              <div class="dialog-content">
+              </div>
+            </div>
+            <div class="bottom">            
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!--
   <div class="modal fade template" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="dialog-1 modal-content">
@@ -102,3 +122,4 @@
       </div>
     </div>
   </div>
+-->

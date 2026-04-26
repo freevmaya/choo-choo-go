@@ -101,9 +101,11 @@ class BaseTrack extends BaseCellObject {
     }
 
     afterRunOut() {
+        /*
         if (this.data.taskName) {
             this.game.deCompletedTask(this.data.taskName, this);
         }
+        */
     }
 
     getCurrentPath() {

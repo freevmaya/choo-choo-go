@@ -12,6 +12,16 @@ class HandTouch {
 		eventBus.on('game-mode-change', this._onModeChange = this.onModeChange.bind(this));
 		eventBus.onBroadcast(this._onBroadcast = this.onBroadcast.bind(this));
         eventBus.on('disposed', this._onDisposed = this.onDisposed.bind(this));
+	    window.addEventListener('mouseup', this._onMouseUp = this.onMouseUp.bind(this));
+	    window.addEventListener('touchend', this._onTouchEnd = this.onTouchEnd.bind(this));
+	}
+
+	onMouseUp(e) {
+		this.closeWaitAction();
+	}
+
+	onTouchEnd(e) {
+		this.closeWaitAction();
 	}
 
 	onDisposed(obj) {
@@ -49,15 +59,30 @@ class HandTouch {
 				this.closeWaitAction();
 			}
 
-			this.focus = focus;
+			if (this.focus = focus) {
 
-			let expectData = parseUserAction(this.focus.data.expect, expect);
+				if (focus instanceof $) {
 
-			if (this.userActionEvent = this.focus.getUserActionEvent(expectData.index)) {
+					let rect = focus[0].getBoundingClientRect();
+					this.element.css({left: rect.left + rect.width / 2, top: rect.top + rect.height / 2});
 
-				eventBus.on(this.userActionEvent, this._onUserActionEvent = this.onUserActionEvent.bind(this));
-				this.game.items.findTrains().forEach(t=>t.State('braking'));
-				this.show(this.animClass = expectData.animClass);
+					this.show(this.animClass = expect.animClass);
+					if (expect.caption)
+						this.game.showTip(lang.get(expect.caption));
+
+				} else {
+
+					let expectData = parseUserAction(focus.data.expect, expect);
+
+					if (this.userActionEvent = focus.getUserActionEvent(expectData.index)) {
+
+						eventBus.on(this.userActionEvent, this._onUserActionEvent = this.onUserActionEvent.bind(this));
+						this.game.items.findTrains().forEach(t=>t.State('braking'));
+						this.show(this.animClass = expectData.animClass);
+						if (expectData.caption)
+							this.game.showTip(lang.get(expectData.caption));
+					}
+				}
 				return;
 			}
 		}
@@ -65,10 +90,24 @@ class HandTouch {
 	}
 
 	onBroadcast(event, data) {
-		if (this.game.isPlaying() && this.game.items) {
+		if (this.game.items) {
 			let focus = this.game.items.findAsTask(event, 'expect');
 			if (focus)
 				this.setFocus(focus, event);
+		}
+
+		let expect = this.game.getConst('expect');
+		if (expect) {
+
+			let exp = expect.find(exp => exp.event == event);
+			if (exp) {
+				let elem = $(exp.element);
+				if (elem.length > 0) {
+					setTimeout(()=>{
+						this.setFocus(elem, exp);
+					}, exp.delay || 0);
+				}
+			}
 		}
 	}
 
@@ -92,7 +131,7 @@ class HandTouch {
 
 	_setClass(a_classes) {
 		this.element.removeClass(['show', 'hide', 'pushAnim', 'rightMoveAnim', 'rightUpMoveAnim', 
-									'leftMoveAnim', 'leftUpMoveAnim']);
+									'leftMoveAnim', 'leftUpMoveAnim', 'pushAnimUp']);
 		this.element.addClass(a_classes);
 	}
 
@@ -105,7 +144,7 @@ class HandTouch {
 	}
 
 	update(dt) {
-		if (this.focus) {
+		if (this.focus && (this.focus.getHandle)) {
 			let pos = this.game.cameraController.getScreenPosition(this.focus.getHandle(this.userActionEvent));
 			this.element.css({left: pos.x, top: pos.y});
 		}
@@ -119,6 +158,8 @@ class HandTouch {
 
 		eventBus.off('complete-task', this._onTask);
 		eventBus.offBroadcast(this._onBroadcast);
+	    window.removeEventListener('mouseup', this._onMouseUp);
+	    window.removeEventListener('touchend', this._onTouchEnd);
 	}
 }
 
@@ -132,15 +173,12 @@ function parseUserAction(input, expect) {
             return { index: 0, animClass: '' };
         }
     }
-    
-    const match = str?.match(/^[^:]+:(\d+):(.+)$/);
-    
-    if (!match) {
-        return { index: 0, animClass: '' };
-    }
+
+    const match = str.split(':');
     
     return {
-        index: parseInt(match[1], 10),
-        animClass: match[2]
+        index: match.length > 1 ? parseInt(match[1], 10) : 0,
+        animClass: match.length > 2 ? match[2] : null,
+        caption: match.length > 3 ? match[3] : null
     };
 }

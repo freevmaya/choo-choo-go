@@ -148,10 +148,8 @@ class RaycasterManager {
 
       let haveHandle = intersects.filter(item => item.object.userData?.onClick);
 
-      if (haveHandle.length > 0) {
+      if (haveHandle.length > 0)
         haveHandle.forEach(h => h.object.userData.onClick(h.object));
-        return;
-      }
 
       // Генерируем событие клика
       this.dispatchEvent('gameObject:click', {

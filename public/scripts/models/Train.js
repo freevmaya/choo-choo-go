@@ -490,13 +490,13 @@ class Train extends BaseCart {
                         this.State('wait');
                     else {
 
-                        if (edgeCollision.reflect) {
-                            allChain.forEach((item, i)=>{
-                                item.cart.forwardTrain = !item.cart.forwardTrain;
-                                item.cart.trackPos.toggleDirect();
-                                item.cart.velocity = newVelocity;
-                            });
-                        } else this.State('stop');
+                        allChain.forEach((item, i)=>{
+                            item.cart.forwardTrain = !item.cart.forwardTrain;
+                            item.cart.trackPos.toggleDirect();
+                            item.cart.velocity = newVelocity;
+                        });
+                        if (!edgeCollision.reflect)
+                            this.State('braking');
                     }
                 }
             } else {

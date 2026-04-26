@@ -14,6 +14,39 @@ function When(conditionFn, timeout = 5000) {
   });
 }
 
+function strEnum(number, pattern, lang = 'ru', show_number = true) {
+    const match = pattern.match(/^([^\[]+)\[([^\]]+)\]$/);
+    if (!match) {
+        return `${number} ${pattern}`;
+    }
+    
+    const base = match[1];
+    const forms = match[2].split(',');
+
+    const leftpart = show_number ? `${number} `: '';
+    
+    if (lang === 'ru') {
+        const num = Math.abs(Number(number));
+        
+        if ((num == 0) || (num % 10 === 1 && num % 100 !== 11)) {
+            return `${leftpart}${base}${forms[0]}`;
+        } else if (num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)) {
+            return `${leftpart}${base}${forms[1]}`;
+        } else {
+            return `${leftpart}${base}${forms[2]}`;
+        }
+    }
+    else if (lang === 'en') {
+        const num = Math.abs(Number(number));
+        return num === 1 
+            ? `${leftpart}${base}${forms[0]}` 
+            : `${leftpart}${base}${forms[2] || forms[0] + 's'}`;
+    }
+    else {
+        return `${leftpart}${base}`;
+    }
+}
+
 function randomArray(length, density) {
   const result = new Array(length).fill(0);
   const onesCount = Math.floor(length * density);
@@ -381,6 +414,12 @@ function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function sprintf(str, ...args) {
+    return str.replace(/{(\d+)}/g, (match, index) => {
+        return args[index] !== undefined ? args[index] : match;
+    });
 }
 
 function createText(text, color = '#FFFFFF', font="Bold 60px Arial") {

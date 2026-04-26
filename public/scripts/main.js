@@ -7,7 +7,6 @@ class RailGame extends BaseGame {
 
     this.camera = new THREE.PerspectiveCamera(40, this.rendererManager.getAspectRatio(), 0.1, 100);
     this.cameraController = new CameraController(this);
-    this.levelLoader = new LevelLoader(this);
     this.lights = [];
     this.gameUI = [];
 
@@ -26,22 +25,6 @@ class RailGame extends BaseGame {
   }
 
   onChangeCells(cells) {
-  }
-
-  onWrong(data) {
-    if (typeof data == 'string') {
-
-      if (this.wrongToastTimer) {
-        clearTimeout(this.wrongToastTimer);
-        this.wrongToastTimer = null;
-      }
-
-      this.wrongToast = this.toast.show(data);
-      this.wrongToastTimer = setTimeout(()=>{
-        if (this.wrongToast)
-          this.wrongToast.dispose();
-      }, 5000);
-    }
   }
 
   createSoundManager() {
@@ -70,8 +53,6 @@ class RailGame extends BaseGame {
   initUI() {
 
     super.initUI();
-
-    this.toast = new ToastMessage(this);
     this.handTouch = new HandTouch(this);
     this.timerElem = $('#time');
     this.btnInventory = $('#inventory');
@@ -86,12 +67,14 @@ class RailGame extends BaseGame {
       items: this.items.items.map(item => (item.toSaveData())),
       objects: this.items.objects.map(item => (item.toSaveData()))
     }
-    this.stateManager.set(this.paramsIndex, data);
+
+    data.paramsIndex = this.paramsIndex;
+    this.stateManager.set('saved-level', data);
   }
 
   resetLevelCustom() {
-    let custom = this.stateManager.get(this.paramsIndex);
-    if (custom) {
+    let custom = this.stateManager.get('saved-level');
+    if (custom && (custom.paramsIndex == this.paramsIndex)) {
       let level = this.levels[this.paramsIndex];
       level.items = custom.items;
       //level.carts = custom.carts;
@@ -111,6 +94,8 @@ class RailGame extends BaseGame {
           this.gameMode(this.getConst('GAME_MODE'));
           this.saveCustom();
         });
+
+        this.showTip(lang.get("close-library-to-continue"), 5000);
       }
     }
   }
@@ -127,11 +112,6 @@ class RailGame extends BaseGame {
 
   isPlaying() {
     return this.gameState.isPlaying() && !['Editor', 'Delete'].includes(this.gameMode());
-  }
-
-  resetGame() {
-    super.resetGame();
-    this._resetGameModeModule();
   }
 
   gameMode(state = null) {
@@ -214,6 +194,10 @@ class RailGame extends BaseGame {
     }
   }
 
+  calcBonuse() {
+    return this.items ? this.items.calcBonuse() : 0;
+  }
+
   isCompletedTask(task) {
       return this.taskCompleted.includes(task);
   }
@@ -267,7 +251,7 @@ class RailGame extends BaseGame {
           this.levels[this.paramsIndex][k] = data[k];
         });
 
-        this.stateManager.set('levels', this.levels);
+        //this.stateManager.set('levels', this.levels);
         console.log(this.levels);
       } else {
         this.stateManager.set('cells', data);
@@ -602,18 +586,7 @@ class RailGame extends BaseGame {
     return value;
   }
 
-  accountAddScore(requireScore) {
-    return new Promise((resolve, reject) => {
-      if (DEV) {
-        this.userScore(this.userScore() + requireScore);
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
-  }
-
-  addPurchased(items, spendScore) {
+  addPurchased(items, spendScore = 0) {
 
     let inventory = this.stateManager.get('inventory', null);
     if (inventory) {
@@ -624,14 +597,18 @@ class RailGame extends BaseGame {
       });
     } else inventory = items;
 
-    let spendCurrentScore = Math.min(this.currentScore, spendScore);
-    let spendTotalScore = spendScore - spendCurrentScore;
+    if (spendScore > 0) {
+      let spendCurrentScore = Math.min(this.currentScore, spendScore);
+      let spendTotalScore = spendScore - spendCurrentScore;
 
-    this.addCurrentScore(-spendCurrentScore);
-    this.userScore(this.stateManager.get('score', 0) - spendTotalScore);
+      this.addCurrentScore(-spendCurrentScore);
+      this.userScore(this.stateManager.get('score', 0) - spendTotalScore);
+    }
 
     this.stateManager.set('inventory', inventory);
     this.refreshInventory();
+
+    eventBus.emit('add-purchased', inventory);
   }
 }
 

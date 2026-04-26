@@ -115,6 +115,9 @@ class Editor extends BaseModeModule {
 	   	eventBus.off('gameObject:click', this._handleObjectClick);
 	   	document.removeEventListener('keydown', this._onKeyDown);
 	   	document.removeEventListener('keyup', this._onKeyUp);
+
+	   	if (this.game.items)
+	   		this.game.items.resetCarts();
 		super.dispose();
 	}
 }

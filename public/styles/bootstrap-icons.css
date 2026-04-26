@@ -11,6 +11,10 @@
     font-style: normal;
 }
 
+.bi-lock-fill::before {
+    content: "\F47A";
+}
+
 .bi-eraser::before {
     content: "\F331";
 }

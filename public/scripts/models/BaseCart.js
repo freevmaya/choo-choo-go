@@ -269,7 +269,7 @@ class BaseCart extends BaseGameObject {
     }
 
     isMoving() {
-    	return Math.abs(this.velocity) > 0.08;
+    	return Math.abs(this.velocity) > this.getConst('MAX_VELOCITY') * 0.5;
     }
 
     headTrain() {
@@ -296,7 +296,7 @@ class BaseCart extends BaseGameObject {
         let train = this.headTrain();
         let last;
 
-        if (train && (last = train.getLastCart(this)) && (train.State() == 'stop')) {
+        if (train && (last = train.getLastCart(this)) && !train.isMoving()) {
             train.removeChain(this);
 
             let pen = this.trackPos.penetration(last.trackPos, false);
@@ -309,8 +309,10 @@ class BaseCart extends BaseGameObject {
             }
 
             eventBus.emit('train-remove-chain', this);
+            /*
             if (this.data.taskName)
                 this.game.deCompletedTask(this.data.taskName);
+                */
 
             return true;
         }

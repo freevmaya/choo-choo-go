@@ -6,7 +6,7 @@ class EndTrack extends StraightTrack {
     		if (posTrain > 1 - hl) {
     			return {
     				edgeTrack: true,
-    				reflect: true
+    				reflect: false
     			}
     		}
     	}

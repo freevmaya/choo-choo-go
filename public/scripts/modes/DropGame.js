@@ -9,18 +9,20 @@ class DropGame extends BaseModeModule {
 	}
 
 	start(showToast = true) {
-		super.start(showToast);
+		if (this._start)
+	    	this.game.gameState.off(GAME_STATE.PLAYING, this._start);
 
-	    if (showToast && !this.toast) {
+	    if (showToast) {
+
+	    	let description = this.game.getConst('DESCRIPTION');
 		    this.timerId1 = setTimeout(()=>{
-		    	this.toast = this.game.toast.show(lang.get('drop-game-description'), null, ()=>{
-		    		this.State('showFinish');
-		    	}, [
+		    	let bonuse = this.game.calcBonuse();
+		    	this.game.showTip(lang.get(description), 15, bonuse ? (sprintf(lang.get('price-title'), bonuse) + 
+		    			' <i class="bi bi-trophy-fill"></i>') : null, null, [
 		    		{
 		    			caption: lang.get('got-it'),
 		    			callback: ()=>{
-		    				this.toast.dispose();
-		    				this.toast = null;
+		    				this.game.toast.hide();
 		    				this.State('showFinish');
 		    			}
 		    		}

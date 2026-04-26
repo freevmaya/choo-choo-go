@@ -17,6 +17,15 @@ class BaseGame {
     this.raycasterManager = null;
     this.afterFrame = [];
 
+    this.accountAddScore = (requireScore) => {
+      return new Promise((resolve, reject) => {
+        this.showTip(`Здесь типа проходит<br>платеж на ${requireScore}!<br>Жми закрыть.`, 0, null, ()=>{
+          this.userScore(this.userScore() + requireScore);
+          resolve(true);
+        })
+      });
+    }
+
     this.advProvider = () => {
       return new Promise((resolve, reject)=>{
         resolve(true);
@@ -48,6 +57,10 @@ class BaseGame {
             this.init();
           });
       });
+  }
+
+  calcBonuse() {
+    return 0;
   }
 
   setTimeout(afterFunc, time) {
@@ -129,6 +142,17 @@ class BaseGame {
     }
   }
 
+  onWrong(data) {
+    this.showTip(data);
+  }
+
+  showTip(data, readTimeSec = 5, title = "", onClose = null, buttons = []) {
+    if (typeof data == 'string') {
+      this.toast.show(data, title, onClose, buttons);
+      this.toast.setOverModal(this.currentModal !== null);
+    }
+  }
+
   unregisterClickableObject(object) {
     if (this.raycasterManager) {
       this.raycasterManager.removeClickableObject(object);
@@ -153,6 +177,8 @@ class BaseGame {
     this.pauseBtn.click(()=>{
       this.showPauseModal();
     });
+
+    this.toast = new ToastMessage(this);
 
     this.initModals();    
     this.initAudio();
@@ -411,6 +437,8 @@ class BaseGame {
   }
 
   Victory() {
+
+    this.stateManager.set('pass-level', this.paramsIndex);
     this.calculateScore();
 
     let lastTotalScore = this.stateManager.get('score', 0);
@@ -549,18 +577,18 @@ class BaseGame {
   initVictoryModal() {
     // Получаем элемент модального окна Victory
 
-    let d = this.initDialog(`<p class="modal-subtitle status" data-lang="victory_title">Вы достигли вершины дерева!</p>
+    let d = this.initDialog(`<p class="modal-subtitle status" data-lang="victory_title"></p>
+      <div class="stars"></div>
       <p class="new-title status" data-lang="new_rank"></p>
-      <!-- Статистика игры -->
       <div class="stats-container victory-stats">
         <div class="row">
           <div class="stat-value" id="victoryScore">0</div>
-          <div class="stat-label" data-lang="victory_score">Очки</div>
+          <div class="stat-label" data-lang="victory_score"></div>
         </div>
       </div>
 
       <div class="text-center">
-        <button type="button" class="btn victoryRestartButton" data-lang="victory_button">Продолжить</button>
+        <button type="button" class="btn victoryRestartButton" data-lang="victory_button"></button>
       </div>`);
     
     this.victoryModalElement = d.dialog;
@@ -629,23 +657,95 @@ class BaseGame {
     }
   }
 
+  offerPaid(text, price) {
+    return new Promise((resolve, reject)=>{
+
+      this.showTip(text, 15, null, null, [
+        {
+          caption: lang.get('ok'),
+          callback: ()=>{
+
+            this.spendScoreEndPay(price)
+              .then(resolve)
+              .catch(reject);
+          }
+        }
+      ]);
+    });
+  }
+
+  spendScoreEndPay(price) {
+    const totalScore = this.currentScore + this.userScore();
+
+    return new Promise((resolve, reject)=>{
+
+        let spendCurrentScore = Math.min(this.currentScore, price);
+        let spendTotalScore = price - spendCurrentScore;
+
+        if (price > totalScore) {
+          this.accountAddScore(price - totalScore)
+              .then((result)=>{
+                if (result) {
+                  this.addCurrentScore(-spendCurrentScore);
+                  this.userScore(this.userScore() - spendTotalScore);
+                }
+                resolve(result);
+              })
+              .catch(reject);
+        } else {
+          this.addCurrentScore(-spendCurrentScore);
+          this.userScore(this.userScore() - spendTotalScore);
+          resolve(true);
+        }
+      });
+  }
+
   showLevelsModal() {
     if (this.levelsModal) {
 
       let content = this.levelsModalElement.find('.list-content');
       content.empty();
 
+      let passLevel = this.paid('levels') ? null : this.stateManager.get('pass-level', START_GAME);
+      let lock = false;
       Object.keys(this.levels).forEach((k, i) => {
-        let item = $(`<div class="item" data-key="${k}"><span class="num">${i}</span><span class="name">${lang.get(k)}</span></div>`);
+
+        let pay_key = 'level-' + k;
+        let item = $(`<div class="item" data-key="${k}"><span class="num">${i + 1}</span><span class="name">${lang.get(k)}</span><i class="bi bi-lock-fill"></i></div>`);
+        
+        item.lock = lock && !this.paid(pay_key);
+        item.toggleClass('lock', item.lock);
+
         item.click(()=>{
-          this.levelsModal.hide();
-          this.GoToLevel(k);
+          if (item.lock)
+            this.offerPaid(sprintf(lang.get('level-lock-description'), PRICES.UNLOCK_LEVEL), PRICES.UNLOCK_LEVEL)
+              .then(()=>{
+                this.paid(pay_key, true);
+                this.levelsModal.hide();
+                this.GoToLevel(k);
+              });
+          else {
+            this.levelsModal.hide();
+            this.GoToLevel(k);
+          }
         });
         content.append(item);
+        
+        if (k == passLevel)
+          lock = true;
       });
 
       this.levelsModal.show();
     }
+  }
+
+  paid(service, value = null) {
+    let paid = this.stateManager.get('paid', {});
+    if (value !== null) {
+      paid[service] = value;
+      this.stateManager.set('paid', paid);
+    }
+    return paid[service]
   }
   
   showStartModal() {
@@ -702,12 +802,13 @@ class BaseGame {
       new SparkEffect({
         x: coord.x + coord.width / 2,
         y: coord.y + coord.height / 2,
-        count: this.testResult > 30 ? 60 : 30,
+        count: this.testResult > 30 ? 40 : 20,
         colors: ['#FFF', '#F8F', '#FF8', '#8FF'],
         sizes: [4, 8],
         speeds: [1, 3],
         gravity: 0.04,
-        baseRadius: coord.width * 0.4
+        baseRadius: coord.width * 0.4,
+        className: 'star'
       });
     });
   }
@@ -762,6 +863,7 @@ class BaseGame {
 
     let diff = this.currentScore - prevValue;
     this.currentScoreElem.toggleClass('hide', this.currentScore == 0);
+    this.currentScoreElem.removeClass('pulse');
 
     if (diff > 0) {
       enumerateTo(prevValue, this.currentScore, 1000, (score)=>{
@@ -779,6 +881,9 @@ class BaseGame {
           gravity: 0.04,
           baseRadius: coord.width * 0.4
         });
+
+        this.currentScoreElem.addClass('pulse');
+
       });
     } else valueElem.text(0);
   }

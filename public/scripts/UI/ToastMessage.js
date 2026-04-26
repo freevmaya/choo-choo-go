@@ -31,20 +31,29 @@ class ToastMessage extends Swipeable {
     this._onClose = null;
     
     this.element.find('.btn-close').click(() => this.hide());
+
+    this.visible = false;
+    this.stack = [];
   }
   
   _setVisible(visible) {
     this.element.removeClass(['show', 'hide']);
     this.element.addClass(visible ? 'show' : 'hide');
+    this.visible = visible;
+  }
+
+  setOverModal(value) {
+    this.element.toggleClass('over-modal', value);
   }
   
-  show(text, title = "", onClose = null, buttons = []) {
+  _show(text, title = "", onClose = null, buttons = []) {
     this.element.find('.content').html(text);
     this._setVisible(true);
     
-    if (title) {
-      this.element.find('.title').text(title);
-    }
+    let titleCtrl = this.element.find('.title');
+    titleCtrl.empty();
+    if (title)
+      titleCtrl.html(title);
 
     let footer = this.element.find('.footer');
     footer.empty();
@@ -59,13 +68,24 @@ class ToastMessage extends Swipeable {
     
     this._onClose = onClose;
     this.reset();
-    
-    return {
-      dispose: () => {
-        this._onClose = null;
-        this._setVisible(false);
-      }
-    };
+  }
+  
+  show(text, title = "", onClose = null, buttons = []) {
+    if (this.visible) {
+      this.hide();
+      this.stack.push({
+        text,
+        title,
+        onClose,
+        buttons
+      });
+      setTimeout(()=>{
+        if (this.stack.length > 0) {
+          let first = this.stack.shift();
+          this.show(first.text, first.title, first.onClose, first.buttons);
+        }
+      }, 800);
+    } else this._show(text, title, onClose, buttons);
   }
   
   hide() {

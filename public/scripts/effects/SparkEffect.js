@@ -1,18 +1,33 @@
 
 class SparkEffect {
-  constructor(options = {}) {
+  constructor(a_options = {}) {
     // Настройки по умолчанию
+    let options = {
+      x: 0, y: 0,
+      radius: 20,
+      count: 50,
+      gravity: 0.1,
+      lifetime: 2000,
+      colors: ['#ffaa00', '#ff6600', '#ff3300', '#ffff00', '#ff9900'],
+      sizes: [1, 3],
+      speeds: [2, 8],
+      baseRadius: 0,
+      ...a_options
+    };
+
     this.container = options.container || document.body;
-    this.x = options.x || 0;
-    this.y = options.y || 0;
-    this.radius = options.radius || 100;
-    this.count = options.count || 50;
-    this.gravity = options.gravity || 0.1;
-    this.lifetime = options.lifetime || 2000; // мс
-    this.colors = options.colors || ['#ffaa00', '#ff6600', '#ff3300', '#ffff00', '#ff9900'];
-    this.sizes = options.sizes || [1, 3];
-    this.speeds = options.speeds || [2, 8];
-    this.baseRadius = options.baseRadius || 0;
+    this.x = options.x;
+    this.y = options.y;
+    this.radius = options.radius;
+    this.count = options.count;
+    this.gravity = options.gravity;
+    this.lifetime = options.lifetime; // мс
+    this.colors = options.colors;
+    this.sizes = options.sizes;
+    this.speeds = options.speeds;
+    this.baseRadius = options.baseRadius;
+
+    this.options = options;
     
     this.sparks = [];
     this.animationId = null;
@@ -57,14 +72,19 @@ class SparkEffect {
     
     // Создаем DOM элемент
     const element = document.createElement('div');
+    if (this.options.className)
+        element.className = this.options.className;
+    else {      
+      element.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+    }
+    element.style.borderRadius = '50%';
     element.style.position = 'fixed';
     element.style.width = `${size}px`;
     element.style.height = `${size}px`;
     element.style.backgroundColor = color;
-    element.style.borderRadius = '50%';
+    element.style.color = color;
     element.style.pointerEvents = 'none';
     element.style.zIndex = '9999';
-    element.style.boxShadow = `0 0 ${size * 2}px ${color}`;
     element.style.left = `${startX}px`;
     element.style.top = `${startY}px`;
     
@@ -80,7 +100,8 @@ class SparkEffect {
       size,
       lifetime: sparkLifetime,
       birthTime: Date.now(),
-      color
+      color,
+      rotation: 0
     });
   }
   

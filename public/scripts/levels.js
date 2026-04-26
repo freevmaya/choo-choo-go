@@ -12,6 +12,7 @@ var GAME_PARAMS = {
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "PlayAndEdit",
+            "DESCRIPTION": "start-description",
             "task": [
                 "connect",
                 "finish"
@@ -263,43 +264,11 @@ var GAME_PARAMS = {
         },
         "items": [
             {
-                "type": "CrossTrack",
-                "location": [
-                    0,
-                    0,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -1,
-                    0,
-                    1
-                ]
-            },
-            {
                 "type": "StraightTrack",
                 "location": [
                     1,
                     0,
                     1
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    -1,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    1,
-                    0
                 ]
             },
             {
@@ -313,14 +282,6 @@ var GAME_PARAMS = {
                 "taskName": "finish"
             },
             {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    0,
-                    2
-                ]
-            },
-            {
                 "type": "EndTrack",
                 "location": [
                     0,
@@ -332,27 +293,19 @@ var GAME_PARAMS = {
                 "cart_name": "blue"
             },
             {
-                "type": "CurvedTrack",
+                "type": "ForkTrack",
                 "location": [
-                    -2,
-                    2,
-                    3
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -2,
+                    -1,
                     1,
-                    0
+                    1
                 ]
             },
             {
-                "type": "StraightTrack",
+                "type": "CurvedTrack",
                 "location": [
                     -1,
                     2,
-                    1
+                    3
                 ]
             },
             {
@@ -361,6 +314,62 @@ var GAME_PARAMS = {
                     0,
                     2,
                     0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    1,
+                    3
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -2,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "CrossTrack",
+                "location": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    0,
+                    2
                 ]
             }
         ],
@@ -457,33 +466,339 @@ var GAME_PARAMS = {
         ],
         "carts": [
             {
+                "type": "Train",
+                "location": [
+                    -2,
+                    -1,
+                    false
+                ]
+            },
+            {
                 "type": "Wagon",
                 "location": [
-                    0,
+                    1,
                     0,
                     true
                 ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
+                "name": "blue",
+                "expect": ["blue-placed:0:pushAnim:remove-chain"],
+                "user_action_event": ["train-remove-chain"]
+            }
+        ]
+    },
+    "LEVEL-3": {
+        "ENV": {
+            "BACKGROUND_COLOR": "#334466",
+            "GROUND_COLOR": "#334466",
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "DESCRIPTION": "red-green-level-description",
+            "GAME_MODE": "GenCycle",
+            "task": [
+                "blue"
+            ],
+            "expect": [
+                {
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
                 },
-                "color": 4886745,
-                "name": "blue"
+                {
+                    "event": "add-purchased",
+                    "element": "#inventory",
+                    "animClass": "pushAnimUp"
+                },
+                {
+                    "event": "created-library",
+                    "element": ".library-block .container-items",
+                    "animClass": "rightMoveAnim",
+                    "delay": 500
+                }
+            ]
+        },
+        "items": [
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -2,
+                    2
+                ],
+                "color": "#6AF",
+                "cart_name": "blue",
+                "taskName": "blue"
             },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    0,
+                    1
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    2,
+                    0,
+                    1
+                ]
+            }
+        ],
+        "objects": [],
+        "carts": [
             {
                 "type": "Train",
                 "location": [
-                    -1,
                     0,
+                    -2,
+                    false
+                ]
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    0,
+                    2,
                     true
                 ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": -0.008335807909487479,
-                    "forwardInTrack": true
+                "color": "#6AF",
+                "name": "blue"
+            }
+        ]
+    },
+    "LEVEL-4": {
+        "ENV": {
+            "BACKGROUND_COLOR": "#666666",
+            "GROUND_COLOR": "#666666",
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "DESCRIPTION": "red-green-level-description",
+            "GAME_MODE": "GenCycle",
+            "task": [
+                "blue",
+                "red"
+            ],
+            "expect": [
+                {
+                    'event': 'created-game-objects',
+                    'element': 'span[data-lang="shop"]',
+                    'animClass': 'pushAnimUp'
                 },
+                {
+                    'event': 'add-purchased',
+                    'element': '#inventory',
+                    'animClass': 'pushAnimUp'
+                },
+                {
+                    'event': 'created-library',
+                    'element': '.library-block .container-items',
+                    'animClass': 'rightMoveAnim',
+                    'delay': 500
+                }
+            ]
+        },
+        "items": [
+            {
+                "type": "EndTrack",
+                "location": [
+                    1,
+                    -3,
+                    2
+                ],
+                "color": "#D33",
+                "cart_name": "red",
+                "taskName": "red"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -1,
+                    -3,
+                    2
+                ],
+                "color": "#33D",
+                "cart_name": "blue",
+                "taskName": "blue"
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -2,
+                    -1,
+                    3
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    -2,
+                    0
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -1,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    4,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Train",
+                "location": [
+                    0,
+                    2,
+                    false
+                ],
                 "chain": []
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    1,
+                    -3,
+                    true
+                ],
+                "color": "#33D",
+                "name": "blue"
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -2,
+                    -1,
+                    true
+                ],
+                "color": "#D33",
+                "name": "red"
             }
         ]
     },
@@ -1467,7 +1782,8 @@ var GAME_PARAMS = {
                     3
                 ],
                 "peopleCount": 0,
-                "taskName": "unload"
+                "taskName": "unload",
+                "score": 100
             }
         ],
         "carts": [
@@ -2438,6 +2754,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
+            "DESCRIPTION": "drop-game-description",
             "GAME_MODE": "DropGame",
             "task": ["finish"]
         },
@@ -2690,6 +3007,7 @@ var GAME_PARAMS = {
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "DropGame",
+            "DESCRIPTION": "drop-game-description",
             "task": ["wagon", "finish"]
         },
         "items": [

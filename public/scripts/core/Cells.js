@@ -40,6 +40,20 @@ class Cells {
 		}
 	}
 
+	calcBonuse() {
+		let list = []
+		list = [...list, ...this.carts.filter(c => c.data.taskName)];
+		list = [...list, ...this.objects.filter(c => c.data.taskName)];
+		list = [...list, ...this.items.filter(c => c.data.taskName)];
+
+		let total = 0;
+		list.forEach(item => {
+		    total += item.data?.score || this.game.getConst("DEFAULT_TASK_SCORE");
+		});
+
+		return total;
+	}
+
 	checkTaskRectord(taskName, value) {
         if (!value) return false;
         if (Array.isArray(value)) 
@@ -103,6 +117,10 @@ class Cells {
 		    objects.forEach((item)=>{
 		      this.addObject({...item});
 		    });
+	}
+
+	resetCarts() {
+		this.carts.forEach(c => c.resetTrackPos());
 	}
 
 	getObjectsCell(cell) {

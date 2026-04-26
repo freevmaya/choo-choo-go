@@ -15,12 +15,14 @@ function sparkTest() {
 	  new SparkEffect({
 	    x: e.clientX,
 	    y: e.clientY,
-	    count: 20,
-	    colors: ['#FFF', '#FAF', '#FF0', '#0FF'],
+	    count: 10,
+	    colors: ['#F0F', '#F00', '#0F0', '#00F'],
 	    sizes: [4, 8],
-	    speeds: [1, 3],
+	    speeds: [0, 1],
 	    gravity: 0.04,
-	    baseRadius: 50
+	    baseRadius: 50,
+	    lifetime: 1000,
+	    className: 'star'
 	  });
 	});
 }

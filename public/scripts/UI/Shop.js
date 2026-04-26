@@ -40,7 +40,7 @@ class Shop {
 	    this.elem = d.dialog;
 	    this.modal = d.modal;
 
-	    this.elem.find('.pay').click(this.onPayClick.bind(this));
+	    btnOnClick(this.elem.find('.pay'), this.onPayClick.bind(this), 20000);
 	}
 
 	show() {
@@ -73,19 +73,13 @@ class Shop {
 	}
 
 	onPayClick() {
+		
 		let spendScore = this.calcSpend();
-		if (spendScore > this.totalScore) {
-			this.game.accountAddScore(spendScore - this.totalScore)
-				.then((result)=>{
-					if (result)
-						this.purchase(spendScore);
-				});
-		} else this.purchase(spendScore);
-	}
-
-	purchase(spendScore) {
-		this.game.addPurchased(this.spend, spendScore);
-		this.modal.hide();
+		this.game.offerPaid(sprintf(lang.get('items-pay-description'), spendScore), spendScore)
+			.then(()=>{
+				this.game.addPurchased(this.spend);
+				this.modal.hide();
+			});
 	}
 
 	itemCount(item, count = null) {

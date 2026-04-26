@@ -7,6 +7,10 @@
   --frame-bg-color: #677339;
 }
 
+.modal {
+  --bs-modal-width: 461px;
+}
+
 /*
 @font-face {
   font-family: 'game-font-b';
@@ -141,7 +145,6 @@ body {
   right: 0;
   height: 30px;
   pointer-events: none;
-  background: #0000004a;
 }
 
 /* Верхний блок с игрой (85%) */
@@ -385,9 +388,8 @@ body {
 
 .stat-label {
   font-size: 1rem;
-  color: #aaa;
+  color: #efe0a6;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 /* Адаптация для мобильных устройств */
@@ -430,12 +432,15 @@ body {
 }
 
 .status {
-
   font-family: 'game-font-a', sans-serif;
   font-size: 26px;
   text-align: center;
   text-shadow: 2px 2px 2px #000000c4;
   color: #efd654;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (max-width: 420px) {
@@ -607,9 +612,14 @@ body {
 
 .toast-message {
   background: var(--tools-bg-color);
-  z-index: 101;
+  z-index: 110;
   bottom: 70px;
   transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  max-width: calc(100% - 50px);
+}
+
+.over-modal {
+  z-index: 1100;
 }
 
 .toast-message .frame {
@@ -643,9 +653,15 @@ body {
 
 .toast-message .head {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: end;
   justify-content: space-between;
+  padding-left: 45px;
+}
+
+.toast-message .head .title {
+  color: #fff700;
+  text-shadow: 2px 2px 3px black;
 }
 
 .toast-message .actor-icon {
@@ -664,6 +680,32 @@ body {
   height: calc(100% - 10px);
   background-image: url(images/actor-1.png);
   background-position: center;
+}
+
+.show .actor-icon .frame {
+  animation: rotateDamping 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0.4s;
+}
+
+@keyframes rotateDamping {
+  0% {
+      transform: rotate(0deg);
+  }
+  20% {
+      transform: rotate(40deg);
+  }
+  30% {
+      transform: rotate(-30deg);
+  }
+  55% {
+      transform: rotate(15deg);
+  }
+  80% {
+      transform: rotate(-5deg);
+  }
+  100% {
+      transform: rotate(0deg);
+  }
 }
 
 .toast-message.border-block {
@@ -1002,6 +1044,17 @@ body {
   background-position: 64px 0px;
 }
 
+.hand-touch.pushAnimUp {
+  margin-left: -54px;
+  margin-top: 10px;
+}
+
+.hand-touch.pushAnimUp .img {
+  animation: downUp1 1.2s ease-in-out infinite,
+            shiftSprite1 1.2s steps(1) infinite;
+  rotate: 180deg;
+}
+
 .hand-touch.pushAnim .img {
   animation: downUp1 1.2s ease-in-out infinite,
             shiftSprite1 1.2s steps(1) infinite;
@@ -1099,8 +1152,70 @@ body {
 }
 
 /*_________________DIALOGS__________________*/
-.modal {
-  --bs-modal-width: 500px;
+
+
+
+.dialog-1.modal-content {
+  border: none;
+  background: none;
+  width: var(--bs-modal-width);
+}
+
+.dialog-1 .top, .dialog-1 .middle, .dialog-1 .bottom {
+  background-position: center;
+  background-repeat: repeat-y;
+}
+
+.dialog-1 .top {
+  background-image: url(dialog/dialog-top.png);
+  height: 112px;
+  flex-shrink: 0;
+}
+
+.dialog-1 .middle {
+  background-image: url(dialog/dialog-middle.png);
+  flex: 1 1 auto;
+}
+
+.dialog-1 .bottom {
+  background-image: url(dialog/dialog-bottom.png);
+  height: 67px;
+  flex-shrink: 0;
+}
+
+.dialog-1 .dialog-content {
+  margin: -20px 70px;
+}
+
+.dialog-1 .dialog-content p {
+  padding: 0.2em 1em;
+  margin-bottom: 10px;
+}
+
+.dialog-1 .background {
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 50px;
+  margin-bottom: 10px;
+  position: absolute;
+  width: calc(100% - 100px);
+  height: calc(100% - 60px);
+  z-index: -1;
+  background-image: url(dialog/dialog-bg.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.dialog-1 .wrapper {
+  /*background-image: url(dialog/dialog-bg.png);*/
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  color: #d9c0a9;
+  font-size: 14px;
+  margin: auto;
+  width: var(--bs-modal-width);
 }
 
 /* Простая bounce анимация */
@@ -1148,77 +1263,37 @@ body {
   }
 }
 
+[data-lang="victory_title"] {
+  background-image: url(images/ribbon-red.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: bottom;
+  aspect-ratio: 3 / 1;
+  min-width: 300px;
+  padding-bottom: 0.5em;
+}
+
+.stars {
+  background-image: url(images/stars.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: bottom;
+  aspect-ratio: 3 / 1;
+  width: 200px;
+  margin: auto;
+}
+
 .modal .modal-dialog {
   animation: bounce 1s ease-out;
   margin: auto;
-}
-
-.dialog-1.modal-content {
-  border: none;
-  background: none;
-  width: var(--bs-modal-width);
-}
-
-.dialog-1 .top, .dialog-1 .middle, .dialog-1 .bottom {
-  background-position: center;
-  background-repeat: repeat-y;
-}
-
-.dialog-1 .top {
-  background-image: url(dialog/dialog-top.png);
-  height: 124px;
-  flex-shrink: 0;
-}
-
-.dialog-1 .middle {
-  background-image: url(dialog/dialog-middle.png);
-  flex: 1 1 auto;
-}
-
-.dialog-1 .bottom {
-  background-image: url(dialog/dialog-bottom.png);
-  height: 80px;
-  flex-shrink: 0;
-}
-
-.dialog-1 .dialog-content {
-  margin: -20px 120px;
-}
-
-.dialog-1 .dialog-content p {
-  padding: 0.2em 1em;
-  margin-bottom: 10px;
-}
-
-.dialog-1 .background {
-  margin-left: 50px;
-  margin-right: 50px;
-  margin-top: 50px;
-  margin-bottom: 10px;
-  position: absolute;
-  width: calc(100% - 100px);
-  height: calc(100% - 60px);
-  z-index: -1;
-  background-image: url(dialog/dialog-bg.png);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.dialog-1 .wrapper {
-  /*background-image: url(dialog/dialog-bg.png);*/
   display: flex;
-  flex-direction: column;
-  max-height: 100%;
-  color: #d9c0a9;
-  font-size: 14px;
-  margin: auto;
-  width: var(--bs-modal-width);
+  align-items: center;
+  justify-content: center;
 }
 
 .tools-block {
   position: absolute;
-  top: 35px;
+  top: 5px;
   right: 5px;
   z-index: 1;
   gap: 5px;
@@ -1230,6 +1305,10 @@ body {
 .tools-panel a {
   color: #fff7bf;
   text-decoration: none;
+}
+
+.modal-dialog .frame {
+  padding: 20px;
 }
 
 .tools-panel {
@@ -1245,6 +1324,17 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+}
+
+.pulse {
+  animation: pulseAnim 0.3s ease-in-out;
+}
+
+@keyframes pulseAnim {
+    0%, 100% { scale: 1; }
+    25% { scale: 1.5; }
+    50% { scale: 0.8; }
+    75% { scale: 1.1; }
 }
 
 .warning {
@@ -1275,7 +1365,7 @@ body {
 
 #tools {
   position: absolute;
-  top: 35px;
+  top: 5px;
   left: 5px;
   z-index: 1;
 }
@@ -1333,7 +1423,7 @@ body {
 /*________________LIST_________________*/
 
 .list {
-  max-height: 300px;
+  max-height: 293px;
   overflow-y: auto;
   overflow-x: hidden;
   background: #f8f9fa0d;
@@ -1366,10 +1456,13 @@ body {
   justify-content: space-evenly;
 }
 
+.list-content .item {
+}
+
 .item {
   width: 80px;
   height: 80px;
-  background: #007bff6e;
+  background: #1b715b;
   color: white;
   border-radius: 8px;
   display: flex;
@@ -1382,6 +1475,21 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  box-shadow: 1px 1px 5px black;
+  border: 1px solid yellow;
+}
+
+.item .bi-lock-fill {
+  display: none;
+}
+
+.item.lock .bi-lock-fill {
+  display: block;
+  margin-top: auto;  /* Прижимает иконку к низу */
+  align-self: flex-end;  /* Прижимает к правому краю */
+  font-size: 14px;
+  color: gold;
+  margin-right: 5px;
 }
 
 .counter {
@@ -1448,4 +1556,13 @@ body {
   box-shadow: none;
   color: white;
   background: red;
+}
+
+.star {
+    font-size: 50px;
+    color: gold;
+}
+
+.star::before {
+    content: "★";  /* или "☆" для пустой звезды */
 }
