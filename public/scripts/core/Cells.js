@@ -120,7 +120,9 @@ class Cells {
 	}
 
 	resetCarts() {
-		this.carts.forEach(c => c.resetTrackPos());
+		this.carts.forEach(c => {
+			c.resetTrackPos()
+		});
 	}
 
 	getObjectsCell(cell) {

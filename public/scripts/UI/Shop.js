@@ -40,6 +40,8 @@ class Shop {
 	    this.elem = d.dialog;
 	    this.modal = d.modal;
 
+	    this.elem.attr('id', 'shop');
+
 	    btnOnClick(this.elem.find('.pay'), this.onPayClick.bind(this), 20000);
 	}
 
@@ -51,7 +53,7 @@ class Shop {
 			let itm = this.items[i];
 
 			let path = `images/library/${itm.type.name}.png`;
-			let item = $(`<div class="item" style="background-image: url(${path})">
+			let item = $(`<div class="item" style="background-image: url(${path})" data-type="${itm.type.name}">
 				<div class="price"><span data-lang="price"></span>: ${itm.price}</div>
 			</div>`);
 			item.click(()=>{
@@ -70,15 +72,17 @@ class Shop {
 		this.refreshScore();
 
 		this.modal.show();
+
+		eventBus.emit("show-shop", this);
 	}
 
 	onPayClick() {
 		
 		let spendScore = this.calcSpend();
+		this.modal.hide();
 		this.game.offerPaid(sprintf(lang.get('items-pay-description'), spendScore), spendScore)
 			.then(()=>{
 				this.game.addPurchased(this.spend);
-				this.modal.hide();
 			});
 	}
 
@@ -148,5 +152,6 @@ class Shop {
 			this.itemCount(item, 1);
 	    }
 		this.refreshBasket();
+		eventBus.emit(`to-basket.${type}`, type);
 	}
 }

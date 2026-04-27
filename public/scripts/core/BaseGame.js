@@ -3,7 +3,7 @@
 class BaseGame {
   constructor() {
 
-    this.levels = structuredClone(GAME_PARAMS);
+    this.levels = this.originLevelsCopy();
     this.timers = [];
     this.mouseControl = null;
     this.lastTime = performance.now();
@@ -57,6 +57,10 @@ class BaseGame {
             this.init();
           });
       });
+  }
+
+  originLevelsCopy() {
+    return structuredClone(GAME_PARAMS);
   }
 
   calcBonuse() {
@@ -500,11 +504,14 @@ class BaseGame {
   initStartModal() {
     // Получаем элемент модального окна Start
     let d = this.initDialog(`
-      <p>
-        <i class="bi bi-info-circle"></i> <span data-lang="start_info_1"></span>
+      <div class="actor-icon">
+        <div class="frame padding actor-1">
+        </div>
+      </div>
+      <div class="status" data-lang="app_name"></div>
+      <p style="padding-top: 20px;"><span data-lang="start_info_1"></span>
       </p>
-      <p>
-        <i class="bi bi-exclamation-triangle-fill"></i> <span data-lang="start_info_2"></span>
+      <p><span data-lang="start_info_2"></span>
       </p>
       <p style="display:none" class="devBlock">
         <span data-lang="gpu_speed">GPU speed:</span> <span class="testResult"></span>. 
@@ -577,11 +584,16 @@ class BaseGame {
   initVictoryModal() {
     // Получаем элемент модального окна Victory
 
-    let d = this.initDialog(`<p class="modal-subtitle status" data-lang="victory_title"></p>
+    let d = this.initDialog(`
+      <div class="actor-icon">
+        <div class="frame padding actor-2">
+        </div>
+      </div>
+      <p class="modal-subtitle status" data-lang="victory_title"></p>
       <div class="stars"></div>
       <p class="new-title status" data-lang="new_rank"></p>
-      <div class="stats-container victory-stats">
-        <div class="row">
+      <div class="stats-container victory-stats shine">
+        <div>
           <div class="stat-value" id="victoryScore">0</div>
           <div class="stat-label" data-lang="victory_score"></div>
         </div>
@@ -665,6 +677,7 @@ class BaseGame {
           caption: lang.get('ok'),
           callback: ()=>{
 
+            this.toast.hide();
             this.spendScoreEndPay(price)
               .then(resolve)
               .catch(reject);
@@ -757,6 +770,7 @@ class BaseGame {
   hideStartModal() {
     if (this.startModal) {
       this.startModal.hide();
+      this.resetGame();
     }
   }
 
@@ -893,8 +907,6 @@ class BaseGame {
   }
   
   init() {    
-
-    this.createGameObjects();
     this.initRaycaster();
     this.animate();
 

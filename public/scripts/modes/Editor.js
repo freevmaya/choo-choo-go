@@ -67,15 +67,24 @@ class Editor extends BaseModeModule {
 	}
 
 	onGroundClick(cell) {
-		
-		if (this.key == 'Shift')
-			this.deleteOnCell(cell);
-		else this.doRotateTrack(cell);
+
+		if (!this.library.deleteMode) {
+			if (this.key == 'Shift')
+				this.deleteOnCell(cell);
+			else this.doRotateTrack(cell);
+		}
+	}
+
+	isAwailableDelete(ga) {
+		if (ga instanceof BaseTrack)
+			return !ga.isBusy();
+		return ga != null;
 	}
 
 	deleteOnCell(cell) {
 		this.game.items.getObjectsCell(cell).forEach((ga)=>{
-			this.game.items.delete(ga);
+			if (this.isAwailableDelete(ga)) 
+				this.game.items.delete(ga);
 		});
 	}
 
@@ -88,7 +97,7 @@ class Editor extends BaseModeModule {
 	handleObjectClick(data) {
 	    let hit = null;
 	    
-	    if (data.intersects && data.intersects[0]) {
+	    if (!this.library.deleteMode && data.intersects && data.intersects[0]) {
 	      	hit = data.intersects[0];
 
 	      	const object = hit.object;
@@ -116,8 +125,6 @@ class Editor extends BaseModeModule {
 	   	document.removeEventListener('keydown', this._onKeyDown);
 	   	document.removeEventListener('keyup', this._onKeyUp);
 
-	   	if (this.game.items)
-	   		this.game.items.resetCarts();
 		super.dispose();
 	}
 }

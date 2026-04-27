@@ -330,6 +330,12 @@ class BaseCart extends BaseGameObject {
         if (idx > -1) 
             this.game.items.carts.splice(idx, 1);
 
+        this.game.items.items.forEach((t)=>{
+            let idx = t.carts.indexOf(this);
+            if (idx > -1)
+                t.carts.splice(idx, 1);
+        })
+
         this.deChain();
         super.dispose();
     }

@@ -5,7 +5,7 @@ class ToastMessage extends Swipeable {
     const element = $(
       `<div class="toast-message border-block hide">
         <div class="actor-icon">
-          <div class="frame padding">
+          <div class="frame padding actor-1">
           </div>
         </div>
         <div class="frame padding">
@@ -84,7 +84,7 @@ class ToastMessage extends Swipeable {
           let first = this.stack.shift();
           this.show(first.text, first.title, first.onClose, first.buttons);
         }
-      }, 800);
+      }, 600);
     } else this._show(text, title, onClose, buttons);
   }
   

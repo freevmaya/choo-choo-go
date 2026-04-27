@@ -374,9 +374,13 @@ body {
 .stats-container {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
-  padding: 20px;
+  padding: 5px;
   margin: 20px;
   text-align: center;
+}
+.stats-container > div {
+  background: var(--frame-bg-color);
+  border-radius: 10px;
 }
 
 .stat-value {
@@ -586,7 +590,7 @@ body {
 .border-block {
   border-radius: 20px;
   box-shadow: 2px 2px 6px black;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .padding {
@@ -619,7 +623,7 @@ body {
   line-height: 20px;
 }
 
-.toast-message i {
+.toast-message .content i {
   display: block;
   line-height: 18px !important;
 }
@@ -684,8 +688,15 @@ body {
 .actor-icon .frame {
   border-radius: 45px;
   height: calc(100% - 10px);
-  background-image: url(images/actor-1.png);
   background-position: center;
+}
+
+.actor-1 {
+  background-image: url(images/actor-1.png);
+}
+
+.actor-2 {
+  background-image: url(images/actor-2.png);
 }
 
 .show .actor-icon .frame {
@@ -1028,7 +1039,7 @@ body {
 
 .hand-touch {
   position: absolute;
-  z-index: 102;
+  z-index: 1101;
   pointer-events: none;
   margin-left: -10px;
   margin-top: -72px;
@@ -1581,4 +1592,24 @@ body {
 
 .star::before {
     content: "★";  /* или "☆" для пустой звезды */
+}
+
+.shine {
+    background: repeating-linear-gradient(
+        135deg,
+        rgba(255, 215, 0, 0.3) 18%,
+        rgba(255, 215, 0, 0.9) 20%,
+        rgba(255, 215, 0, 0.3) 22%
+    );
+    background-size: 300% 100%;
+    animation: goldWave 6s linear infinite;
+}
+
+@keyframes goldWave {
+    0% {
+        background-position: 100% 0%;
+    }
+    100% {
+        background-position: -200% 0%;
+    }
 }

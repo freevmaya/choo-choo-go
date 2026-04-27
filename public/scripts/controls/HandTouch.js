@@ -17,11 +17,17 @@ class HandTouch {
 	}
 
 	onMouseUp(e) {
-		this.closeWaitAction();
+		this.onRequireCloseWait();
 	}
 
 	onTouchEnd(e) {
-		this.closeWaitAction();
+		this.onRequireCloseWait();
+	}
+
+	onRequireCloseWait() {
+		if (!this._justSetFocus && this.game.gameState.state != GAME_STATE.IDLE) {
+			this.closeWaitAction();
+		}
 	}
 
 	onDisposed(obj) {
@@ -72,7 +78,7 @@ class HandTouch {
 
 				} else {
 
-					let expectData = parseUserAction(focus.data.expect, expect);
+					let expectData = typeof(expect) == 'string' ? parseUserAction(focus.data.expect, expect) : expect;
 
 					if (this.userActionEvent = focus.getUserActionEvent(expectData.index)) {
 
@@ -83,6 +89,10 @@ class HandTouch {
 							this.game.showTip(lang.get(expectData.caption));
 					}
 				}
+
+				this._justSetFocus = setTimeout(()=>{
+					this._justSetFocus = null;
+				}, 500);
 				return;
 			}
 		}
@@ -90,10 +100,17 @@ class HandTouch {
 	}
 
 	onBroadcast(event, data) {
+
+		let setFocus = (elem, exp) => {
+			setTimeout(()=>{
+				this.setFocus(elem, exp);
+			}, exp.delay || 0);
+		}
+
 		if (this.game.items) {
 			let focus = this.game.items.findAsTask(event, 'expect');
 			if (focus)
-				this.setFocus(focus, event);
+				setFocus(focus, event);
 		}
 
 		let expect = this.game.getConst('expect');
@@ -101,12 +118,11 @@ class HandTouch {
 
 			let exp = expect.find(exp => exp.event == event);
 			if (exp) {
-				let elem = $(exp.element);
-				if (elem.length > 0) {
-					setTimeout(()=>{
-						this.setFocus(elem, exp);
-					}, exp.delay || 0);
-				}
+				if (exp.element) {
+					let elem = $(exp.element);
+					if (elem.length > 0) setFocus(elem, exp);
+				} else
+					if (data) setFocus(data, exp);
 			}
 		}
 	}

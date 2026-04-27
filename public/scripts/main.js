@@ -431,9 +431,6 @@ class RailGame extends BaseGame {
         },{
             type: Snow,
             k: 0.1
-        },{
-            type: RailwayPlatform,
-            k: 0.9
         }
     ];
 
@@ -592,7 +589,7 @@ class RailGame extends BaseGame {
     if (inventory) {
       Object.keys(items).forEach((k, i)=>{
         if (inventory[k])
-          inventory[k] += items[k];
+          inventory[k] = Math.max(inventory[k] + items[k], 0);
         else inventory[k] = items[k];
       });
     } else inventory = items;

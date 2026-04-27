@@ -15,15 +15,18 @@ class PositionCart {
 
     setCurrentChain(trackIndex, pathIndex, indexPosInChain, forwardInTrack = true) {
         
-        this.pathIndex = pathIndex;
-        this.indexPosInChain = indexPosInChain;
-        this.forwardInTrack  = forwardInTrack;
+        let track = this.game.items.get(trackIndex);
+        if (track) {
+            this.pathIndex = pathIndex;
+            this.indexPosInChain = indexPosInChain;
+            this.forwardInTrack  = forwardInTrack;
 
-        if (this.trackIndex != trackIndex) {
-            this.trackIndex = trackIndex;
-            this.currentTrack = this.game.items.get(this.trackIndex);
-            this.currentTrack.runOver(this);
-        }
+            if (this.trackIndex != trackIndex) {
+                this.trackIndex = trackIndex;
+                this.currentTrack = track;
+                this.currentTrack.runOver(this);
+            }
+        } else tracer.error(`Track index ${trackIndex} invalid`);
     }
 
     clone() {

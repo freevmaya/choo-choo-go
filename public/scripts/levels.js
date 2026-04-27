@@ -497,7 +497,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "DESCRIPTION": "red-green-level-description",
+            "DESCRIPTION": "level-3-description",
             "GAME_MODE": "GenCycle",
             "task": [
                 "blue"
@@ -517,6 +517,23 @@ var GAME_PARAMS = {
                     "event": "created-library",
                     "element": ".library-block .container-items",
                     "animClass": "rightMoveAnim",
+                    "delay": 500
+                },
+                {
+                    "event": "show-shop",
+                    "element": '.shop [data-type="ForkTrack"]',
+                    "animClass": "pushAnim",
+                    "delay": 1000
+                },
+                {
+                    "event": "to-basket.ForkTrack",
+                    "element": '#shop .btn.pay',
+                    "animClass": "pushAnim",
+                    "delay": 500
+                },
+                {
+                    "event": "drop-elem.ForkTrack",
+                    "animClass": "pushAnim",
                     "delay": 500
                 }
             ]
@@ -889,6 +906,320 @@ var GAME_PARAMS = {
                 ],
                 "color": "#D33",
                 "name": "red"
+            }
+        ]
+    },
+    "LEVEL-5": {
+        "ENV": {
+            "BACKGROUND_COLOR": "#33AA33",
+            "GROUND_COLOR": "#33AA33",
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "DESCRIPTION": "three-wagon-description",
+            "GAME_MODE": "GenCycle",
+            "task": [
+                "black",
+                "yellow",
+                "green"
+            ]
+        },
+        "items": [
+            {
+                "type": "CrossTrack",
+                "location": [
+                    -1,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    1,
+                    0,
+                    1
+                ],
+                "color": "yellow",
+                "cart_name": "yellow",
+                "taskName": "yellow"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    1,
+                    1,
+                    1
+                ],
+                "color": "black",
+                "cart_name": "black",
+                "taskName": "black"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -1,
+                    -3,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    -1,
+                    1,
+                    3
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    0,
+                    1
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -4,
+                    0,
+                    3
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -4,
+                    1,
+                    3
+                ],
+                "color": "green",
+                "cart_name": "green",
+                "taskName": "green"
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    1,
+                    1
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    -3,
+                    1,
+                    3
+                ]
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    -3,
+                    0,
+                    3
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    0,
+                    0,
+                    1
+                ]
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    0,
+                    1,
+                    1
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    0,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    1,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -4,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -5,
+                    3,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Wagon",
+                "location": [
+                    -1,
+                    -3,
+                    true
+                ],
+                "color": "black",
+                "name": "black"
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -1,
+                    -2,
+                    false
+                ],
+                "color": "yellow",
+                "name": "yellow"
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -4,
+                    0,
+                    false
+                ],
+                "color": "green",
+                "name": "green"
+            },
+            {
+                "type": "Train",
+                "location": [
+                    -4,
+                    1,
+                    true
+                ],
+                "chain": []
             }
         ]
     },
@@ -1576,7 +1907,11 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "task": ['pickup', 'unload'],
+            "task": [
+                "pickup",
+                "unload",
+                "blue"
+            ],
             "DESCRIPTION": "pickup-wagon-passangers"
         },
         "items": [
@@ -1783,18 +2118,29 @@ var GAME_PARAMS = {
             {
                 "type": "StraightTrack",
                 "location": [
+                    -3,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
                     0,
                     -3,
                     1
                 ]
             },
             {
-                "type": "StraightTrack",
+                "type": "EndTrack",
                 "location": [
-                    -3,
                     0,
-                    0
-                ]
+                    -4,
+                    2
+                ],
+                "color": "#33A",
+                "cart_name": "blue",
+                "taskName": "blue"
             }
         ],
         "objects": [
@@ -1903,6 +2249,16 @@ var GAME_PARAMS = {
                     "forwardInTrack": false
                 },
                 "chain": []
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -3,
+                    -2,
+                    true
+                ],
+                "color": "#33A",
+                "name": "blue"
             }
         ]
     },

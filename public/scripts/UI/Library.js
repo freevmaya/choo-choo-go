@@ -17,7 +17,6 @@ class Library {
 		this.libraryLayer = this.elem.find('.items');
 		this.dropZone = dropZone;
 		this.dropZoneOver = false;
-		this.created = [];
 		this.draggableItems = [];
 		this.currentItem = null;
 		this.access = false;
@@ -26,6 +25,7 @@ class Library {
 		
 		// Подписываемся на события отпускания для обработки drop
 		this._setupDropListeners();
+		this.originLevel = this.game.originLevelsCopy()[this.game.paramsIndex];
 
 		eventBus.emit("created-library", this);
 	}
@@ -120,17 +120,36 @@ class Library {
 		this._refreshUserItems();
 	}
 
+	isAvailableTrack(ga) {
+		if (ga instanceof BaseTrack) {
+			if (ga.isBusy())
+				return false;
+
+			let cell = ga.getCellPosition();
+			return !this.originLevel.items.find(t => (t.location[0] == cell.x) && (t.location[1] == cell.y));
+		}
+
+		return ga != null;
+	}
+
 	onObjectClick(data) {
 	    
 		if (data.intersects && data.intersects[0]) {
 		  let ga = data.intersects[0].object.userData?.gameObject;
 			if (ga) {
 				if (this.deleteMode) {
+
 					if (ga instanceof Ground) {
 						let cell = ga.hitPointToCell(data.intersects[0].point);
-						this.game.items.getObjectsCell(cell).forEach(tga=> this.game.items.delete(tga));
 
-					} else this.game.items.delete(ga);
+						let index = this.game.items.find(cell);
+						ga = index > -1 ? this.game.items.items[index] : null;
+					} else {
+						ga = ga instanceof BaseTrack ? ga : null;
+					}
+
+					if (this.isAvailableTrack(ga)) 
+						this.game.items.delete(ga);
 				}
 			}
 		}
@@ -263,9 +282,11 @@ class Library {
 			    if (!Array.isArray(this.classes)) {
 			    	this.changeCount(this.currentItem.type.name, -1);
 			    }
-			    this.created.push(dropItem);
+
 			    if (this.deleteMode)
 			    	this.onDeleteClick();
+
+			    eventBus.emit(`drop-elem.${this.currentItem.type.name}`, dropItem);
 		    }
 		}
 		this.dropZone.removeClass('drag-over');
@@ -287,10 +308,8 @@ class Library {
 	}
 
 	onDisposed(ga) {
-		let idx = this.created.indexOf(ga);
-		if (idx > -1) {
+		if (this.isAvailableTrack(ga))
 			this.changeCount(ga.constructor.name, 1);
-		}
 	}
 
 	dispose() {
