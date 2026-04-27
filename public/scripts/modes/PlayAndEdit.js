@@ -18,6 +18,9 @@ class PlayAndEdit extends BaseModeModule {
 		if (trackIndex > -1) {
 			let track = this.game.items.get(trackIndex);
 
+			if (track instanceof ForkTrack)
+				return;
+
 			if (!track.isBusy()) {
 				if (!track.data.fixed)
 	        		track.nextRotation();

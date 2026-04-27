@@ -25,11 +25,7 @@ class Cells {
 			if (ga instanceof BaseCart) {
 				ga.dispose();
 			} else if (ga instanceof BaseTrack) {
-				let idx = this.items.indexOf(ga);
-				if (idx > -1) {
-					this.items.splice(idx, 1);
-					ga.dispose();
-				}
+				ga.dispose();
 			} else {
 				let idx = this.objects.indexOf(ga);
 				if (idx > -1) {
@@ -346,9 +342,9 @@ class Cells {
 	}
 
 	clear() {
-		this.items.forEach(ga => ga.dispose());
-		this.objects.forEach(ga => ga.dispose());
-		this.carts.forEach(ga => ga.dispose());
+		[...this.items].forEach(ga => ga.dispose());
+		[...this.objects].forEach(ga => ga.dispose());
+		[...this.carts].forEach(ga => ga.dispose());
 
 		this.items.length = 0;
 		this.objects.length = 0;

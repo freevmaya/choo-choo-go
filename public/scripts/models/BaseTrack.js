@@ -269,4 +269,18 @@ class BaseTrack extends BaseCellObject {
     isAwailableRotate() {
         return this.carts.length == 0;
     }
+
+    dispose() {
+
+        let idx = this.game.items.items.indexOf(this);
+        if (idx > -1) {
+            this.game.items.carts.forEach(c => {
+                if (c.trackPos && (c.trackPos.trackIndex > idx))
+                    c.trackPos.trackIndex--;
+            });
+            this.game.items.items.splice(idx, 1);
+        }
+
+        super.dispose();
+    }
 }

@@ -1223,6 +1223,865 @@ var GAME_PARAMS = {
             }
         ]
     },
+    "PATH": {
+        "ENV": {
+            "BACKGROUND_COLOR": 12303359,
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": "PlayAndEdit",
+            "DESCRIPTION": "restore-path-and-pick-up-wagon",
+            "task": ["connect", "finish"]
+        },
+        "items": [
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    0,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    -3,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    -2,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    -2,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    -3,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -3,
+                    -2,
+                    2
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -3,
+                    -3,
+                    3
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -3,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    1,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    0,
+                    1,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    0,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    -1,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -4,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -4,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    3,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    3,
+                    0,
+                    2
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    3,
+                    1,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    2,
+                    0,
+                    2
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    1,
+                    0,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    1,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    2,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    2,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    3,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    2,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -3,
+                    2,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -4,
+                    2,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -4,
+                    3,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -3,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    0,
+                    -5,
+                    0
+                ],
+                "title": "start",
+                "fixed": true
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    -3,
+                    4,
+                    0
+                ],
+                "title": "finish",
+                "taskName": "finish",
+                "fixed": true
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    2,
+                    -2,
+                    3
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    2,
+                    -3,
+                    2
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -4,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -4,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -5,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -5,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -5,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    4,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    4,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    4,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "PassengerWagon",
+                "location": [
+                    3,
+                    0,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "taskName": "connect"
+            },
+            {
+                "type": "Train",
+                "location": [
+                    0,
+                    -5,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "chain": []
+            }
+        ]
+    },
+    "LEVEL-7": {
+        "ENV": {
+            "BACKGROUND_COLOR": "#AAA",
+            "GROUND_COLOR": "#AAA",
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": "GenCycle",
+            "DESCRIPTION": "three-wagon-description",
+            "task": [
+                "brown",
+                "blue"
+            ]
+        },
+        "items": [
+            {
+                "type": "EndTrack",
+                "location": [
+                    1,
+                    -3,
+                    2
+                ],
+                "color": "#37A",
+                "cart_name": "blue",
+                "taskName": "blue"
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    1,
+                    -2,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -2,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -2,
+                    1
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -2,
+                    -3,
+                    2
+                ],
+                "color": "#A73",
+                "cart_name": "brown",
+                "taskName": "brown"
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    -2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    -1,
+                    3
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -1,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    -1,
+                    -1,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    0,
+                    -1,
+                    1
+                ]
+            }
+        ],
+        "tracks": [],
+        "objects": [
+            {
+                "type": "Snow",
+                "location": [
+                    -2,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -3,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -1,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -4,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -4,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -1,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -1,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -4,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -5,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -5,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    1,
+                    0,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Wagon",
+                "location": [
+                    0,
+                    2,
+                    true
+                ],
+                "color": "#37A",
+                "name": "blue"
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -1,
+                    2,
+                    true
+                ],
+                "color": "#A73",
+                "name": "brown"
+            },
+            {
+                "type": "Train",
+                "location": [
+                    -1,
+                    -2,
+                    true
+                ],
+                "chain": []
+            }
+        ]
+    },
     "TEST": {
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
@@ -2262,508 +3121,6 @@ var GAME_PARAMS = {
             }
         ]
     },
-    "PATH": {
-        "ENV": {
-            "BACKGROUND_COLOR": 12303359,
-            "KEY_LIGHT_COLOR": 16777215,
-            "RIM_LIGHT_COLOR": 8490232,
-            "FILL_LIGHT_COLOR": 6529416,
-            "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 150,
-            "FILL_LIGHT_INTENSITY": 2,
-            "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "PlayAndEdit",
-            "DESCRIPTION": "restore-path-and-pick-up-wagon",
-            "task": ["connect", "finish"]
-        },
-        "items": [
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    -4,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    0,
-                    -3,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -1,
-                    -3,
-                    3
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -1,
-                    -2,
-                    1
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -2,
-                    -2,
-                    2
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    -2,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    -3,
-                    1
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -3,
-                    -2,
-                    2
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -3,
-                    -3,
-                    3
-                ]
-            },
-            {
-                "type": "ForkTrack",
-                "location": [
-                    -3,
-                    -1,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    -1,
-                    2
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -2,
-                    0,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    1,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -1,
-                    1,
-                    1
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    0,
-                    1,
-                    1
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    0,
-                    0
-                ]
-            },
-            {
-                "type": "ForkTrack",
-                "location": [
-                    0,
-                    -1,
-                    2
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    1,
-                    -1,
-                    3
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -4,
-                    -1,
-                    2
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -1,
-                    -4,
-                    1
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    1,
-                    -3,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    3,
-                    -1,
-                    2
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    3,
-                    0,
-                    2
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    3,
-                    1,
-                    1
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    2,
-                    1,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    2,
-                    0,
-                    2
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    1,
-                    0,
-                    2
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    1,
-                    1,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    1,
-                    2,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    2,
-                    1
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -1,
-                    2,
-                    3
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -1,
-                    3,
-                    1
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    3,
-                    0
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    2,
-                    2
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -3,
-                    2,
-                    1
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -4,
-                    2,
-                    3
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -4,
-                    3,
-                    1
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -3,
-                    3,
-                    0
-                ]
-            },
-            {
-                "type": "PointTrack",
-                "location": [
-                    0,
-                    -5,
-                    0
-                ],
-                "title": "start",
-                "fixed": true
-            },
-            {
-                "type": "PointTrack",
-                "location": [
-                    -3,
-                    4,
-                    0
-                ],
-                "title": "finish",
-                "taskName": "finish",
-                "fixed": true
-            },
-            {
-                "type": "ForkTrack",
-                "location": [
-                    2,
-                    -1,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    2,
-                    -2,
-                    3
-                ]
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    2,
-                    -3,
-                    2
-                ]
-            }
-        ],
-        "objects": [
-            {
-                "type": "SimpleTree",
-                "location": [
-                    2,
-                    -5,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    3,
-                    -5,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    3,
-                    -4,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -3,
-                    -5,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -4,
-                    -5,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -4,
-                    -4,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -5,
-                    0,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -5,
-                    -1,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    -5,
-                    1,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    4,
-                    3,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    4,
-                    4,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    3,
-                    4,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    1,
-                    4,
-                    0
-                ]
-            }
-        ],
-        "carts": [
-            {
-                "type": "PassengerWagon",
-                "location": [
-                    3,
-                    0,
-                    true
-                ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
-                },
-                "taskName": "connect"
-            },
-            {
-                "type": "Train",
-                "location": [
-                    0,
-                    -5,
-                    true
-                ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
-                },
-                "chain": []
-            }
-        ]
-    },
     "PICKUP-PASSENGERS": {
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
@@ -3186,7 +3543,6 @@ var GAME_PARAMS = {
             }
         ]
     },
-
     "DROP-GAME-1" :{
         "ENV": {
             "BACKGROUND_COLOR": "#4469AA",
