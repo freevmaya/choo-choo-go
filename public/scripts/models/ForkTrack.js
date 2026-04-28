@@ -17,8 +17,8 @@ class ForkTrack extends BaseCurveTrack {
     createModel() {
         const group = new THREE.Group();
         
-        this.createRailPair(group, true);
-        this.createRailPair(group, false);
+        this.relPath1 = this.createRailPair(group, true);
+        this.relPath2 = this.createRailPair(group, false);
 
         this.createSleepers(group, true, 3);
         this.createSleepers(group, false, 3);
@@ -144,6 +144,11 @@ class ForkTrack extends BaseCurveTrack {
 
     _afterSetCurrentPath() {
         this._updateHandle();
+
+        if (this.relPath1)
+            groupTransparent(this.relPath1, this._currentPath == 0 ? 1 : 0.4);
+        if (this.relPath2)
+            groupTransparent(this.relPath2, this._currentPath == 1 ? 1 : 0.4);
     }
 }
 registerClass(ForkTrack);

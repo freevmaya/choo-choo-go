@@ -191,7 +191,7 @@ class BaseGame {
     this.initModals();    
     this.initAudio();
 
-    if ((typeof DEV == 'undefined') || !DEV) {
+    if (!isDev()) {
       $(window).on('blur', () => {
         this.gameState.pause();
       });
@@ -406,13 +406,13 @@ class BaseGame {
     eventBus.emit('set_user_title', key);
   }
 
-  getUserTitle(totalScore) {
-    let accumulatedScore = 0;
+  getUserTitle(vin) {
+    let accumulatedVin = 0;
     
     for (const [key, value] of Object.entries(USER_TITLES)) {
-      if (totalScore < accumulatedScore + value.step)
+      if (vin < accumulatedVin + value.step)
         return key;
-      accumulatedScore += value.step;
+      accumulatedVin += value.step;
     }
     
     // Если достигнут максимум
@@ -423,9 +423,9 @@ class BaseGame {
   updateUserTitle() {
 
     let current = this.stateManager.get('title', Object.keys(USER_TITLES)[0]);
-    let totalScore = this.stateManager.get('score', this.currentScore);
+    let vin = this.stateManager.get('vin', 0);
 
-    let titleKey = this.getUserTitle(totalScore);
+    let titleKey = this.getUserTitle(vin);
     if (titleKey != current) {
       this.setUserTitle(titleKey);
       return titleKey;
@@ -529,7 +529,7 @@ class BaseGame {
     this.startModalElement = d.dialog;
     this.startModal = d.modal;
 
-    if (DEV) {
+    if (isDev()) {
       this.startModalElement.find('.devBlock').css('display', 'block');
       this.startModalElement.find('.testResult').text(Math.round(this.testResult));
     }
@@ -938,7 +938,7 @@ class BaseGame {
     document.addEventListener('hide.bs.modal', this.onHideModal.bind(this));
 
     /*
-    if (DEV) 
+    if (isDev()) 
       setTimeout(this.gameState.start.bind(this.gameState), 1000);
       */
   }

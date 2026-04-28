@@ -1344,6 +1344,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  pointer-events: none;
+}
+
+.tools-block * {
+  pointer-events: auto;
 }
 
 .tools-panel a {
@@ -1470,7 +1475,7 @@ body {
 /*________________LIST_________________*/
 
 .list {
-  max-height: 293px;
+  max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
   background: #f8f9fa0d;
@@ -1481,7 +1486,7 @@ body {
 }
 
 .list.shop, .list.basket {
-  height: 200px;
+  max-height: 210px;
 }
 
 .empty .basket_placeholder {

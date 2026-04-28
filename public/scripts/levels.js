@@ -486,6 +486,322 @@ var GAME_PARAMS = {
             }
         ]
     },
+    "TEST": {
+        "ENV": {
+            "BACKGROUND_COLOR": 12303359,
+            "GROUND_COLOR": 8930389,
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "AMOUNT_TIME": 60,
+            "DESCRIPTION": "lead-wagon-to-finish",
+            "task": ["connect", "finish"]
+        },
+        "items": [
+            {
+                "type": "PointTrack",
+                "location": [
+                    1,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    -4,
+                    1,
+                    0
+                ],
+                "title": "finish",
+                "taskName": "finish"
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -1,
+                    1
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -1,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -1,
+                    1,
+                    3
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    1,
+                    1
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -1,
+                    2,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    3,
+                    1
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -3,
+                    3,
+                    3
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    2,
+                    3
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -2,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -3,
+                    -1,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -4,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -4,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -4,
+                    2,
+                    0
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -1,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    1,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    -2,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Wagon",
+                "location": [
+                    -3,
+                    3,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "taskName": "connect"
+            },
+            {
+                "type": "Train",
+                "location": [
+                    1,
+                    -3,
+                    true
+                ],
+                "trackPos": {
+                    "pathIndex": 0,
+                    "indexPosInChain": 0,
+                    "forwardInTrack": true
+                },
+                "chain": []
+            }
+        ]
+    },
     "LEVEL-3": {
         "ENV": {
             "BACKGROUND_COLOR": "#334466",
@@ -714,7 +1030,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "DESCRIPTION": "red-green-level-description",
+            "DESCRIPTION": "three-wagon-description",
             "GAME_MODE": "GenCycle",
             "task": [
                 "blue",
@@ -2109,10 +2425,10 @@ var GAME_PARAMS = {
             }
         ]
     },
-    "TEST": {
+    "LEVEL-8": {
         "ENV": {
-            "BACKGROUND_COLOR": 12303359,
-            "GROUND_COLOR": 8930389,
+            "BACKGROUND_COLOR": "#335544",
+            "GROUND_COLOR": "#335544",
             "KEY_LIGHT_COLOR": 16777215,
             "RIM_LIGHT_COLOR": 8490232,
             "FILL_LIGHT_COLOR": 6529416,
@@ -2120,111 +2436,187 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "AMOUNT_TIME": 60,
-            "DESCRIPTION": "lead-wagon-to-finish",
-            "task": ["connect", "finish"]
+            "AMOUNT_TIME": 360,
+            "DESCRIPTION": "three-wagon-description",
+            "GAME_MODE": "GenCycle",
+            "task": [
+                "red",
+                "green",
+                "blue"
+            ]
         },
         "items": [
             {
-                "type": "PointTrack",
+                "type": "StraightTrack",
                 "location": [
-                    1,
-                    -3,
+                    -1,
+                    0,
                     0
                 ]
             },
             {
-                "type": "PointTrack",
+                "type": "StraightTrack",
                 "location": [
-                    -4,
+                    -1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
                     1,
                     0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -2,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -1,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    -1,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    -1,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    0,
+                    2,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -5,
+                    2
                 ],
-                "title": "finish",
-                "taskName": "finish"
+                "color": "blue",
+                "cart_name": "blue",
+                "taskName": "blue"
             },
             {
-                "type": "StraightTrack",
+                "type": "EndTrack",
                 "location": [
-                    1,
+                    -1,
+                    -5,
+                    2
+                ],
+                "color": "green",
+                "cart_name": "green",
+                "taskName": "green"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
                     -2,
-                    0
-                ]
+                    -5,
+                    2
+                ],
+                "color": "red",
+                "cart_name": "red",
+                "taskName": "red"
             },
             {
-                "type": "CurvedTrack",
-                "location": [
-                    1,
-                    -1,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    -1,
-                    1
-                ]
-            },
-            {
-                "type": "ForkTrack",
+                "type": "ForkLStTrack",
                 "location": [
                     -1,
-                    -1,
+                    -3,
                     2
                 ]
             },
             {
                 "type": "StraightTrack",
                 "location": [
-                    -1,
-                    0,
+                    -2,
+                    -4,
                     0
                 ]
             },
             {
-                "type": "ForkTrack",
+                "type": "ForkRStTrack",
                 "location": [
                     -1,
-                    1,
-                    3
-                ]
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    0,
-                    1,
-                    1
-                ]
-            },
-            {
-                "type": "ForkTrack",
-                "location": [
-                    -1,
-                    2,
-                    1
+                    -4,
+                    2
                 ]
             },
             {
                 "type": "CurvedTrack",
                 "location": [
-                    -1,
-                    3,
+                    0,
+                    -4,
                     0
                 ]
             },
             {
-                "type": "StraightTrack",
+                "type": "ForkTrack",
                 "location": [
                     -2,
-                    3,
-                    1
+                    -3,
+                    0
                 ]
             },
             {
-                "type": "EndTrack",
+                "type": "CurvedTrack",
+                "location": [
+                    -3,
+                    -3,
+                    2
+                ]
+            },
+            {
+                "type": "CurvedTrack",
                 "location": [
                     -3,
                     3,
@@ -2232,34 +2624,10 @@ var GAME_PARAMS = {
                 ]
             },
             {
-                "type": "CurvedTrack",
-                "location": [
-                    -2,
-                    2,
-                    3
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -2,
-                    1,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    -2,
-                    0,
-                    0
-                ]
-            },
-            {
                 "type": "ForkTrack",
                 "location": [
                     -2,
-                    -1,
+                    3,
                     2
                 ]
             },
@@ -2267,30 +2635,38 @@ var GAME_PARAMS = {
                 "type": "StraightTrack",
                 "location": [
                     -3,
-                    -1,
-                    1
-                ]
-            },
-            {
-                "type": "CurvedTrack",
-                "location": [
-                    -4,
-                    -1,
-                    2
+                    -2,
+                    0
                 ]
             },
             {
                 "type": "StraightTrack",
                 "location": [
-                    -4,
+                    -3,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -3,
                     0,
                     0
                 ]
             },
             {
-                "type": "EndTrack",
+                "type": "StraightTrack",
                 "location": [
-                    -4,
+                    -3,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -3,
                     2,
                     0
                 ]
@@ -2298,50 +2674,138 @@ var GAME_PARAMS = {
         ],
         "objects": [
             {
-                "type": "DeciduousTree",
-                "location": [
-                    -1,
-                    -3,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
+                "type": "Snow",
                 "location": [
                     -2,
-                    -3,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    -3,
-                    -3,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    2,
                     -1,
                     0
                 ]
             },
             {
                 "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -4,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -5,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -5,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -5,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -5,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    0,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -3,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -4,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -5,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -5,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
                 "location": [
                     3,
-                    -3,
+                    2,
                     0
                 ]
             },
             {
                 "type": "DeciduousTree",
                 "location": [
-                    2,
+                    1,
                     -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    1,
+                    -1,
                     0
                 ]
             },
@@ -2356,16 +2820,8 @@ var GAME_PARAMS = {
             {
                 "type": "DeciduousTree",
                 "location": [
-                    2,
                     1,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    2,
-                    2,
+                    0,
                     0
                 ]
             },
@@ -2373,22 +2829,62 @@ var GAME_PARAMS = {
                 "type": "DeciduousTree",
                 "location": [
                     1,
-                    3,
+                    1,
                     0
                 ]
             },
             {
-                "type": "DeciduousTree",
+                "type": "Snow",
                 "location": [
-                    2,
-                    3,
+                    -2,
+                    1,
                     0
                 ]
             },
             {
-                "type": "DeciduousTree",
+                "type": "Snow",
                 "location": [
                     -4,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -4,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    -2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    1,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "Snow",
+                "location": [
+                    0,
                     -2,
                     0
                 ]
@@ -2396,32 +2892,43 @@ var GAME_PARAMS = {
         ],
         "carts": [
             {
-                "type": "Wagon",
-                "location": [
-                    -3,
-                    3,
-                    true
-                ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
-                },
-                "taskName": "connect"
-            },
-            {
                 "type": "Train",
                 "location": [
-                    1,
-                    -3,
+                    -1,
+                    0,
                     true
                 ],
-                "trackPos": {
-                    "pathIndex": 0,
-                    "indexPosInChain": 0,
-                    "forwardInTrack": true
-                },
                 "chain": []
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -2,
+                    4,
+                    true
+                ],
+                "color": "blue",
+                "name": "blue"
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    -1,
+                    4,
+                    true
+                ],
+                "color": "red",
+                "name": "red"
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    0,
+                    4,
+                    true
+                ],
+                "color": "green",
+                "name": "green"
             }
         ]
     },

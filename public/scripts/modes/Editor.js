@@ -125,6 +125,8 @@ class Editor extends BaseModeModule {
 	   	document.removeEventListener('keydown', this._onKeyDown);
 	   	document.removeEventListener('keyup', this._onKeyUp);
 
+	   	this.game.refreshInventory();
+
 		super.dispose();
 	}
 }

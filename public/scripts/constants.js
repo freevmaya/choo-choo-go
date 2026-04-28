@@ -79,19 +79,19 @@ const HUMAN_HEIGHT = 0.6;
 // Звания пользователей - ИНДЕКСЫ для локализации
 const USER_TITLES = {
     Novice: {
-        step: 500
+        step: 1
     },
     Warrior: {
-        step: 800
+        step: 3
     },
     Knight: {
-        step: 1000
+        step: 6
     },
     Lord: {
-        step: 1200
+        step: 9
     },
     Legend: {
-        step: 1500
+        step: 16
     },
 }
 
@@ -133,7 +133,7 @@ const GAME_SETTINGS = {
     TRAIN_WHEEL_RADIUS : 0.18,
     TRAIN_LEIGHT: 1.5,
     MAX_VELOCITY: 1.5,
-    MIN_VELOCITY: 0.5,
+    MIN_VELOCITY: 1,
 
     WAGON_WEIGHT: 0.1,
 
@@ -159,6 +159,10 @@ const GAME_SETTINGS = {
     GROUND_DENSITY: 2,
 
     GROUND_COLOR: 0x336633,
+
+    RAIL_COLOR: 0xccccdd,
+    UNACTIVE_RAIL_COLOR: 0x7777aa,
+    SLEEPER_COLOR: 0x8B5A2B,
 
     START_CELL: {x: 0, y: 0},
     CAMERA_FOCUS: [25, 15],

@@ -31,7 +31,7 @@ class BaseGameObject extends BaseStateMashine {
     	if (!this.game.gameObjects.includes(this))
     		this.game.gameObjects.push(this);
 
-        let options = DEV ? {
+        let options = isDev() ? {
         } : {
           transparent: true,
           opacity: 0

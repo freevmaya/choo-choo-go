@@ -50,12 +50,16 @@ class BaseCurveTrack extends StraightTrack {
         // Сохраняем точки для внешней и внутренней рельсы
         const pointsOuter = this.calcPoints(segments, radius, toLeft);
         const pointsInner = this.calcPoints(segments, radius - GAME_SETTINGS.RAIL_SPACE, toLeft);
-        
-        // Создаём внешнюю рельсу из прямоугольных сегментов
-        this.createRailFromPoints(pointsOuter, this.railMaterial, GAME_SETTINGS.RAIL_WIDTH, GAME_SETTINGS.RAIL_HEIGHT, group);
-        // Создаём внутреннюю рельсу из прямоугольных сегментов
-        this.createRailFromPoints(pointsInner, this.railMaterial, GAME_SETTINGS.RAIL_WIDTH, GAME_SETTINGS.RAIL_HEIGHT, group);
 
+        let relGroup = new THREE.Group();
+        const material = this.railMaterial.clone();
+        // Создаём внешнюю рельсу из прямоугольных сегментов
+        this.createRailFromPoints(pointsOuter, material, GAME_SETTINGS.RAIL_WIDTH, GAME_SETTINGS.RAIL_HEIGHT, relGroup);
+        // Создаём внутреннюю рельсу из прямоугольных сегментов
+        this.createRailFromPoints(pointsInner, material, GAME_SETTINGS.RAIL_WIDTH, GAME_SETTINGS.RAIL_HEIGHT, relGroup);
+
+        group.add(relGroup);
+        return relGroup;
     }
 
     createSleepers(group, toLeft = true, sleeperCount = 5) {

@@ -95,11 +95,14 @@ class Library {
 	_refreshUserItems() {
 		this.libraryLayer.empty();
 		Object.keys(this.classes).forEach((k, i)=>{
-			if (this.classes[k] > 0)
-				this.createItem({
-					type: typeof k == 'string' ? k : getClass(k),
-					count: this.classes[k]
-				});
+			if (this.classes[k] > 0) {
+				let c = getClass(k);
+				if (c)
+					this.createItem({
+						type: c,
+						count: this.classes[k]
+					});
+			}
 		});
 	}
 

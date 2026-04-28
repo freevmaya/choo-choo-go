@@ -58,7 +58,7 @@ class RailGame extends BaseGame {
     this.btnInventory = $('#inventory');
     this.btnInventory.click(this.onClickInventory.bind(this));
 
-    if (DEV)
+    if (isDev())
       setTimeout(()=>{
         this.initDevTools();
       }, 1000);
@@ -106,6 +106,9 @@ class RailGame extends BaseGame {
     this.inventory = this.stateManager.get('inventory', null);
     let have = this.inventory !== null;
 
+    if (have)
+      have = Object.keys(this.inventory).find(i => getClass(i) && this.inventory[i] > 0) != null;
+
     this.btnInventory.toggleClass('show', have);
     this.btnInventory.toggleClass('hide', !have);
 
@@ -123,10 +126,11 @@ class RailGame extends BaseGame {
 
   getMaxVelocity() {
     let result = this.getConst('MAX_VELOCITY');
-    Object.keys(this.inventory).forEach((k)=>{
-      if (k == 'speed')
-        result *= 2;
-    });
+    if (this.inventory)
+      Object.keys(this.inventory).forEach((k)=>{
+        if (k == 'speed')
+          result *= 2;
+      });
     return result;
   }
 
@@ -190,7 +194,7 @@ class RailGame extends BaseGame {
 
   showVictoryModal(lastScore, newScore, newTitle) {
     super.showVictoryModal(lastScore, newScore, newTitle);
-    if (DEV) {
+    if (isDev()) {
       tracer.log(`Level Time: ${this.levelTime} sec.`);
     }
   }
@@ -277,7 +281,7 @@ class RailGame extends BaseGame {
     try {
       let data = this.items.toSaveData();
 
-      if (DEV) {
+      if (isDev()) {
         Object.keys(data).forEach(k=>{
           this.levels[this.paramsIndex][k] = data[k];
         });
@@ -430,7 +434,7 @@ class RailGame extends BaseGame {
             type: {
               name: 'speed'
             },
-            k: 0.1
+            k: 0.5
         },{
             type: StraightTrack,
             k: 0.1
@@ -455,9 +459,6 @@ class RailGame extends BaseGame {
         },{
             type: PointTrack,
             k: 0.15
-        },{
-            type: Train,
-            k: 0.7
         },{
             type: SimpleTree,
             k: 0.1
@@ -544,7 +545,7 @@ class RailGame extends BaseGame {
       this.cameraController.reset();
     this.ground = (new Ground(env.GROUND_IMAGE_PATH, env.GROUND_COLOR)).init(this);
 
-    if (DEV) {
+    if (isDev()) {
       /*
       let levels = this.stateManager.get('levels');
       if (levels) {
@@ -640,6 +641,7 @@ class RailGame extends BaseGame {
       this.userScore(this.stateManager.get('score', 0) - spendTotalScore);
     }
 
+    this.inventory = inventory;
     this.stateManager.set('inventory', inventory);
     this.refreshInventory();
 
@@ -664,7 +666,7 @@ class SmoothRainbowBackground {
     this.interval = setInterval(() => {
       this.hue = (this.hue + this.speed) % 360;
       this.element.style.backgroundColor = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha})`;
-    }, 50);
+    }, 200);
   }
   
   stop() {
@@ -672,22 +674,22 @@ class SmoothRainbowBackground {
   }
 }
 
-document.addEventListener('show.bs.modal', function (event) {
-    if (event.target) {
-      /*
-      const rainbow = new SmoothRainbowBackground(event.target, {
-        hue: Math.random() * 360,
-        speed: 0.5, 
-        saturation: 80, 
-        lightness: 30,
-        alpha: 0.3
-      });
 
-      let _onHide = () =>{
-        rainbow.stop();
-        document.removeEventListener('hide.bs.modal', _onHide);
+if (!isDev())
+  document.addEventListener('show.bs.modal', function (event) {
+      if (event.target) {
+        const rainbow = new SmoothRainbowBackground(event.target, {
+          hue: Math.random() * 360,
+          speed: 0.5, 
+          saturation: 80, 
+          lightness: 30,
+          alpha: 0.3
+        });
+
+        let _onHide = () =>{
+          rainbow.stop();
+          document.removeEventListener('hide.bs.modal', _onHide);
+        }
+        document.addEventListener('hide.bs.modal', _onHide);
       }
-      document.addEventListener('hide.bs.modal', _onHide);
-      */
-    }
-});
+  });

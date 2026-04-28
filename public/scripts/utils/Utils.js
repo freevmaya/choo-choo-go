@@ -453,3 +453,25 @@ function createText(text, color = '#FFFFFF', font="Bold 60px Arial") {
   );
   return plane;
 }
+
+function groupTransparent(group, opacity = 0.5, color = null) {
+  group.traverse((child) => {
+    if (child.isMesh) {
+      if (Array.isArray(child.material)) {
+        child.material.forEach(mat => {
+          mat.transparent = true;
+          mat.opacity = opacity;
+          if (color !== null) mat.color.setHex(color);
+        });
+      } else {
+        child.material.transparent = true;
+        child.material.opacity = opacity;
+        if (color !== null) child.material.color.setHex(color);
+      }
+    }
+  });
+}
+
+function isDev() {
+    return (typeof DEV != 'undefined') && DEV;
+}

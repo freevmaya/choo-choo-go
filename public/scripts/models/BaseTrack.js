@@ -4,21 +4,29 @@ class BaseTrack extends BaseCellObject {
     	super(data);
         this._currentPath = 0;
         this.carts = [];
+
+    }
+
+    init(game) {
         
         this.railMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0xccccdd, 
+            color: game.getConst('RAIL_COLOR'), 
             metalness: 0.8, 
-            roughness: 0.3
+            roughness: 0.3,
+            transparent: true,   // Включаем прозрачность
+            opacity: 1
         });
         this.sleeperMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x8B5A2B, 
+            color: game.getConst('SLEEPER_COLOR'), 
             roughness: 0.9
         });
         
         // Регистрируем материалы
         this._registerMaterial(this.railMaterial);
         this._registerMaterial(this.sleeperMaterial);
+        super.init(game);
 
+        this._afterSetCurrentPath();
     }
 
     checkEdge(cart, posTrain) {

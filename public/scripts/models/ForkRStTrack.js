@@ -3,9 +3,9 @@ class ForkRStTrack extends ForkTrack {
     createModel() {
         const group = new THREE.Group();
         
-        this.createRailPair(group, true);
+        this.relPath1 = this.createRailPair(group, true);
         this.createSleepers(group, true, 3);
-        this.createStRail(group);
+        this.relPath2 = this.createStRail(group);
 
         this.createLever(group);
 

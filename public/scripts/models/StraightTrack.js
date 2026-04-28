@@ -15,16 +15,20 @@ class StraightTrack extends BaseTrack {
         
         const railWidth = GAME_SETTINGS.RAIL_WIDTH;
         const railHeight = GAME_SETTINGS.RAIL_HEIGHT;
+
+        const material = this.railMaterial.clone();
+
         this.railY = this.getConst('RAIL_HEIGHT') / 2 + this.getConst('SLEEPER_HEIGHT') / 2;
         
-        const leftRail = this.createBox(railWidth, railHeight, trackLength, this.railMaterial);
+        const relGroup = new THREE.Group();
+        const leftRail = this.createBox(railWidth, railHeight, trackLength, material);
         leftRail.position.set(-railSpacing / 2, this.railY, 0);
-        group.add(leftRail);
+        relGroup.add(leftRail);
         
         // Правая рельса
-        const rightRail = this.createBox(railWidth, railHeight, trackLength, this.railMaterial);
+        const rightRail = this.createBox(railWidth, railHeight, trackLength, material);
         rightRail.position.set(railSpacing / 2, this.railY, 0);
-        group.add(rightRail);
+        relGroup.add(rightRail);
         
         // Шпалы
         const step = GAME_SETTINGS.SLEEPER_STEP;
@@ -41,6 +45,9 @@ class StraightTrack extends BaseTrack {
             sleeper.rotation.y = PI_HALF;
             group.add(sleeper);
         }
+
+        group.add(relGroup);
+        return relGroup;
     }
 
     /* relPathPos от -1 до 1 */

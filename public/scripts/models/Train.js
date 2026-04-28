@@ -88,10 +88,13 @@ class Train extends BaseCart {
     }
 
     onGaDown(data) {
-        if (this.game.isPlaying() &&
-            (data.intersects.length > 0) && 
-            (data.intersects[0].object.userData.gameObject == this)) 
-            this.beginDrag(data.pos);
+
+        if (this.game.isPlaying()) {
+            if (data.intersects.find((i)=>{
+                return i.object.userData.gameObject == this;
+            }))
+                this.beginDrag(data.pos);
+        }
     }
 
     onGaUp(data) {
