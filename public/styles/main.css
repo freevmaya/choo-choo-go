@@ -5,10 +5,16 @@
   --library-height: min(600px, 80vh);
   --tools-bg-color: #715f00;
   --frame-bg-color: #677339;
+  --tool-text-color: #fff7bf;
+  --tool-text-shadow: 1px 1px 2px black;;
 }
 
 .modal {
   --bs-modal-width: 461px;
+}
+
+.modal-dialog .modal-content {
+  margin: 30px;
 }
 
 /*
@@ -101,8 +107,6 @@ body {
 
 .s-view {
   width: 88px;
-  height: 64px;
-  background-image: url(images/s-view.png);
   display: flex;
   flex-direction: column;
 }
@@ -114,8 +118,8 @@ body {
 .s-view .value {
   font-size: 18px;
   text-align: center;
-  text-shadow: 0 0 3px #000000ad;
-  color: #331c00;
+  text-shadow: var(--tool-text-shadow);
+  color: var(--tool-text-color);
 }
 
 .game-bottom > div {
@@ -378,9 +382,18 @@ body {
   margin: 20px;
   text-align: center;
 }
+
 .stats-container > div {
-  background: var(--frame-bg-color);
   border-radius: 10px;
+  box-shadow: 0 0 4px black;
+}
+
+#victory .stats-container > div {
+  background: #572781;
+}
+
+#loss-game .stats-container > div {
+  padding: 20px;
 }
 
 .stat-value {
@@ -617,7 +630,7 @@ body {
 .toast-message {
   background: var(--tools-bg-color);
   z-index: 110;
-  bottom: 70px;
+  bottom: 80px;
   transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   max-width: calc(100% - 50px);
   line-height: 20px;
@@ -697,6 +710,14 @@ body {
 
 .actor-2 {
   background-image: url(images/actor-2.png);
+}
+
+.actor-3 {
+  background-image: url(images/actor-3.png);
+}
+
+.actor-4 {
+  background-image: url(images/actor-4.png);
 }
 
 .show .actor-icon .frame {
@@ -989,10 +1010,6 @@ body {
     padding: 5px;
     border-radius: 0 0 14px 14px;
     margin-left: -40px;
-  }
-
-  .toast-message {
-    padding: 5px;
   }
 
   .toast-message .content {
@@ -1330,7 +1347,8 @@ body {
 }
 
 .tools-panel a {
-  color: #fff7bf;
+  color: var(--tool-text-color);
+  text-shadow: var(--tool-text-shadow);
   text-decoration: none;
 }
 
@@ -1342,7 +1360,8 @@ body {
   background: var(--tools-bg-color);
   width: fit-content;
   font-size: 16px;
-  color: #fff7bf;
+  color: var(--tool-text-color);
+  text-shadow: var(--tool-text-shadow);
   border: none !important;
   display: flex;
   justify-content: space-between;
@@ -1398,7 +1417,8 @@ body {
 }
 
 #tools .on i {
-  color: #fff7bf;
+  color: var(--tool-text-color);
+  text-shadow: var(--tool-text-shadow);
 }
 
 #tools i {
@@ -1504,6 +1524,16 @@ body {
   background-size: cover;
   box-shadow: 1px 1px 5px black;
   border: 1px solid yellow;
+  overflow: hidden;
+}
+
+.item div {
+  font-size: 12px;
+}
+
+.item.current {
+  background: #00534b;
+  cursor: default;
 }
 
 .item .bi-lock-fill {
@@ -1603,6 +1633,7 @@ body {
     );
     background-size: 300% 100%;
     animation: goldWave 6s linear infinite;
+    box-shadow: 0px 0px 8px black;
 }
 
 @keyframes goldWave {

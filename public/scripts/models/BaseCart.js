@@ -7,6 +7,10 @@ class BaseCart extends BaseGameObject {
         this.moveDelta = 0;
 	}
 
+    updateMaxVelocity() {
+        this.max_velocity = this.game.getMaxVelocity();
+    }
+
     init(game, data) {
         this.data = data;
 
@@ -15,6 +19,7 @@ class BaseCart extends BaseGameObject {
         super.init(game);
         this.weight = this.defaultWeight();
         this.resetTrackPos();
+        this.updateMaxVelocity();
         return this;
     }
 
@@ -269,7 +274,7 @@ class BaseCart extends BaseGameObject {
     }
 
     isMoving() {
-    	return Math.abs(this.velocity) > this.getConst('MAX_VELOCITY') * 0.5;
+    	return Math.abs(this.velocity) > this.max_velocity * 0.25;
     }
 
     headTrain() {

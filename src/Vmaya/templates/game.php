@@ -71,7 +71,7 @@
       'main'
     ];
 
-    if (DEV) {
+    if ($is_developer) {
       $scripts[] = 'utils/DevTools';
       $scripts[] = 'UI/RGBColorControl';
     }

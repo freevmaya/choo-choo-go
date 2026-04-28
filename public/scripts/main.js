@@ -59,7 +59,9 @@ class RailGame extends BaseGame {
     this.btnInventory.click(this.onClickInventory.bind(this));
 
     if (DEV)
-      this.initDevTools();
+      setTimeout(()=>{
+        this.initDevTools();
+      }, 1000);
   }
 
   saveCustom() {
@@ -101,13 +103,31 @@ class RailGame extends BaseGame {
   }
 
   refreshInventory() {
-    let inventory = this.stateManager.get('inventory', null);
-    let have = inventory !== null;
+    this.inventory = this.stateManager.get('inventory', null);
+    let have = this.inventory !== null;
 
     this.btnInventory.toggleClass('show', have);
     this.btnInventory.toggleClass('hide', !have);
 
-    eventBus.emit('refreshInventory', inventory);
+    eventBus.emit('refreshInventory', this.inventory);
+
+    this.refreshTrainSpeed();
+  }
+
+  refreshTrainSpeed() {
+    if (this.items)
+      this.items.carts.forEach(c => {
+        if (c instanceof Train) c.updateMaxVelocity();
+      });
+  }
+
+  getMaxVelocity() {
+    let result = this.getConst('MAX_VELOCITY');
+    Object.keys(this.inventory).forEach((k)=>{
+      if (k == 'speed')
+        result *= 2;
+    });
+    return result;
   }
 
   isPlaying() {
@@ -168,6 +188,13 @@ class RailGame extends BaseGame {
     this.modeModule = createObject(this.gameModes[this.gameModeIndex], this);
   }
 
+  showVictoryModal(lastScore, newScore, newTitle) {
+    super.showVictoryModal(lastScore, newScore, newTitle);
+    if (DEV) {
+      tracer.log(`Level Time: ${this.levelTime} sec.`);
+    }
+  }
+
   _resetTimer() {
     let amountTime = this.getConst('AMOUNT_TIME');
     this.timerElem.css('display', amountTime ? 'flex' : 'none');
@@ -176,22 +203,26 @@ class RailGame extends BaseGame {
       clearInterval(this.timerId);
 
     this.alarmTime = false;
+    this.levelTime = 0;
     this.timerElem.removeClass('warning');
 
-    if (amountTime) {
-      this.timerId = setInterval(()=>{
-        if (this.isPlaying()) {
+    this.timerId = setInterval(()=>{
+      if (this.isPlaying()) {
+        this.levelTime++;
+        if (amountTime) {
           amountTime -= 1;
 
-          if (!this.alarmTime && (amountTime < 10))
+          if (!this.alarmTime && (amountTime < 10)) {
+            this.alarmTime = true;
             this.timerElem.addClass('warning');
+          }
 
           if (amountTime > 0) {
             this.timerElem.find('.time').text(formatTime(amountTime));
           } else this.gameState.set(GAME_STATE.GAME_OVER);
         }
-      }, 1000);
-    }
+      }
+    }, 1000);
   }
 
   calcBonuse() {
@@ -396,6 +427,11 @@ class RailGame extends BaseGame {
   shopItems() {
     let list = [
         {
+            type: {
+              name: 'speed'
+            },
+            k: 0.1
+        },{
             type: StraightTrack,
             k: 0.1
         },{
@@ -503,6 +539,7 @@ class RailGame extends BaseGame {
     this.createLights();
     this.createGameUI();
     super.createGameObjects();
+
     if (this.cameraController)
       this.cameraController.reset();
     this.ground = (new Ground(env.GROUND_IMAGE_PATH, env.GROUND_COLOR)).init(this);
@@ -531,6 +568,7 @@ class RailGame extends BaseGame {
     });
 
     this.cameraController.setLookCell(this.getConst("START_CELL", GAME_SETTINGS.START_CELL));
+    this.refreshTrainSpeed();
   }
 
   createNewLevel() {

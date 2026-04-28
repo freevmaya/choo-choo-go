@@ -136,9 +136,11 @@ class Train extends BaseCart {
             let direct = endDragPoint.clone().sub(this.startDragPoint);
 
             if (!['boarding'].includes(this.State())) {
-                if (direct.length() > 0.1) {
+                if (direct.length() > 0.2) {
                     let forward = new THREE.Vector3();
                     this.model.getWorldDirection(forward);
+
+                    this.max_velocity = Math.max(this.game.getMaxVelocity() * Math.min(1, direct.length() / 2),this.getConst('MIN_VELOCITY'));
 
                     this.setForward(direct.dot(forward) < 0);
                     this.State('run');
@@ -421,7 +423,7 @@ class Train extends BaseCart {
     
     updateLamp(deltaTime) {
         if (!this.animatedParts.lamp) return;
-        const intensity = this.isMoving ? 0.6 + Math.sin(Date.now() * 0.02) * 0.3 : 0.3;
+        const intensity = this.isMoving() ? 0.6 + Math.sin(Date.now() * 0.02) * 0.3 : 0.3;
         this.animatedParts.lamp.material.emissiveIntensity = intensity;
     }
 
@@ -468,9 +470,7 @@ class Train extends BaseCart {
             }
         }
 
-        let max_velocity = this.getConst('MAX_VELOCITY');
-
-        let vel = Math.min(newVelocity, max_velocity);
+        let vel = Math.min(newVelocity, this.max_velocity);
 
         newVelocity = newVelocity > 0 ? vel : -vel;
 

@@ -79,10 +79,13 @@ class Shop {
 	onPayClick() {
 		
 		let spendScore = this.calcSpend();
-		this.modal.hide();
 		this.game.offerPaid(sprintf(lang.get('items-pay-description'), spendScore), spendScore)
 			.then(()=>{
+				this.modal.hide();
 				this.game.addPurchased(this.spend);
+			})
+			.catch(()=>{
+				this.modal.hide();
 			});
 	}
 

@@ -97,7 +97,7 @@ class Library {
 		Object.keys(this.classes).forEach((k, i)=>{
 			if (this.classes[k] > 0)
 				this.createItem({
-					type: getClass(k),
+					type: typeof k == 'string' ? k : getClass(k),
 					count: this.classes[k]
 				});
 		});
@@ -161,6 +161,10 @@ class Library {
 	}
 
 	createItem(item) {
+
+		if (!item.type.name)
+			return;
+
 		let path = `images/library/${item.type.name}.png`;
 		let itemCtrl = $(`<div class="item draggable" style="background-image: url(${path})" data-type="${item.type.name}"></div>`);
 		let _this = this;

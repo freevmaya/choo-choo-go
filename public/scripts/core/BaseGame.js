@@ -177,6 +177,10 @@ class BaseGame {
 
     this.currentScoreElem = $('#score-indicator');
 
+    $('#reboot-btn').click(()=>{
+      this.resetGame();
+    });
+
     this.pauseBtn = $('#pause-btn');
     this.pauseBtn.click(()=>{
       this.showPauseModal();
@@ -537,12 +541,14 @@ class BaseGame {
   initGameOverModal() {
     // Получаем элемент модального окна Game Over
 
-    let d = this.initDialog(`<p class="status" data-lang="game_over_title">Неудача!</p>
+    let d = this.initDialog(`
+    <div class="actor-icon">
+      <div class="frame padding actor-4">
+      </div>
+    </div>
+    <p class="status" data-lang="game_over_title">Неудача!</p>
       <div class="stats-container">
-        <div class="row">
-          <div class="col-12">
-            <div class="stat-value"></div>
-          </div>
+        <div data-lang="loss-game">
         </div>
       </div>
       <div class="text-center">
@@ -551,6 +557,8 @@ class BaseGame {
     `);
     this.gameOverModalElement = d.dialog;
     this.gameOverModal = d.modal;
+
+    this.gameOverModalElement.attr('id', 'loss-game');
       
     // Обработчик для кнопки рестарта в Game Over
     btnOnClick(this.gameOverModalElement.find('.btn'), ()=>{
@@ -605,6 +613,8 @@ class BaseGame {
     
     this.victoryModalElement = d.dialog;
     this.victoryModal = d.modal;
+
+    this.victoryModalElement.attr('id', 'victory');
       
     // Обработчик для кнопки рестарта в Victory
     btnOnClick(this.victoryModalElement.find('.btn'), this.doNextLevel.bind(this));
@@ -648,6 +658,7 @@ class BaseGame {
       </div>`);
     this.levelsModalElement = d.dialog;
     this.levelsModal = d.modal;
+    this.levelsModalElement.attr('id', 'levels');
   }
   
   initShopModal() {
@@ -724,24 +735,29 @@ class BaseGame {
       Object.keys(this.levels).forEach((k, i) => {
 
         let pay_key = 'level-' + k;
-        let item = $(`<div class="item" data-key="${k}"><span class="num">${i + 1}</span><span class="name">${lang.get(k)}</span><i class="bi bi-lock-fill"></i></div>`);
+        let item = $(`<div class="item" data-key="${k}"><div>${i + 1}</div><div>${lang.get(k)}</div><i class="bi bi-lock-fill"></i></div>`);
         
         item.lock = lock && !this.paid(pay_key);
         item.toggleClass('lock', item.lock);
 
-        item.click(()=>{
-          if (item.lock)
-            this.offerPaid(sprintf(lang.get('level-lock-description'), PRICES.UNLOCK_LEVEL), PRICES.UNLOCK_LEVEL)
-              .then(()=>{
-                this.paid(pay_key, true);
-                this.levelsModal.hide();
-                this.GoToLevel(k);
-              });
-          else {
-            this.levelsModal.hide();
-            this.GoToLevel(k);
-          }
-        });
+        if (this.paramsIndex == k)
+          item.addClass('current');
+        else {
+
+          item.click(()=>{
+            if (item.lock)
+              this.offerPaid(sprintf(lang.get('level-lock-description'), PRICES.UNLOCK_LEVEL), PRICES.UNLOCK_LEVEL)
+                .then(()=>{
+                  this.paid(pay_key, true);
+                  this.levelsModal.hide();
+                  this.GoToLevel(k);
+                });
+            else {
+              this.levelsModal.hide();
+              this.GoToLevel(k);
+            }
+          });
+        }
         content.append(item);
         
         if (k == passLevel)
@@ -793,7 +809,7 @@ class BaseGame {
   
   showVictoryModal(lastScore, newScore, newTitle) {
     // Обновляем статистику в модальном окне победы
-    const victoryScoreElement = $('#victoryScore');
+    const victoryScoreElement = this.victoryModalElement.find('#victoryScore');
 
     this.waitBtn(this.victoryModalElement.find('.victoryRestartButton'), 3);    
 

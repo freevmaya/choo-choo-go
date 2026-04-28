@@ -722,20 +722,20 @@ var GAME_PARAMS = {
             ],
             "expect": [
                 {
-                    'event': 'created-game-objects',
-                    'element': 'span[data-lang="shop"]',
-                    'animClass': 'pushAnimUp'
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
                 },
                 {
-                    'event': 'add-purchased',
-                    'element': '#inventory',
-                    'animClass': 'pushAnimUp'
+                    "event": "add-purchased",
+                    "element": "#inventory",
+                    "animClass": "pushAnimUp"
                 },
                 {
-                    'event': 'created-library',
-                    'element': '.library-block .container-items',
-                    'animClass': 'rightMoveAnim',
-                    'delay': 500
+                    "event": "created-library",
+                    "element": ".library-block .container-items",
+                    "animClass": "rightMoveAnim",
+                    "delay": 500
                 }
             ]
         },
@@ -807,6 +807,30 @@ var GAME_PARAMS = {
                 "location": [
                     1,
                     -2,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    0,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    1,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    1,
+                    0,
                     0
                 ]
             }
@@ -920,6 +944,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
+            "AMOUNT_TIME": 180,
             "DESCRIPTION": "three-wagon-description",
             "GAME_MODE": "GenCycle",
             "task": [
@@ -1233,6 +1258,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
+            "AMOUNT_TIME": 80,
             "GAME_MODE": "PlayAndEdit",
             "DESCRIPTION": "restore-path-and-pick-up-wagon",
             "task": ["connect", "finish"]
@@ -1737,6 +1763,7 @@ var GAME_PARAMS = {
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "GenCycle",
+            "AMOUNT_TIME": 180,
             "DESCRIPTION": "three-wagon-description",
             "task": [
                 "brown",
@@ -2093,6 +2120,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
+            "AMOUNT_TIME": 60,
             "DESCRIPTION": "lead-wagon-to-finish",
             "task": ["connect", "finish"]
         },
@@ -3132,9 +3160,14 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
+            "AMOUNT_TIME": "100",
             "GAME_MODE": "PlayAndEdit",
             "DESCRIPTION": "pickup-wagon-passangers",
-            "task": ["pickup", "finish"]
+            "task": [
+                "pickup",
+                "finish",
+                "blue"
+            ]
         },
         "items": [
             {
@@ -3221,14 +3254,6 @@ var GAME_PARAMS = {
                 "type": "StraightTrack",
                 "location": [
                     1,
-                    1,
-                    1
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
                     1,
                     1
                 ]
@@ -3414,6 +3439,33 @@ var GAME_PARAMS = {
                 "location": [
                     2,
                     0,
+                    0
+                ],
+                "color": "#36A",
+                "cart_name": "blue",
+                "taskName": "blue"
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    0,
+                    1,
+                    3
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    3,
                     0
                 ]
             }
@@ -3540,6 +3592,16 @@ var GAME_PARAMS = {
                     "forwardInTrack": true
                 },
                 "chain": []
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    0,
+                    3,
+                    true
+                ],
+                "color": "#36A",
+                "name": "blue"
             }
         ]
     },

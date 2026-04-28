@@ -13,18 +13,20 @@
       <div class="game-bottom">
         <div class="left">
         </div>
-        <div>
-          <div class="s-view" id="state-score">
-            <div class="status" data-lang="score_label">Счет</div>
-            <div class="value">123</div>
-          </div>
-          <div class="s-view" id="state-vin">
-            <div class="status" data-lang="wins_label">Поб.</div>
-            <div class="value">123</div>
-          </div>
-          <div class="s-view" id="state-title">
-            <div class="status" data-lang="title_label">Зван.</div>
-            <div class="value">Рекрут</div>
+        <div class="tools-panel border-block">
+          <div class="frame padding-2">
+            <div class="s-view" id="state-score">
+              <div class="status" data-lang="score_label">Счет</div>
+              <div class="value">123</div>
+            </div>
+            <div class="s-view" id="state-vin">
+              <div class="status" data-lang="wins_label">Поб.</div>
+              <div class="value">123</div>
+            </div>
+            <div class="s-view" id="state-title">
+              <div class="status" data-lang="title_label">Зван.</div>
+              <div class="value">Рекрут</div>
+            </div>
           </div>
         </div>
         <div class="right">
@@ -33,14 +35,17 @@
 
       <div id="tools" class="tools-panel border-block">
         <div class="frame padding-2">
-          <span id="pause-btn">
+          <span id="pause-btn" class="on" data-lang-title="pause">
             <i class="bi bi-pause-fill"></i>
           </span>
-          <span id="music" class="on">
+          <span id="music" class="on" data-lang-title="music">
             <i class="bi bi-music-note-beamed"></i>
           </span>
-          <span id="volume" class="on">
+          <span id="volume" class="on" data-lang-title="sound">
             <i class="bi bi-volume-down"></i>
+          </span>
+          <span id="reboot-btn" class="on" data-lang-title="reboot">
+            <i class="bi bi-bootstrap-reboot"></i>
           </span>
         </div>
       </div>
