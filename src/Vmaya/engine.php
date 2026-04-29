@@ -1,5 +1,5 @@
 <?
-	include(dirname(__DIR__, 2).'/config/config.php');
+	include(dirname(__DIR__, 2).'/config_ccgo/config.php');
 
 	define('INCLUDE_PATH', BASEPATH.'/src/Vmaya/include/');
 	define('LOGPATH', BASEPATH.'/logs//');

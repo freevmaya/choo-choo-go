@@ -2,22 +2,26 @@
 	{
 		"item_id": 1,
 		"title": "100 монет",
-		"photo_url": "https://vmaya.ru/choo-choo-go/mages/coin.jpg",
+		"count": 100,
+		"photo_url": "https://vmaya.ru/choo-choo-go/images/coin.jpg",
 		"price": 5
 	},{
 		"item_id": 2,
 		"title": "200 монет",
-		"photo_url": "https://vmaya.ru/choo-choo-go/mages/coin.jpg",
+		"count": 200,
+		"photo_url": "https://vmaya.ru/choo-choo-go/images/coin.jpg",
 		"price": 10
 	},{
 		"item_id": 3,
 		"title": "300 монет",
-		"photo_url": "https://vmaya.ru/choo-choo-go/mages/coin.jpg",
+		"count": 300,
+		"photo_url": "https://vmaya.ru/choo-choo-go/images/coin.jpg",
 		"price": 15
 	},{
 		"item_id": 4,
 		"title": "400 монет",
-		"photo_url": "https://vmaya.ru/choo-choo-go/mages/coin.jpg",
+		"count": 400,
+		"photo_url": "https://vmaya.ru/choo-choo-go/images/coin.jpg",
 		"price": 20
 	}
 ]

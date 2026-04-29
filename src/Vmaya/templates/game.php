@@ -67,7 +67,6 @@
       'modes/Delete',
       'modes/PlayAndEdit',
       'modes/DropGame',
-      'modes/GenCycle',
       'main'
     ];
 

@@ -479,3 +479,20 @@ function groupTransparent(group, opacity = 0.5, color = null) {
 function isDev() {
     return (typeof DEV != 'undefined') && DEV;
 }
+
+async function loadJSON(url) {
+    try {
+        const response = await fetch(url);
+        
+        // Проверяем, успешен ли запрос
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Ошибка загрузки JSON:', error);
+        return null;
+    }
+}

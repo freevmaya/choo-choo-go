@@ -17,7 +17,7 @@ class RailGame extends BaseGame {
     eventBus.on('wrong', this.onWrong.bind(this));
     eventBus.on('hide-toast', this.onHideToast.bind(this));
 
-    this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame', 'GenCycle'];
+    this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame'];
     this.gameMode('Play');
   }
 
@@ -116,7 +116,15 @@ class RailGame extends BaseGame {
         if (!this.toast.visible && this.isPlaying()) {
           let tip = this.nextTip();
           if (tip)
-            this.showTip(tip, this.getConst('TIP_TIME'));
+            this.showTip(tip, this.getConst('TIP_TIME'), "", null, [
+              {
+                caption: lang.get('got-it'),
+                callback: ()=>{
+                  this.stateManager.set('tip-' + this.currentTip, true);
+                  this.toast.hide();
+                }
+              }
+            ]);
         }
         this.waitToastId = null;
       }, 10000);
@@ -124,14 +132,19 @@ class RailGame extends BaseGame {
   }
 
   nextTip() {
-    let tips = lang.get('tips');
-    if (Array.isArray(tips) && tips.length > 0) {
-      this.currentTip = typeof this.currentTip == 'undefined' ? 
-          Math.floor(Math.random() * tips.length) : 
-          (this.currentTip + 1) % tips.length;
-      return tips[this.currentTip];
+    const tips = lang.get('tips');
+    if (!tips?.length) return null;
+    
+    this.currentTip ??= Math.floor(Math.random() * tips.length);
+    this.currentTip = (this.currentTip + 1) % tips.length;
+    
+    const start = this.currentTip;
+    while (this.stateManager.get(`tip-${this.currentTip}`, false)) {
+        this.currentTip = (this.currentTip + 1) % tips.length;
+        if (this.currentTip === start) return null; // все просмотрены
     }
-    return null;
+    
+    return tips[this.currentTip];
   }
 
   refreshInventory() {

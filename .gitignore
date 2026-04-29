@@ -2,7 +2,7 @@
 *.zip
 prepare/
 *.psd
-config/
+config*/
 logs/
 dev/
 combined.txt

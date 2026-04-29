@@ -748,10 +748,12 @@ class BaseGame {
         let pay_key = 'level-' + k;
         let item = $(`<div class="item" data-key="${k}"><div>${i + 1}</div><div>${lang.get(k)}</div><i class="bi bi-lock-fill"></i></div>`);
         
-        item.lock = lock && !this.paid(pay_key);
+        let current = this.paramsIndex == k;
+
+        item.lock = lock && !this.paid(pay_key) && !current && !isDev();
         item.toggleClass('lock', item.lock);
 
-        if (this.paramsIndex == k)
+        if (current)
           item.addClass('current');
         else {
 
