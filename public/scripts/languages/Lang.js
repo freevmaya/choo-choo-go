@@ -82,9 +82,12 @@ class Lang {
         }
 
         // Замена параметров вида %1, %2 и т.д.
-        return text.replace(/%(\d+)/g, (match, num) => {
-            return params[num] !== undefined ? params[num] : match;
-        });
+        if (typeof text == 'string')
+            return text.replace(/%(\d+)/g, (match, num) => {
+                return params[num] !== undefined ? params[num] : match;
+            });
+
+        return text;
     }
 
     /**

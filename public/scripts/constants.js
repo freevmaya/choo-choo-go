@@ -168,5 +168,8 @@ const GAME_SETTINGS = {
     CAMERA_FOCUS: [25, 15],
 
     DEFAULT_TASK_SCORE: 20,
-    GAME_MODE: 'Play'
+    GAME_MODE: 'Play',
+
+    DESCRIPTION_TIME: 15,
+    TIP_TIME: 10
 };

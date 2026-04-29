@@ -16,7 +16,7 @@ class BaseModeModule extends BaseStateMashine {
 	    let description = this.game.getConst('DESCRIPTION');
 	    if (showToast && description) {
 	    	let bonuse = this.game.calcBonuse();
-	    	this.game.showTip(lang.get(description), 15, bonuse ? (sprintf(lang.get('price-title'), strEnum(bonuse, lang.get('bonuse-enum'))) + 
+	    	this.game.showTip(lang.get(description), this.game.getConst("DESCRIPTION_TIME"), bonuse ? (sprintf(lang.get('price-title'), strEnum(bonuse, lang.get('bonuse-enum'))) + 
 	    			' <i class="bi bi-trophy-fill"></i>') : null);
 	    }
 	}

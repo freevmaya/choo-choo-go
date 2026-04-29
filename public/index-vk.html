@@ -69,7 +69,10 @@
     
     vkBridge.send("VKWebAppInit", {})
       .then((response)=>{
-        tracer.log(response);
+
+        //console.log(response);
+        window.game = new RailGame(VKStateManager);
+        new VKUser(window.game);
       });
   </script>
 
@@ -195,6 +198,7 @@
   <script src="./scripts/bootstrap.bundle.min.js"></script>
   <script src="./scripts/three.min.js?v=24"></script>
   <script src="./scripts/main.mini.js"></script>
+  <script src="./scripts/core/VKUser.js"></script>
   <script src="./scripts/core/VKStateManager.js"></script>
   
   <script>
@@ -220,12 +224,6 @@
           error(...arguments) {}
       }
     }
-  </script>
-  <script>
-    // Запуск игры
-    onAllImagesLoaded(() => {
-      window.game = new RailGame(VKStateManager);
-    });
   </script>
   </body>
 </html>

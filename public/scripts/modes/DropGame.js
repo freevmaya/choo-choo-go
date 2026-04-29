@@ -17,7 +17,7 @@ class DropGame extends BaseModeModule {
 	    	let description = this.game.getConst('DESCRIPTION');
 		    this.timerId1 = setTimeout(()=>{
 		    	let bonuse = this.game.calcBonuse();
-		    	this.game.showTip(lang.get(description), 15, bonuse ? (sprintf(lang.get('price-title'), bonuse) + 
+		    	this.game.showTip(lang.get(description), this.game.getConst("DESCRIPTION_TIME"), bonuse ? (sprintf(lang.get('price-title'), bonuse) + 
 		    			' <i class="bi bi-trophy-fill"></i>') : null, null, [
 		    		{
 		    			caption: lang.get('got-it'),

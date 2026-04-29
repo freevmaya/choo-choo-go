@@ -143,7 +143,7 @@ class Train extends BaseCart {
                     let forward = new THREE.Vector3();
                     this.model.getWorldDirection(forward);
 
-                    this.max_velocity = Math.max(this.game.getMaxVelocity() * Math.min(1, direct.length() / 2),this.getConst('MIN_VELOCITY'));
+                    this.max_velocity = Math.max(this.game.getMaxVelocity() * Math.min(1, direct.length() / 1.2),this.getConst('MIN_VELOCITY'));
 
                     this.setForward(direct.dot(forward) < 0);
                     this.State('run');

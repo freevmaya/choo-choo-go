@@ -37,6 +37,7 @@ class ToastMessage extends Swipeable {
   }
   
   _setVisible(visible) {
+    this.setOverModal(this.game.currentModal !== null);
     this.element.removeClass(['show', 'hide']);
     this.element.addClass(visible ? 'show' : 'hide');
     this.visible = visible;
@@ -94,6 +95,7 @@ class ToastMessage extends Swipeable {
       this._onClose();
       this._onClose = null;
     }
+    eventBus.emit('hide-toast');
   }
   
   dispose() {

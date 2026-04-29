@@ -152,8 +152,19 @@ class BaseGame {
 
   showTip(data, readTimeSec = 5, title = "", onClose = null, buttons = []) {
     if (typeof data == 'string') {
+      if (this.readTimerId) {
+        clearTimeout(this.readTimerId);
+        this.readTimerId = null;
+      }
+
       this.toast.show(data, title, onClose, buttons);
-      this.toast.setOverModal(this.currentModal !== null);
+
+      if (readTimeSec > 0) {
+        this.readTimerId = setTimeout(()=>{
+          this.toast.hide();
+          this.readTimerId = null;
+        }, readTimeSec * 1000);
+      }
     }
   }
 

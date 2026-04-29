@@ -15,6 +15,7 @@ class RailGame extends BaseGame {
     eventBus.on('change-cells', this.onChangeCells.bind(this));
     eventBus.on('user-action', this.onUserAction.bind(this));
     eventBus.on('wrong', this.onWrong.bind(this));
+    eventBus.on('hide-toast', this.onHideToast.bind(this));
 
     this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame', 'GenCycle'];
     this.gameMode('Play');
@@ -100,6 +101,37 @@ class RailGame extends BaseGame {
         this.showTip(lang.get("close-library-to-continue"), 5000);
       }
     }
+  }
+
+  onHideToast() {
+
+    if (this.isPlaying()) {
+
+      if (this.waitToastId) {
+        clearTimeout(this.waitToastId);
+        this.waitToastId = null;
+      }
+
+      this.waitToastId = setTimeout(()=>{
+        if (!this.toast.visible && this.isPlaying()) {
+          let tip = this.nextTip();
+          if (tip)
+            this.showTip(tip, this.getConst('TIP_TIME'));
+        }
+        this.waitToastId = null;
+      }, 10000);
+    }
+  }
+
+  nextTip() {
+    let tips = lang.get('tips');
+    if (Array.isArray(tips) && tips.length > 0) {
+      this.currentTip = typeof this.currentTip == 'undefined' ? 
+          Math.floor(Math.random() * tips.length) : 
+          (this.currentTip + 1) % tips.length;
+      return tips[this.currentTip];
+    }
+    return null;
   }
 
   refreshInventory() {

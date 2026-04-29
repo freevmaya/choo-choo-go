@@ -98,7 +98,5 @@
 
   <script>
     // Запуск игры
-    onAllImagesLoaded(() => {
-      window.game = new RailGame(StateManager);
-    });
+    window.game = new RailGame(StateManager);
   </script>
