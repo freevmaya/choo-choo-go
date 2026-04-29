@@ -131,7 +131,7 @@ try {
     const obfuscatedCode = JavaScriptObfuscator.obfuscate(combinedCode, obfuscationOptions);
     
     // Сохранение результата
-    const outputPath = 'prepare/mini/scripts/main.mini.js';
+    const outputPath = 'public/scripts/main.mini.js';
     fs.writeFileSync(outputPath, obfuscatedCode.getObfuscatedCode());
     const stats = fs.statSync(outputPath);
     console.log(`\n✅ Готово! Результат сохранен в ${outputPath}`);

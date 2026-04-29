@@ -1,7 +1,8 @@
 node obfuscate.js
-REM xcopy ".\public\index.html" ".\prepare\mini\index.html" /Y
-REM xcopy ".\public\index-vk.html" ".\prepare\mini\index-vk.html" /Y
+xcopy ".\public\index.html" ".\prepare\mini\index.html" /Y
+xcopy ".\public\index-vk.html" ".\prepare\mini\index-vk.html" /Y
 
+xcopy ".\public\scripts\main.mini.js" ".\prepare\mini\scripts\main.mini.js" /Y
 xcopy ".\public\scripts\core\VKStateManager.js" ".\prepare\mini\scripts\core\VKStateManager.js" /Y
 
 xcopy ".\public\scripts\languages" ".\prepare\mini\scripts\languages" /Y
