@@ -153,6 +153,10 @@ class Library {
 
 					if (this.isAvailableTrack(ga)) 
 						this.game.items.delete(ga);
+					else {
+						this.game.showTip(lang.get('can-delay-only-yours'));
+						eventBus.emit('wrong');
+					}
 				}
 			}
 		}

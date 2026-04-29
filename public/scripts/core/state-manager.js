@@ -1,14 +1,13 @@
 
 class StateManager {
-    constructor(config) {
+    constructor(config, defaultStage = {}) {
         this.isPlaying;
         this.isPaused;
         this.lastHash = '';
         this.config = { ...{use_server: typeof user_id != 'undefined'}, ...config};
 
         this.STORAGE_KEY = 'chuchugo_state';
-        this.DEFAULT_STATE = {
-        };
+        this.DEFAULT_STATE = defaultStage;
         
         this.state = { ...this.DEFAULT_STATE };
 

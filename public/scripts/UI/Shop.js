@@ -34,6 +34,7 @@ class Shop {
 	      </div>
 
 	      <div class="text-center">
+			<div class="tip"></div>
 	        <button type="button" class="btn pay" disabled="on" data-lang="pay">Купить</button>
 	        <button type="button" class="btn" data-bs-dismiss="modal" data-lang="cancel">Закрать</button>
 	      </div>`);
@@ -79,10 +80,12 @@ class Shop {
 	onPayClick() {
 		
 		let spendScore = this.calcSpend();
-		this.game.offerPaid(sprintf(lang.get('items-pay-description'), spendScore), spendScore)
-			.then(()=>{
+		this.game.spendScoreEndPay(spendScore)
+			.then((result)=>{
 				this.modal.hide();
-				this.game.addPurchased(this.spend);
+
+				if (result)
+					this.game.addPurchased(this.spend);
 			})
 			.catch(()=>{
 				this.modal.hide();
@@ -129,11 +132,13 @@ class Shop {
 	}
 
 	refreshScore() {
-		let score = this.totalScore;
 		let spend = this.calcSpend();
+		let overSpend = Math.max(0, spend - this.totalScore);
 
-		this.elem.find('.score .value').text(Math.round(score - spend));
-		this.elem.find('.spend .value').text(Math.round(spend));
+		this.elem.find('.score .value').text(strEnum(this.totalScore));
+		this.elem.find('.spend .value').text(strEnum(Math.round(spend)));
+
+		this.elem.find('.tip').text(overSpend > 0 ? lang.get('over-spend') : '');
 	}
 
 	refreshBasket() {

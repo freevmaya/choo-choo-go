@@ -1,7 +1,7 @@
 // scripts/core/BaseGame.js
 
 class BaseGame {
-  constructor() {
+  constructor(stageManagerClass = null) {
 
     this.levels = this.originLevelsCopy();
     this.timers = [];
@@ -10,7 +10,7 @@ class BaseGame {
     this.frame_num = 0; 
     this.gameStarted = false; // Флаг, что игра была запущена
     this.testResult = this.quickGPUTest();
-    this.stateManager = new StateManager();
+    this.stateManager = stageManagerClass !== null ? new stageManagerClass() : new StateManager();
     this.allow_playing = true;
     this.paramsIndex = START_GAME;
     this.gameObjects = [];
@@ -746,7 +746,7 @@ class BaseGame {
 
           item.click(()=>{
             if (item.lock)
-              this.offerPaid(sprintf(lang.get('level-lock-description'), PRICES.UNLOCK_LEVEL), PRICES.UNLOCK_LEVEL)
+              this.offerPaid(sprintf(lang.get('level-lock-description'), strEnum(PRICES.UNLOCK_LEVEL)), PRICES.UNLOCK_LEVEL)
                 .then(()=>{
                   this.paid(pay_key, true);
                   this.levelsModal.hide();

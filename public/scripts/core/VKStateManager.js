@@ -1,0 +1,3 @@
+
+class VKStateManager extends StateManager {
+}

@@ -1541,13 +1541,15 @@ body {
   cursor: default;
 }
 
-.item .bi-lock-fill {
-  display: none;
+.item .bi-lock-fill:before {
+  visibility: hidden;
+}
+
+.item.lock .bi-lock-fill:before {
+  visibility: visible;
 }
 
 .item.lock .bi-lock-fill {
-  display: block;
-  margin-top: auto;  /* Прижимает иконку к низу */
   align-self: flex-end;  /* Прижимает к правому краю */
   font-size: 14px;
   color: gold;

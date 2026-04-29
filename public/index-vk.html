@@ -18,6 +18,7 @@
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+  <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
   <style type="text/css">
 
@@ -65,7 +66,18 @@
     } else {
       disablePullToRefresh();
     }
+    
+    vkBridge.send("VKWebAppInit", {})
+      .then((response)=>{
+        tracer.log(response);
+      });
   </script>
+
+  <style>
+    .tools-block {
+      margin-top: 50px;
+    }
+  </style>
 
 </head>
 <body>

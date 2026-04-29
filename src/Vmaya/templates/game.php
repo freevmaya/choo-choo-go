@@ -95,3 +95,10 @@
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
   <?}?>
+
+  <script>
+    // Запуск игры
+    onAllImagesLoaded(() => {
+      window.game = new RailGame(StateManager);
+    });
+  </script>

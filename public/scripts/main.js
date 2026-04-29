@@ -649,11 +649,6 @@ class RailGame extends BaseGame {
   }
 }
 
-// Запуск игры
-onAllImagesLoaded(() => {
-  window.game = new RailGame();
-});
-
 class SmoothRainbowBackground {
   constructor(element, options = {}) {
     this.element = element || document.body;
