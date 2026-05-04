@@ -53,7 +53,7 @@ class Shop {
 		this.items.forEach((k, i) => {
 			let itm = this.items[i];
 
-			let path = `images/library/${itm.type.name}.png`;
+			let path = `images/library/${itm.type.name}.jpg`;
 			let item = $(`<div class="item" style="background-image: url(${path})" data-type="${itm.type.name}">
 				<div class="price"><span data-lang="price"></span>: ${itm.price}</div>
 			</div>`);
@@ -151,7 +151,7 @@ class Shop {
 		if (item.length > 0) {
 			this.itemCount(item, this.itemCount(item) + 1);
 		} else {
-			let path = `images/library/${type}.png`;
+			let path = `images/library/${type}.jpg`;
 			let item = $(`<div class="item" style="background-image: url(${path})" data-type="${type}"></div>`);
 	        this.basket.append(item);
 	        item.click(()=>{

@@ -20,6 +20,14 @@ class GSoundManager extends SoundManager {
     window.addEventListener('focus', () => {
       this.setMuted(this.userMuted);
     });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.setMuted(true);
+      } else {
+        this.setMuted(this.userMuted);
+      }
+    });
   }
   
   /**

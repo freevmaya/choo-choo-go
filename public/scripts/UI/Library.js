@@ -172,7 +172,7 @@ class Library {
 		if (!item.type.name)
 			return;
 
-		let path = `images/library/${item.type.name}.png`;
+		let path = `images/library/${item.type.name}.jpg`;
 		let itemCtrl = $(`<div class="item draggable" style="background-image: url(${path})" data-type="${item.type.name}"></div>`);
 		let _this = this;
 

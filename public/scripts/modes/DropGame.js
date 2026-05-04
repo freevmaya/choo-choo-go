@@ -82,7 +82,7 @@ class DropGame extends BaseModeModule {
 	    this.initListeners();		
 	}
 
-	onDropTrack(track) {
+	pulseTrain() {
 		let trains = this.game.items.carts.filter(c => c instanceof Train);
 		trains.forEach(t => {
 			if (['wait', 'stop'].includes(t.State()))
@@ -92,6 +92,10 @@ class DropGame extends BaseModeModule {
 			this.toast.dispose();
 			this.toast = null;
 		}
+	}
+
+	onDropTrack(track) {
+		this.pulseTrain();
 	}
 
 	initListeners() {

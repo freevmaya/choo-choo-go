@@ -146,10 +146,25 @@ class RaycasterManager {
     
     if (intersects.length > 0) {
 
+      let top = intersects[0];
+      if (top.object.userData?.onClick)
+        top.object.userData.onClick(top.object);
+
+      this.dispatchEvent('gameObject:click', {
+        type: 'click',
+        originalEvent: event,
+        intersects: [top],
+        pos: pos
+      });
+      /*
+
       let haveHandle = intersects.filter(item => item.object.userData?.onClick);
 
-      if (haveHandle.length > 0)
-        haveHandle.forEach(h => h.object.userData.onClick(h.object));
+      if (haveHandle.length > 0) {
+        let h = haveHandle[0];
+        h.object.userData.onClick(h.object);
+      }
+        //haveHandle.forEach(h => h.object.userData.onClick(h.object));
 
       // Генерируем событие клика
       this.dispatchEvent('gameObject:click', {
@@ -157,16 +172,16 @@ class RaycasterManager {
         originalEvent: event,
         intersects: intersects,
         pos: pos
-      });
+      });*/
 
-    } else {
+    }/* else {
       // Клик мимо объектов
       this.dispatchEvent('gameObject:click:miss', {
         type: 'click',
         originalEvent: event,
         pos: pos
       });
-    }
+    }*/
   }
   
   /**

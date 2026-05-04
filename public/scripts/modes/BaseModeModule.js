@@ -4,15 +4,18 @@ class BaseModeModule extends BaseStateMashine {
 		this.game = game;
 		this.lastTaskCart = null;
 
+		eventBus.on('runOver', this._onRunOver = this.onRunOver.bind(this));
+		eventBus.on('runOut', this._onRunOut = this.onRunOut.bind(this));
+		eventBus.on('train-remove-chain', this._onRemoveChain = this.onRemoveChain.bind(this));
+	}
+
+	Start() {
+
 	    if (this.game.isPlaying())
 	    	this.start();
 		else this.game.gameState.on(GAME_STATE.PLAYING, this._start = ()=>{
 			this.start();
 		});
-
-		eventBus.on('runOver', this._onRunOver = this.onRunOver.bind(this));
-		eventBus.on('runOut', this._onRunOut = this.onRunOut.bind(this));
-		eventBus.on('train-remove-chain', this._onRemoveChain = this.onRemoveChain.bind(this));
 	}
 
 	start(showToast = true) {

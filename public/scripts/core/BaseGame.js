@@ -46,7 +46,7 @@ class BaseGame {
     this.initScene();
     this.initUI();
 
-    if (hasParam('clear-state')) {
+    if (hasParam('clear') || (window.location.hash == '#clear')) {
       this.stateManager.clear();
       this.init();
     }
@@ -209,6 +209,14 @@ class BaseGame {
 
       $(window).on('focus', () => {
         this.gameState.resume();
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this.gameState.pause();
+        } else {
+          this.gameState.resume();
+        }
       });
     }
   }
@@ -745,36 +753,40 @@ class BaseGame {
       let lock = false;
       Object.keys(this.levels).forEach((k, i) => {
 
-        let pay_key = 'level-' + k;
-        let item = $(`<div class="item" data-key="${k}"><div>${i + 1}</div><div>${lang.get(k)}</div><i class="bi bi-lock-fill"></i></div>`);
-        
-        let current = this.paramsIndex == k;
+        if ((this.levels[k].DEV !== true) || isDev()) {
+          let pay_key = 'level-' + k;
+          let item = $(`<div class="item" data-key="${k}"><div>${i + 1}</div><div>${lang.get(k)}</div><i class="bi bi-lock-fill"></i></div>`);
+          
+          let current = this.paramsIndex == k;
 
-        item.lock = lock && !this.paid(pay_key) && !current && !isDev();
-        item.toggleClass('lock', item.lock);
+          item.lock = lock && !this.paid(pay_key) && !current && !isDev();
+          item.toggleClass('lock', item.lock);
 
-        if (current)
-          item.addClass('current');
-        else {
+          item.css('background-image', `url('images/levels/${k}.jpg')`);
 
-          item.click(()=>{
-            if (item.lock)
-              this.offerPaid(sprintf(lang.get('level-lock-description'), strEnum(PRICES.UNLOCK_LEVEL)), PRICES.UNLOCK_LEVEL)
-                .then(()=>{
-                  this.paid(pay_key, true);
-                  this.levelsModal.hide();
-                  this.GoToLevel(k);
-                });
-            else {
-              this.levelsModal.hide();
-              this.GoToLevel(k);
-            }
-          });
+          if (current)
+            item.addClass('current');
+          else {
+
+            item.click(()=>{
+              if (item.lock)
+                this.offerPaid(sprintf(lang.get('level-lock-description'), strEnum(PRICES.UNLOCK_LEVEL)), PRICES.UNLOCK_LEVEL)
+                  .then(()=>{
+                    this.paid(pay_key, true);
+                    this.levelsModal.hide();
+                    this.GoToLevel(k);
+                  });
+              else {
+                this.levelsModal.hide();
+                this.GoToLevel(k);
+              }
+            });
+          }
+          content.append(item);
+          
+          if (k == passLevel)
+            lock = true;
         }
-        content.append(item);
-        
-        if (k == passLevel)
-          lock = true;
       });
 
       this.levelsModal.show();

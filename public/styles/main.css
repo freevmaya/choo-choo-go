@@ -421,6 +421,11 @@ body {
     font-size: 12px;
     padding: 4px 10px;
   }
+
+  .game-top {
+    top: auto;
+    bottom: 75px;
+  }
 }
 
 /* Стили для модального окна победы */
@@ -652,6 +657,9 @@ body {
 
 .toast-message .footer {
   text-align: center;
+  display: flex;
+  gap: 5px;
+  justify-content: center;
 }
 
 .toast-message .footer button {
@@ -826,6 +834,7 @@ body {
 .library-block .items {
     /* содержимое, которое может быть выше */
     min-width: 80px;
+    min-height: 80px;
 }
 
 .library-block .item {
@@ -883,6 +892,10 @@ body {
   flex-direction: column;
   gap: 5px;
   padding: 5px;
+}
+
+.items:empty {
+  background: gray;
 }
 
 .ui-draggable-dragging {
@@ -1528,8 +1541,17 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   box-shadow: 1px 1px 5px black;
-  border: 1px solid yellow;
+  border: 2px solid #292929;
   overflow: hidden;
+}
+
+#levels .item {
+  color: black;
+}
+
+#levels .item div {
+  background: #ffffff5e;
+  padding: 2px;
 }
 
 .item div {
@@ -1539,6 +1561,7 @@ body {
 .item.current {
   background: #00534b;
   cursor: default;
+  border: 2px solid yellow;
 }
 
 .item .bi-lock-fill:before {

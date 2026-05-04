@@ -95,7 +95,9 @@ class RailGame extends BaseGame {
         this.modeModule.library.loadClasses(inventory);
         this.modeModule.library.setCloseButton(()=>{
           this.gameMode(this.getConst('GAME_MODE'));
-          this.saveCustom();
+          if (!(this.modeModule instanceof DropGame))
+            this.saveCustom();
+          else this.modeModule.pulseTrain();
         });
 
         this.showTip(lang.get("close-library-to-continue"), 5000);
@@ -211,6 +213,10 @@ class RailGame extends BaseGame {
       console.log(`Change gameMode: ${this.gameMode()}`);
       eventBus.emit('game-mode-change', this.gameMode());
     }
+
+    this.doAfterFrame(()=>{
+      this.modeModule.Start();
+    });
 
     return this.gameModes[this.gameModeIndex];
   }
@@ -482,37 +488,37 @@ class RailGame extends BaseGame {
             k: 0.5
         },{
             type: StraightTrack,
-            k: 0.1
+            k: 0.2
         },{
             type: EndTrack,
             k: 0.3
         },{
             type: CurvedTrack,
-            k: 0.1
+            k: 0.2
         },{
             type: ForkTrack,
-            k: 0.15
+            k: 0.25
         },{
             type: ForkRStTrack,
-            k: 0.15
+            k: 0.25
         },{
             type: ForkLStTrack,
-            k: 0.15
+            k: 0.25
         },{
             type: CrossTrack,
-            k: 0.15
+            k: 0.25
         },{
             type: PointTrack,
-            k: 0.15
+            k: 0.25
         },{
             type: SimpleTree,
-            k: 0.1
+            k: 0.2
         },{
             type: DeciduousTree,
-            k: 0.1
+            k: 0.2
         },{
             type: Snow,
-            k: 0.1
+            k: 0.2
         }
     ];
 
@@ -579,7 +585,8 @@ class RailGame extends BaseGame {
 
     this.gameMode(env.GAME_MODE || 'Play');
 
-    this.resetLevelCustom();
+    if (!(this.modeModule instanceof DropGame))
+      this.resetLevelCustom();
 
     this._resetTimer();
     this.createLights();

@@ -399,6 +399,11 @@ function hasParam(paramName) {
     return urlParams.has(paramName);
 }
 
+function getParam(paramName) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(paramName);
+}
+
 function loadScript(src, callback) {
     const script = document.createElement('script');
     script.src = src;

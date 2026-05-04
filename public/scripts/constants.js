@@ -119,9 +119,9 @@ const PI_HALF = Math.PI / 2;
 // Камера
 const CAMERA_FOLLOW_SPEED = 6;
 const CAMERA_HEIGHT_OFFSET = 40;
-const MAXSCREENSIZE = 1024;
+const MAXSCREENSIZE = 800;
 
-const PRICES = {
+var PRICES = {
     UNLOCK_LEVEL: 400
 }
 
