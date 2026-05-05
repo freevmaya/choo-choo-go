@@ -6622,7 +6622,6 @@ var GAME_PARAMS = {
         ]
     },
     "PAY-WAGON": {
-        "DEV": true,
         "ENV": {
             "BACKGROUND_COLOR": "#557755",
             "GROUND_COLOR": "#557755",

@@ -56,13 +56,23 @@ class Train extends BaseCart {
         return result;
     }
 
-    getLastCart(cart) {
+    getBeforeCart(cart) {
 
         let cart_item = this.chain.find(item => item.cart == cart);
         if (cart_item) {
             let sameList = this.chain.filter(item => (item.forward == cart_item.forward) && (item.cart != cart));
 
             return sameList.length > 0 ? sameList[sameList.length - 1].cart : this;
+        }
+        return false;
+    }
+
+    getLastCart(cart) {
+
+        let cart_item = this.chain.find(item => item.cart == cart);
+        if (cart_item) {
+            let sameList = this.chain.filter(item => item.forward == cart_item.forward);
+            return sameList.length > 0 ? sameList[sameList.length - 1].cart : null;
         }
         return false;
     }

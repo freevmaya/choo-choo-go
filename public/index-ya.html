@@ -1,10 +1,10 @@
-﻿
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Чух чух поехали!</title>
+  <title lang-data="app_name"></title>
   
   <!-- Bootstrap CSS -->
   <link href="./styles/bootstrap.min.css" rel="stylesheet">
@@ -184,8 +184,8 @@
   <script src="./scripts/bootstrap.bundle.min.js"></script>
   <script src="./scripts/three.min.js"></script>
   <script src="./scripts/main.mini.js?v=57"></script>
-  <script src="./scripts/core/VKUser.js?v=57"></script>
-  <script src="./scripts/core/VKStateManager.js?v=57"></script>
+  <script src="./scripts/core/YaUser.js?v=57"></script>
+  <script src="./scripts/core/YaStateManager.js?v=57"></script>
   
   <script>
     var DEV = hasParam('dev');
@@ -210,17 +210,6 @@
           error(...arguments) {}
       }
     }
-
-    
-    vkBridge.send("VKWebAppInit", {})
-      .then((response)=>{
-        $(window).ready(()=>{
-          //console.log(response);
-          window.game = new RailGame(VKStateManager);
-          new VKUser(window.game);
-
-        });
-      });
   </script>
   </body>
 </html>
