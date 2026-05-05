@@ -15,10 +15,11 @@ class VKUser {
 		loadJSON('data/vk-prices.json')
 			.then((data)=> {
 				this.goods = data;
+				this.initPayments();
 			});
 		//this.initBrowser();
 
-		this.game.accountAddScore = (requireScore) => {
+		this.game.accountAddScore = (requireScore, text=null) => {
           return new Promise((resolve, reject) => {
           	let countStr = strEnum(requireScore);
           	let buttons = [];
@@ -34,7 +35,7 @@ class VKUser {
 		                	vkBridge.send('VKWebAppShowOrderBox', 
 								{ 
 									type: 'item',
-									item: g_item.item_id,
+									item: String(g_item.item_id),
 								})
 								.then( (data) => {
 								  	this.game.toast.hide();
@@ -89,7 +90,7 @@ class VKUser {
           		});
           	}
 
-            this.game.showTip(`Требуется добавить для<br>покупки ${countStr}.<br>Выберите способ.`, 0, null, null, buttons);
+            this.game.showTip(text != null ? text : lang.get('title-require-payment', [countStr]), 0, null, null, buttons);
           });
         }
 
@@ -143,6 +144,44 @@ class VKUser {
     	eventBus.on('new_level', this.onNewLevel.bind(this));
     	eventBus.on('new_score', this.onNewScore.bind(this));
     	eventBus.on('set_user_title', this.onNewTitle.bind(this));
+	}
+
+	initPayments() {
+		let d = this.game.initDialog(`
+			<div class="actor-icon">
+				<div class="frame padding actor-1">
+				</div>
+			</div>
+			<div class="status with-actor" data-lang="app_name"></div>
+			<p style="padding-top: 20px;"><span data-lang="select-payment"></span>
+			</p>
+			<div class="list">
+				<div class="list-content">
+				</div>
+			</div>
+			<div class="text-center">
+				<button type="button" data-bs-dismiss="modal" class="btn" data-lang="close"></button>
+			</div>
+	    `, 'payment-dialog');
+	    this.payment = d;
+
+	    let elem = this.payment.dialog.find('.list-content');
+	    this.goods.forEach(g => {
+	    	let pitem = $(`<div class="item" style="background-image: url(${g.photo_url})">${g.title}</div>`);
+	    	pitem.click(()=>{
+	    		this.game.accountAddScore(g.count, lang.get('title-payment', [g.count]))
+	    			.then((result)=>{
+	    				if (result)
+	    					this.payment.modal.hide();
+	    			})
+	    	});
+	    	elem.append(pitem);
+	    });
+
+	    this.game.stateView.score.click(()=>{
+    		this.payment.modal.show();
+	    	//this.game.accountAddScore(price - totalScore);
+	    });
 	}
 
 	onNewLevel(level) {

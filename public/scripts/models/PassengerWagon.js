@@ -74,6 +74,11 @@ class PassengerWagon extends Wagon {
         
         return group;
     }
+
+    canDeChain() {
+        let train = this.headTrain();
+        return train && super.canDeChain() && (train.State() != 'boarding');
+    }
 }
 
 registerClass(PassengerWagon);

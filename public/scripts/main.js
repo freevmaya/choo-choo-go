@@ -519,6 +519,9 @@ class RailGame extends BaseGame {
         },{
             type: Snow,
             k: 0.2
+        },{
+            type: PassengerWagon,
+            k: 0.4
         }
     ];
 
@@ -713,7 +716,7 @@ class SmoothRainbowBackground {
     this.interval = setInterval(() => {
       this.hue = (this.hue + this.speed) % 360;
       this.element.style.backgroundColor = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha})`;
-    }, 200);
+    }, 500);
   }
   
   stop() {
@@ -727,7 +730,7 @@ if (!isDev())
       if (event.target) {
         const rainbow = new SmoothRainbowBackground(event.target, {
           hue: Math.random() * 360,
-          speed: 0.5, 
+          speed: 2, 
           saturation: 80, 
           lightness: 30,
           alpha: 0.3

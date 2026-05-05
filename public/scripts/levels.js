@@ -1592,7 +1592,6 @@ var GAME_PARAMS = {
                     3
                 ],
                 "period": 120,
-                "spawner": "blue",
                 "color": "magenta",
                 "cart_name": "magenta",
                 "taskName": "magenta"
@@ -1605,7 +1604,6 @@ var GAME_PARAMS = {
                     3
                 ],
                 "period": 120,
-                "spawner": "magenta",
                 "color": "blue",
                 "cart_name": "blue",
                 "taskName": "blue"
@@ -1617,8 +1615,7 @@ var GAME_PARAMS = {
                     4,
                     0
                 ],
-                "period": 120,
-                "spawner": "green"
+                "period": 120
             },
             {
                 "type": "EndTrack",
@@ -1627,8 +1624,7 @@ var GAME_PARAMS = {
                     -4,
                     2
                 ],
-                "period": 120,
-                "spawner": "red"
+                "period": 120
             },
             {
                 "type": "StraightTrack",
@@ -6622,6 +6618,443 @@ var GAME_PARAMS = {
                 },
                 "color": "#333333",
                 "name": "black"
+            }
+        ]
+    },
+    "PAY-WAGON": {
+        "DEV": true,
+        "ENV": {
+            "BACKGROUND_COLOR": "#557755",
+            "GROUND_COLOR": "#557755",
+            "KEY_LIGHT_COLOR": '#FF8800',
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 0.5,
+            "KEY_LIGHT_INTENSITY": 300,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "DESCRIPTION": "pay-paswagon-description",
+            "GAME_MODE": "Play",
+            "task": [
+                "blue",
+                "pickup",
+                "unload"
+            ]
+        },
+        "items": [
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    0,
+                    -3,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    -2,
+                    1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    1,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -2,
+                    -3,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    -2,
+                    0,
+                    2
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -3,
+                    0,
+                    3
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -3,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -3,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -3,
+                    -4,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -2,
+                    -4,
+                    1
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    -4,
+                    1
+                ]
+            },
+            {
+                "type": "CrossTrack",
+                "location": [
+                    -1,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -1,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    1,
+                    -1,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    1,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -3,
+                    -2,
+                    1
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -4,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -4,
+                    -5,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -4,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "ForkTrack",
+                "location": [
+                    -4,
+                    -2,
+                    3
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -4,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -4,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -4,
+                    1,
+                    0
+                ],
+                "color": "#5588EE",
+                "taskName": "blue",
+                "cart_name": "blue"
+            },
+            {
+                "type": "ForkLStTrack",
+                "location": [
+                    0,
+                    -1,
+                    0
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "RailwayPlatform",
+                "location": [
+                    2,
+                    1,
+                    1
+                ],
+                "peopleCount": 5,
+                "taskName": "pickup"
+            },
+            {
+                "type": "RailwayPlatform",
+                "location": [
+                    -5,
+                    -4,
+                    3
+                ],
+                "peopleCount": 0,
+                "taskName": "unload",
+                "score": 100
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    -2,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Wagon",
+                "location": [
+                    -1,
+                    -1,
+                    true
+                ],
+                "name": "blue",
+                "color": "#5588EE"
+            },
+            {
+                "type": "Train",
+                "location": [
+                    -2,
+                    -4,
+                    true
+                ]
             }
         ]
     }

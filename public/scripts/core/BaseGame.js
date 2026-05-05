@@ -573,11 +573,9 @@ class BaseGame {
       <div class="text-center">
         <button type="button" class="btn" data-lang="game_over_button">Продолжить</button>
       </div>      
-    `);
+    `, 'loss-game');
     this.gameOverModalElement = d.dialog;
     this.gameOverModal = d.modal;
-
-    this.gameOverModalElement.attr('id', 'loss-game');
       
     // Обработчик для кнопки рестарта в Game Over
     btnOnClick(this.gameOverModalElement.find('.btn'), ()=>{
@@ -592,7 +590,7 @@ class BaseGame {
     });
   }
 
-  initDialog(content) {
+  initDialog(content, id = null) {
     let template = $('.modal.template');
     let dialog = template.clone();
     dialog.removeClass('template');
@@ -605,6 +603,9 @@ class BaseGame {
       backdrop: 'static',
       keyboard: false
     });
+
+    if (id != null)
+      dialog.attr('id', id);
     return {dialog, modal};
   }
   
@@ -628,12 +629,10 @@ class BaseGame {
 
       <div class="text-center">
         <button type="button" class="btn victoryRestartButton" data-lang="victory_button"></button>
-      </div>`);
+      </div>`, 'victory');
     
     this.victoryModalElement = d.dialog;
     this.victoryModal = d.modal;
-
-    this.victoryModalElement.attr('id', 'victory');
       
     // Обработчик для кнопки рестарта в Victory
     btnOnClick(this.victoryModalElement.find('.btn'), this.doNextLevel.bind(this));
@@ -674,10 +673,9 @@ class BaseGame {
       </div>
       <div class="text-center">
         <button type="button" class="btn" data-bs-dismiss="modal" data-lang="pause_resume">Продолжить</button>
-      </div>`);
+      </div>`, 'levels');
     this.levelsModalElement = d.dialog;
     this.levelsModal = d.modal;
-    this.levelsModalElement.attr('id', 'levels');
   }
   
   initShopModal() {

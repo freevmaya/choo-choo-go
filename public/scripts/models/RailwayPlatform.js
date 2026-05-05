@@ -131,7 +131,8 @@ class RailwayPlatform extends BaseCellObject {
     if (train && this.parked &&
 
       (train.State() == 'stop') && 
-      (this.parked.headTrain() == train)) {
+      (this.parked.headTrain() == train) &&
+      (this.data.taskName && !this.game.isCompletedTask(this.data.taskName))) {
 
       if (this.getPeopleCount() > 0) { // Если забираем людей
 

@@ -297,11 +297,17 @@ class BaseCart extends BaseGameObject {
         }
     }
 
-    deChain() {
+    canDeChain() {
         let train = this.headTrain();
-        let last;
+        return train && train.getLastCart(this) && !train.isMoving();
+    }
 
-        if (train && (last = train.getLastCart(this)) && !train.isMoving()) {
+    deChain() {
+
+        if (this.canDeChain()) {
+            
+            let train = this.headTrain();
+            let last = train.getLastCart(this);
             train.removeChain(this);
 
             let pen = this.trackPos.penetration(last.trackPos, false);

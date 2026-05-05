@@ -81,7 +81,7 @@ class Lang {
             return key;
         }
 
-        // Замена параметров вида %1, %2 и т.д.
+        // Замена параметров вида %0, %1 и т.д.
         if (typeof text == 'string')
             return text.replace(/%(\d+)/g, (match, num) => {
                 return params[num] !== undefined ? params[num] : match;

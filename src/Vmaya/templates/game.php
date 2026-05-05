@@ -89,10 +89,10 @@
   <!--<script src="<?=SCRIPTURL?>language-switcher.js?v=<?=$v?>"></script>-->
 
   <?if ($is_developer) {?>
-    <script src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>
-    <!-- Eruda is console for mobile browsers-->
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
+    <script src="<?=SCRIPTURL?>test-unit.js?v=<?=$v?>"></script>
+
+    <!--<script src="<?=SCRIPTURL?>eruda.js"></script>
+    <script>eruda.init();</script>-->
   <?}?>
 
   <script>

@@ -122,6 +122,12 @@ body {
   color: var(--tool-text-color);
 }
 
+#state-score {
+  user-select: auto;
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
 .game-bottom > div {
   display: flex;
 }
@@ -463,6 +469,10 @@ body {
   text-align: center;
   justify-content: center;
   align-items: center;
+}
+
+.with-actor {
+  margin-left: 50px;
 }
 
 @media (max-width: 420px) {
@@ -1541,8 +1551,12 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   box-shadow: 1px 1px 5px black;
-  border: 2px solid #292929;
+  border: 2px solid #6b875a;
   overflow: hidden;
+}
+
+.item:active {
+  box-shadow: 0px 0px 2px black;
 }
 
 #levels .item {
@@ -1600,6 +1614,14 @@ body {
   margin-right: 4px;
   margin-bottom: 4px;
   box-shadow: 1px 1px 3px black;
+}
+
+#payment-dialog .item {
+  justify-content: end;
+  background-position: top;
+  background-size: 70%;
+  background-color: #0aa100;
+  font-size: 18px;
 }
 
 .name {

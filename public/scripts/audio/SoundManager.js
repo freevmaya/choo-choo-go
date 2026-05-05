@@ -47,10 +47,36 @@ class SoundManager {
     }
 
     Play(name, a_options) {
+        // Проверяем, не играет ли уже этот звук (активные источники)
+        let isPlaying = false;
+        for (const sourceInfo of this.activeSources.values()) {
+            if (sourceInfo.name === name) {
+                isPlaying = true;
+                break;
+            }
+        }
+        
+        // Проверяем, нет ли звука в приостановленных
+        let isSuspended = false;
+        for (const sourceInfo of this.suspendedSources.values()) {
+            if (sourceInfo.name === name) {
+                isSuspended = true;
+                break;
+            }
+        }
+        
+        if (isPlaying || isSuspended) {
+            console.log(`Звук "${name}" уже ${isPlaying ? 'играет' : 'на паузе'}, пропускаем`);
+            return null;
+        }
+        
         const buffer = this.sounds.get(name);
-        if (buffer)
-            this. _play(name, a_options);
-        else this.requirePlay[name] = a_options;
+        if (buffer) {
+            return this._play(name, a_options);
+        } else {
+            this.requirePlay[name] = a_options;
+            return null;
+        }
     }
 
     _play(name, a_options) {
