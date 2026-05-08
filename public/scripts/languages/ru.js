@@ -143,6 +143,9 @@ window.LANG_RU = {
     'status_victory': 'Победа',
     'status_loading': 'Загрузка',
     'remove-chain': 'Отцепите вагон',
+    'select-element': 'Выберите элемент выше',
+    'yan': 'Ян',
+    'adv': 'Реклама',
 
     'reboot': 'Перезагрузить',
 

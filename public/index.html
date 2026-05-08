@@ -4,14 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Чух чух поехали!</title>
+  <title lang-data="app_name"></title>
   
   <!-- Bootstrap CSS -->
   <link href="./styles/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="./styles/bootstrap-icons.css?v=57">
+  <link rel="stylesheet" href="./styles/bootstrap-icons.css?v=72">
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="./styles/main.css?v=57">
+  <link rel="stylesheet" href="./styles/main.css?v=72">
 
   <!-- JQUERY -->
   <script src="./scripts/jquery-4.0.0.min.js"></script>
@@ -65,6 +65,11 @@
     } else {
       disablePullToRefresh();
     }
+
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        return false;
+    });
   </script>
 
 </head>
@@ -182,7 +187,9 @@
   <!-- Подключаем Bootstrap JS глобально -->
   <script src="./scripts/bootstrap.bundle.min.js"></script>
   <script src="./scripts/three.min.js"></script>
-  <script src="./scripts/main.mini.js?v=57"></script>
+  <script src="./scripts/main.mini.js?v=72"></script>
+  <script src="./scripts/core/YaUser.js?v=72"></script>
+  <script async src="/sdk.js" onload="initSDK()"></script>
   
   <script>
     var DEV = hasParam('dev');
@@ -197,19 +204,25 @@
               console.error(...arguments);
           }
       }
+      loadScript('./scripts/utils/DevTools.js');
       loadScript('./scripts/test-unit.js');
       loadScript('https://cdn.jsdelivr.net/npm/eruda', ()=>{
         eruda.init();
       });
+
+      if (DEV) {
+        $(window).on('keydown', (e)=>{
+          if (event.key == 'v')
+            window.game.gameState.victory();
+        });
+      }
+
     } else {
       var tracer = {
           log(...arguments) {},
           error(...arguments) {}
       }
     }
-  </script>
-  <script>
-    window.game = new RailGame(StateManager);
   </script>
   </body>
 </html>

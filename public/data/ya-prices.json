@@ -4,18 +4,18 @@
 		"title": "100 монет",
 		"count": 100,
 		"photo_url": "./images/coin-1-256.png",
-		"price": 5
+		"price": 50
 	},{
 		"item_id": 2,
 		"title": "200 монет",
 		"count": 200,
 		"photo_url": "./images/coin-2-256.png",
-		"price": 10
+		"price": 100
 	},{
 		"item_id": 3,
 		"title": "300 монет",
 		"count": 300,
 		"photo_url": "./images/coin-3-256.png",
-		"price": 15
+		"price": 150
 	}
 ]

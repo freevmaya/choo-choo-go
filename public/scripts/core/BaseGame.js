@@ -617,9 +617,9 @@ class BaseGame {
         <div class="frame padding actor-2">
         </div>
       </div>
-      <p class="modal-subtitle status" data-lang="victory_title"></p>
+      <div class="modal-subtitle status" data-lang="victory_title"></div>
       <div class="stars"></div>
-      <p class="new-title status" data-lang="new_rank"></p>
+      <div class="new-title" data-lang="new_rank"></div>
       <div class="stats-container victory-stats shine">
         <div>
           <div class="stat-value" id="victoryScore">0</div>
@@ -857,13 +857,34 @@ class BaseGame {
         y: coord.y + coord.height / 2,
         count: this.testResult > 30 ? 40 : 20,
         colors: ['#FFF', '#F8F', '#FF8', '#8FF'],
-        sizes: [4, 8],
-        speeds: [1, 3],
-        gravity: 0.04,
-        baseRadius: coord.width * 0.4,
-        className: 'star'
+        sizes: [10, 50],
+        speeds: [1, 2],
+        velocity: [0, -2],
+        gravity: 0.02,
+        rectWidth: coord.width,
+        rectHeight: coord.height,
+        rotation: {
+          enabled: true,
+          speed: [0, 360],
+          direction: 'random',
+          easing: false,
+        }
       });
     });
+    /*
+    {
+      x: e.clientX,
+      y: e.clientY,
+      count: 10,
+      colors: ['#F0F', '#F00', '#0F0', '#00F'],
+      sizes: [10, 50],
+      speeds: [-1, 1],
+      gravity: 0,
+      baseRadius: 100,
+      lifetime: 1000,
+      emissionTime: 800, 
+      emissionType: 'random'
+    }*/
   }
   
   showPauseModal() {
@@ -929,7 +950,7 @@ class BaseGame {
           y: coord.y + coord.height / 2,
           count: this.testResult > 30 ? 60 : 30,
           colors: ['#FFF', '#F8F', '#FF8', '#8FF'],
-          sizes: [4, 8],
+          sizes: [5, 20],
           speeds: [1, 3],
           gravity: 0.04,
           baseRadius: coord.width * 0.4

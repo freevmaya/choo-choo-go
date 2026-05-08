@@ -141,9 +141,9 @@ class VKUser {
 		});
 
 
-    	eventBus.on('new_level', this.onNewLevel.bind(this));
-    	eventBus.on('new_score', this.onNewScore.bind(this));
-    	eventBus.on('set_user_title', this.onNewTitle.bind(this));
+    	//eventBus.on('new_level', this.onNewLevel.bind(this));
+    	//eventBus.on('new_score', this.onNewScore.bind(this));
+    	//eventBus.on('set_user_title', this.onNewTitle.bind(this));
 	}
 
 	initPayments() {

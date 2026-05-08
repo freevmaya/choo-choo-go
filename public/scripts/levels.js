@@ -486,6 +486,223 @@ var GAME_PARAMS = {
             }
         ]
     },
+    "LEVEL-3": {
+        "ENV": {
+            "BACKGROUND_COLOR": "#334466",
+            "GROUND_COLOR": "#334466",
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "DESCRIPTION": "level-3-description",
+            "GAME_MODE": "Play",
+            "task": [
+                "blue"
+            ],
+            "expect": [
+                {
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
+                },
+                {
+                    "event": "add-purchased",
+                    "element": "#inventory",
+                    "animClass": "pushAnimUp"
+                },
+                {
+                    "event": "created-library",
+                    "element": ".library-block .container-items",
+                    "animClass": "rightMoveAnim",
+                    "delay": 500
+                },
+                {
+                    "event": "show-shop",
+                    "element": '.shop [data-type="ForkTrack"]',
+                    "animClass": "pushAnim",
+                    "delay": 1000
+                },
+                {
+                    "event": "to-basket.ForkTrack",
+                    "element": '#shop .btn.pay',
+                    "animClass": "pushAnim",
+                    "delay": 500
+                },
+                {
+                    "event": "drop-elem.ForkTrack",
+                    "animClass": "pushAnim",
+                    "delay": 500
+                }
+            ]
+        },
+        "items": [
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -2,
+                    2
+                ],
+                "color": "#6AF",
+                "cart_name": "blue",
+                "taskName": "blue"
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    1,
+                    0,
+                    1
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    2,
+                    0,
+                    1
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -4,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    -3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    3,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    3,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    2,
+                    3,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -4,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Train",
+                "location": [
+                    0,
+                    -1,
+                    true
+                ],
+                "chain": []
+            },
+            {
+                "type": "Wagon",
+                "location": [
+                    0,
+                    2,
+                    true
+                ],
+                "color": "#6AF",
+                "name": "blue"
+            }
+        ]
+    },
     "TEST": {
         "ENV": {
             "BACKGROUND_COLOR": 12303359,
@@ -497,7 +714,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "AMOUNT_TIME": 60,
+            "AMOUNT_TIME": 160,
             "GAME_MODE": "PlayAndEdit",
             "DESCRIPTION": "restore-path-and-pick-up-wagon",
             "task": [
@@ -803,223 +1020,6 @@ var GAME_PARAMS = {
                     "forwardInTrack": true
                 },
                 "chain": []
-            }
-        ]
-    },
-    "LEVEL-3": {
-        "ENV": {
-            "BACKGROUND_COLOR": "#334466",
-            "GROUND_COLOR": "#334466",
-            "KEY_LIGHT_COLOR": 16777215,
-            "RIM_LIGHT_COLOR": 8490232,
-            "FILL_LIGHT_COLOR": 6529416,
-            "AMBIENT_LIGHT_INTENSITY": 1,
-            "KEY_LIGHT_INTENSITY": 150,
-            "FILL_LIGHT_INTENSITY": 2,
-            "RIM_LIGHT_INTENSITY": 0.6,
-            "DESCRIPTION": "level-3-description",
-            "GAME_MODE": "Play",
-            "task": [
-                "blue"
-            ],
-            "expect": [
-                {
-                    "event": "created-game-objects",
-                    "element": "span[data-lang=\"shop\"]",
-                    "animClass": "pushAnimUp"
-                },
-                {
-                    "event": "add-purchased",
-                    "element": "#inventory",
-                    "animClass": "pushAnimUp"
-                },
-                {
-                    "event": "created-library",
-                    "element": ".library-block .container-items",
-                    "animClass": "rightMoveAnim",
-                    "delay": 500
-                },
-                {
-                    "event": "show-shop",
-                    "element": '.shop [data-type="ForkTrack"]',
-                    "animClass": "pushAnim",
-                    "delay": 1000
-                },
-                {
-                    "event": "to-basket.ForkTrack",
-                    "element": '#shop .btn.pay',
-                    "animClass": "pushAnim",
-                    "delay": 500
-                },
-                {
-                    "event": "drop-elem.ForkTrack",
-                    "animClass": "pushAnim",
-                    "delay": 500
-                }
-            ]
-        },
-        "items": [
-            {
-                "type": "EndTrack",
-                "location": [
-                    0,
-                    -2,
-                    2
-                ],
-                "color": "#6AF",
-                "cart_name": "blue",
-                "taskName": "blue"
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    0,
-                    2,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    -1,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    0,
-                    1,
-                    0
-                ]
-            },
-            {
-                "type": "StraightTrack",
-                "location": [
-                    1,
-                    0,
-                    1
-                ]
-            },
-            {
-                "type": "EndTrack",
-                "location": [
-                    2,
-                    0,
-                    1
-                ]
-            }
-        ],
-        "objects": [
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    2,
-                    -4,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    3,
-                    -3,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    3,
-                    -2,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    3,
-                    1,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    3,
-                    2,
-                    0
-                ]
-            },
-            {
-                "type": "SimpleTree",
-                "location": [
-                    2,
-                    3,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    -2,
-                    2,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    -3,
-                    2,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    -3,
-                    1,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    -3,
-                    -2,
-                    0
-                ]
-            },
-            {
-                "type": "DeciduousTree",
-                "location": [
-                    -2,
-                    -4,
-                    0
-                ]
-            }
-        ],
-        "carts": [
-            {
-                "type": "Train",
-                "location": [
-                    0,
-                    -1,
-                    true
-                ],
-                "chain": []
-            },
-            {
-                "type": "Wagon",
-                "location": [
-                    0,
-                    2,
-                    true
-                ],
-                "color": "#6AF",
-                "name": "blue"
             }
         ]
     },
@@ -1938,7 +1938,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "AMOUNT_TIME": 80,
+            "AMOUNT_TIME": 180,
             "GAME_MODE": "PlayAndEdit",
             "DESCRIPTION": "restore-path-and-pick-up-wagon",
             "task": ["connect", "finish"]
@@ -4375,7 +4375,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "AMOUNT_TIME": "100",
+            "AMOUNT_TIME": 160,
             "GAME_MODE": "PlayAndEdit",
             "DESCRIPTION": "pickup-wagon-passangers",
             "task": [

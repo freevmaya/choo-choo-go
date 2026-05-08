@@ -26,7 +26,7 @@ class Shop {
 	      <div class="basket empty">
 	        <div class="status" data-lang="basket">Корзина</div>
 	        <div class="list basket">
-	        	<div class="basket_placeholder">Выберите элемент выше</div>
+	        	<div class="basket_placeholder" data-lang="select-element"></div>
 				<div class="list-content">
 
 				</div>

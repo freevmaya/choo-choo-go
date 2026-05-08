@@ -398,6 +398,10 @@ body {
   background: #572781;
 }
 
+.new-title {
+  text-align: center;
+}
+
 #loss-game .stats-container > div {
   padding: 20px;
 }
@@ -553,10 +557,11 @@ body {
 
 .title-image {
   width: 120px;
-  height: 144px;
+  height: 120px;
   position: relative;
   background-repeat: no-repeat;
   background-size: contain;
+  background-position: center;
   margin: auto;
 }
 
@@ -1327,7 +1332,7 @@ body {
   background-position: bottom;
   aspect-ratio: 3 / 1;
   min-width: 300px;
-  padding-bottom: 0.5em;
+  margin-bottom: 0px;
 }
 
 [data-lang="game_over_title"] {

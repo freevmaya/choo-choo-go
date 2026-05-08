@@ -143,6 +143,9 @@ window.LANG_EN = {
     'status_victory': 'Victory',
     'status_loading': 'Loading',
     'remove-chain': 'Uncouple the wagon',
+    'select-element': 'Select an item above',
+    'yan': 'Yan',
+    'adv': 'Adv',
 
     'reboot': 'Reboot',
 

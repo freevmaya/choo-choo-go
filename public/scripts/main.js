@@ -736,7 +736,41 @@ if (!isDev())
           alpha: 0.3
         });
 
+        const rect = $('body')[0].getBoundingClientRect();
+
+        let effect = new SparkEffect({
+          /*
+          x: e.clientX,
+          y: e.clientY,
+          */
+          x: rect.width / 2,
+          y: rect.height / 2,
+          count: 7,
+          colors: ['#F6F', '#FF6', '#6FF', '#6F6'],
+          sizes: [5, 20],
+          speeds: [0, 0],
+          velocity: [0, 0],
+          gravity: 0,
+          baseRadius: 100,
+          lifetime: 500,
+          loop: true,
+          shape: ['star', 'circle'],
+          emissionTime: 3000,
+          /*className: 'star',*/
+          emissionType: 'random',
+          rectWidth : rect.width,
+          rectHeight: rect.height,
+          container: event.target,
+          rotation: {
+            enabled: true,
+            speed: [0, 45],
+            direction: 'random',
+            easing: false,
+          }
+        });
+
         let _onHide = () =>{
+          effect.stop();
           rainbow.stop();
           document.removeEventListener('hide.bs.modal', _onHide);
         }

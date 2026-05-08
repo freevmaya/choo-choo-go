@@ -12,18 +12,37 @@ function VictoryTest() {
 
 function sparkTest() {
 	$(document).on('click', (e) => {
-	  new SparkEffect({
-	    x: e.clientX,
-	    y: e.clientY,
-	    count: 10,
-	    colors: ['#F0F', '#F00', '#0F0', '#00F'],
-	    sizes: [4, 8],
-	    speeds: [0, 1],
-	    gravity: 0.04,
-	    baseRadius: 50,
-	    lifetime: 1000,
-	    className: 'star'
-	  });
+
+		const rect = $('body')[0].getBoundingClientRect();
+		new SparkEffect({
+			/*
+			x: e.clientX,
+			y: e.clientY,
+			*/
+			x: rect.width / 2,
+			y: rect.height / 2,
+			count: 5,
+			colors: ['#F8F', '#F66', '#6F6', '#66F'],
+			sizes: [5, 50],
+			speeds: [0, 0.2],
+			velocity: [0, 0],
+			gravity: 0,
+			baseRadius: 100,
+			lifetime: 4000,
+			loop: true,
+			shape: 'star',
+			emissionTime: 3000,
+			/*className: 'star',*/
+			emissionType: 'random',
+			rectWidth : rect.width,
+			rectHeight: rect.height,
+			rotation: {
+		        enabled: true,
+		        speed: [0, 60],
+		        direction: 'random',
+		        easing: false
+			}
+		});
 	});
 }
 
@@ -45,6 +64,10 @@ function DevKeySupport() {
 	  } else if (event.key === 'v' || event.key === 'V') {
 	  	
 	    window.game.gameState.set(GAME_STATE.VICTORY);
+
+	  } else if (event.key === 't' || event.key === 'T') {
+	  	
+	    window.game.showVictoryModal(0, 100, 'Warrior');
 
 	  } else if (event.key === 'c' || event.key === 'C') {
 	    
