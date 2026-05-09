@@ -134,46 +134,39 @@ class Ajax extends BaseAjax {
 
 	protected function vk_apiCall($data) {
 
-		if ($user_id = Page::getSession('user_id', 0)) {
+		$url = "https://api.vk.com/method/".$data['method'];
+		unset($data['method']);
 
-			$url = "https://api.vk.com/method/".$data['method'];
-			unset($data['method']);
+		$params = array_merge($data, [
+		    'access_token' => VK_APP_SERVER_SECRET,
+		    'v' => '5.199'
+		]);
 
-			if ($user = (new UserModel())->getItem($user_id)) {
+		// Инициализируем cURL
+		$ch = curl_init();
 
-				$params = array_merge($data, [
-				    'access_token' => VK_APP_SERVER_SECRET,
-				    'user_id' => $user['source_id'],
-				    'v' => '5.199'
-				]);
+		// Настройки cURL
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Для локальной разработки, на продакшене лучше true
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // Для локальной разработки
 
-				// Инициализируем cURL
-				$ch = curl_init();
+		// Выполняем запрос
+		$response = curl_exec($ch);
 
-				// Настройки cURL
-				curl_setopt($ch, CURLOPT_URL, $url);
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Для локальной разработки, на продакшене лучше true
-				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // Для локальной разработки
-
-				// Выполняем запрос
-				$response = curl_exec($ch);
-
-				// Проверяем на ошибки
-				if (curl_error($ch)) {
-				    trace_error('Ошибка cURL: ' . curl_error($ch)."\nParams: ".json_encode($params));
-				} else {
-				    $result = json_decode($response, true);
-				    
-				    if (isset($result['error'])) {
-				        trace_error('Ошибка API: ' . $result['error']['error_msg'] . ' (Код: ' . $result['error']['error_code'] . ')'."\nParams: ".json_encode($params));
-				    } else {
-				        return $result;
-				    }
-				}
-			}
+		// Проверяем на ошибки
+		if (curl_error($ch)) {
+		    trace_error('Ошибка cURL: ' . curl_error($ch)."\nParams: ".json_encode($params));
+		} else {
+		    $result = json_decode($response, true);
+		    
+		    if (isset($result['error'])) {
+		        trace_error('Ошибка API: ' . $result['error']['error_msg'] . ' (Код: ' . $result['error']['error_code'] . ')'."\nParams: ".json_encode($params));
+		    } else {
+		        return $result;
+		    }
 		}
 
 		Page::Wrong();

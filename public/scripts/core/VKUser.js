@@ -1,12 +1,18 @@
 const TITLE_MISSION_IDS = {
-
+	Novice: 0,
+	Warrior: 3,
+	Knight: 4,
+	Lord: 5,
+	Legend: 6
 };
+
 
 class VKUser {
 	constructor(game) {
 		this.game = game;
 		this.isOk = this.checkOk();
 		this.goods = [];
+		this.user_id = getParam('vk_ok_user_id') || getParam('vk_user_id');
 
 		PRICES.UNLOCK_LEVEL = 100;
 
@@ -143,7 +149,7 @@ class VKUser {
 
     	//eventBus.on('new_level', this.onNewLevel.bind(this));
     	//eventBus.on('new_score', this.onNewScore.bind(this));
-    	//eventBus.on('set_user_title', this.onNewTitle.bind(this));
+    	eventBus.on('set_user_title', this.onNewTitle.bind(this));
 	}
 
 	initPayments() {
@@ -216,6 +222,7 @@ class VKUser {
 				action: 'vk_apiCall',
 				data: {
 					method: 'secure.addAppEvent',
+					user_id: this.user_id,
 					activity_id: TITLE_MISSION_IDS[key]
 				}
 			}, (data)=>{

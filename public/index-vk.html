@@ -216,7 +216,6 @@
     vkBridge.send("VKWebAppInit", {})
       .then((response)=>{
         $(window).ready(()=>{
-          //console.log(response);
           window.game = new RailGame(VKStateManager);
           new VKUser(window.game);
 
