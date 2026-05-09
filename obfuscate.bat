@@ -20,6 +20,7 @@ xcopy ".\public\data" ".\prepare\mini\data" /E /I /Y /H /R
 xcopy ".\public\index.html" ".\prepare\yandex\index.html" /Y
 xcopy ".\public\scripts\main.mini.js" ".\prepare\yandex\scripts\main.mini.js" /Y
 xcopy ".\public\scripts\core\YaUser.js" ".\prepare\yandex\scripts\core\YaUser.js" /Y
+xcopy ".\public\scripts\core\YaStateManager.js" ".\prepare\yandex\scripts\core\YaStateManager.js" /Y
 xcopy ".\public\scripts\languages" ".\prepare\yandex\scripts\languages" /Y
 
 xcopy ".\public\images" ".\prepare\yandex\images" /E /I /Y /H /R

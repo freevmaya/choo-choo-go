@@ -1,5 +1,6 @@
+var ysdk;
 async function initSDK() {
-  let ysdk = await YaGames.init();
+  ysdk = await YaGames.init();
   if (ysdk) {
 
     $(window).ready(()=>{
@@ -10,10 +11,10 @@ async function initSDK() {
       ysdk.adv.showFullscreenAdv({
           callbacks: {
               onClose: (wasShown) => {
-                new YaUser(ysdk, window.game = new RailGame());
+                new YaUser(ysdk, window.game = new RailGame(YaStateManager));
               },
               onError: (error) => {
-                new YaUser(ysdk, window.game = new RailGame());
+                new YaUser(ysdk, window.game = new RailGame(YaStateManager));
               }
           }
       });
@@ -38,10 +39,6 @@ class YaUser {
         this.initPayments();
         this.initPaymentDialog();
       });
-  
-    ysdk.getPlayer().then(_player => {
-        this.player = _player;
-    });
 
     this.game.advProvider = () => {
         return new Promise((resolve, reject)=>{
@@ -72,6 +69,8 @@ class YaUser {
 
     this.initListener();
     this.ysdk.features.LoadingAPI?.ready();
+
+    this.processPurchases();
   }
 
   initListener() {
@@ -100,6 +99,25 @@ class YaUser {
 
   }
 
+  async handlePurchase(purchase, count=null) {
+    let g_item = this.goods.find(g => g.item_id == purchase.productID);
+    if (g_item) {
+        this.game.userScore(this.game.userScore() + (count == null) ? g_item.count : count);
+        await ysdk.payments.consumePurchase(purchase.purchaseToken);
+    }
+  }
+
+  async processPurchases() {
+    /*
+    const purchases = await this.ysdk.payments.getPurchases()
+      .then(purchases => purchases.forEach(consumePurchase));
+
+    for (let purchase of purchases) {
+        await handlePurchase(purchase);
+    }
+    */
+  }
+
   initPaymentDialog() {
     this.game.accountAddScore = (requireScore, text=null) => {
       return new Promise((resolve, reject) => {
@@ -114,6 +132,15 @@ class YaUser {
             buttons.push({
               caption: window.lang.get("yan"),
               callback: ()=>{
+                tracer.log(this.game.preparePurchases);
+                let g_item = this.goods.find(g => g.count >= requireScore);
+                ysdk.payments.purchase({ id: String(g_item.item_id) })
+                  .then((data)=>{
+                    tracer.log(data);
+                    this.game.toast.hide();
+                    this.handlePurchase(data, requireScore);
+                    resolve(true);
+                  });
               }
             });
           }
@@ -122,7 +149,17 @@ class YaUser {
         if (requireScore <= 100) {
           buttons.push({
             caption: window.lang.get("adv"),
-            callback: ()=>{}
+            callback: ()=>{
+              this.ysdk.adv.showRewardedVideo({
+                  callbacks: {
+                      onRewarded: () => {
+                        this.game.toast.hide();
+                        this.game.userScore(this.game.userScore() + requireScore);
+                        resolve(true);
+                      }
+                  }
+              });
+            }
           });
           /*
           buttons.push({

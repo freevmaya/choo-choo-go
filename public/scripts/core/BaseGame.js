@@ -202,23 +202,25 @@ class BaseGame {
     this.initModals();    
     this.initAudio();
 
-    if (!isDev()) {
+    //if (!isDev()) {
       $(window).on('blur', () => {
         this.gameState.pause();
       });
 
       $(window).on('focus', () => {
-        this.gameState.resume();
+        if (!this.currentModal)
+          this.gameState.resume();
       });
 
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
           this.gameState.pause();
         } else {
-          this.gameState.resume();
+          if (!this.currentModal)
+            this.gameState.resume();
         }
       });
-    }
+    //}
   }
 
   setState(name, value) {

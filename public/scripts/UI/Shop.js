@@ -80,6 +80,9 @@ class Shop {
 	onPayClick() {
 		
 		let spendScore = this.calcSpend();
+
+		this.game.preparePurchases = this.spend;
+		
 		this.game.spendScoreEndPay(spendScore)
 			.then((result)=>{
 				this.modal.hide();

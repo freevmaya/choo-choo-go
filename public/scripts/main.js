@@ -745,7 +745,7 @@ if (!isDev())
           */
           x: rect.width / 2,
           y: rect.height / 2,
-          count: 7,
+          count: 9,
           colors: ['#F6F', '#FF6', '#6FF', '#6F6'],
           sizes: [5, 20],
           speeds: [0, 0],
