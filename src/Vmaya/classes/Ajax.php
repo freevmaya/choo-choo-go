@@ -168,9 +168,8 @@ class Ajax extends BaseAjax {
 		        return $result;
 		    }
 		}
-		return $result;
 
-		//Page::Wrong();
+		Page::Wrong();
 	}
 }
 ?>
