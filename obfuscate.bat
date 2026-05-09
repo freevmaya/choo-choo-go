@@ -28,5 +28,10 @@ xcopy ".\public\styles" ".\prepare\yandex\styles" /E /I /Y /H /R
 xcopy ".\public\sounds" ".\prepare\yandex\sounds" /E /I /Y /H /R
 xcopy ".\public\data" ".\prepare\yandex\data" /E /I /Y /H /R
 
+git add .
+git commit -m "requlary"
+git push
+git pull
+
 echo Done!
 pause
