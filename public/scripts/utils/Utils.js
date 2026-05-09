@@ -135,7 +135,7 @@ async function Ajax(params, after = null, userData = null) {
 
     headers['X-Requested-With'] = 'XMLHttpRequest';
 
-    const request = new Request(document.location.origin + "?page=ajax", {
+    const request = new Request(window.location.href.replace(/[^/]*$/, '') + "?page=ajax", {
         method: "POST",
         headers: headers,
         body: formData
