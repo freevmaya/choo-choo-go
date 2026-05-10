@@ -9,13 +9,15 @@ class VKStateManager extends StateManager {
 		   value: value
 		  })
 		  .then((data) => { 
-		    if (data.result)
+		    if (data.result) 
 		      console.log(`State saved! Length data: ${value.length}`);
 		  })
 		  .catch((error) => {
 		  	super.saveStateLocale();
 		    console.log(error);
 		  });
+
+		 this.try_saveStateToServer();
 
         this.lastHash = this.getHash();
     }

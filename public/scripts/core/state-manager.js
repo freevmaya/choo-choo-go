@@ -102,22 +102,20 @@ class StateManager {
 
     saveStateServer() {
         if (this.state) {
-            if (this.config.use_server) {
-                Ajax({
-                    action: 'setUserState',
-                    data: this.state
-                })
-                .then((response)=>{
-                    if (!response) {
-                        this.config.use_server = false;
-                        this.saveStateLocale();
-                    }
-                })
-                .catch((e)=>{
+            Ajax({
+                action: 'setUserState',
+                data: this.state
+            })
+            .then((response)=>{
+                if (!response) {
                     this.config.use_server = false;
                     this.saveStateLocale();
-                });
-            } else this.saveStateLocale();
+                }
+            })
+            .catch((e)=>{
+                this.config.use_server = false;
+                this.saveStateLocale();
+            });
             this.lastHash = this.getHash();
         }
     }

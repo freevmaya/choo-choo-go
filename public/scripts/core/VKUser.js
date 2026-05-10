@@ -8,7 +8,9 @@ const TITLE_MISSION_IDS = {
 
 
 class VKUser {
-	constructor(game) {
+	constructor(game, options = {}) {
+
+		this.options = {...this.defaultOptions(), ...options};
 		this.game = game;
 		this.isOk = this.checkOk();
 		this.goods = [];
@@ -121,7 +123,33 @@ class VKUser {
 				tracer.log(error);
 			});
 
+		if (this.options.useServer)
+			vkBridge.send('VKWebAppGetUserInfo', {})
+				.then(((user) => { 
+					if (user) {
+						Ajax({
+							action: 'initUser',
+							data: {
+								source_id: this.user_id,
+								source: this.isOk ? 'ok' : 'vk',
+								user_data:  user
+							}
+						}).then((data)=>{
+							if (data) {
+								if (data.redirect)
+									document.location.href = data.redirect;
+							} else this.options.useServer = false;
+						});
+					}
+				}).bind(this));
+
 	  	this.initListeners();
+	}
+
+	defaultOptions() {
+		return {
+			useServer: true
+		}
 	}
 
 	initListeners() {
