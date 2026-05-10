@@ -149,7 +149,7 @@ async function Ajax(params, after = null, userData = null) {
         const response = await fetch(request);
         if (!response.ok) {
             let json_data = JSON.stringify(formData);
-            throw new Error(`Response status: ${response.status}, url: ${url}, data: ${json_data}`);
+            throw new Error(`Response status: ${response.status}, url: ${url}, params: ${params}`);
         }
 
         if (response.headers.has('Server-Time'))
