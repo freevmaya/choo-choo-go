@@ -220,7 +220,8 @@ class BaseGame {
   }
 
   beforeExternal() {
-      this.gameState.pause();
+    this.gameState.pause();
+    this.soundManager.setMuted(true);
   }
 
   afterExternal() {

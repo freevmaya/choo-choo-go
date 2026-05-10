@@ -87,8 +87,10 @@ class VKUser {
           		buttons.push({
 	                caption: "За друга",
 	                callback: ()=>{
+						this.game.beforeExternal();
 	                	vkBridge.send('VKWebAppGetFriends')
-						  .then((data) => { 
+						  .then((data) => {  
+							this.game.afterExternal();
 						    if (data && (data.users.length > 0)) {
 						  		this.game.toast.hide();
 
@@ -97,7 +99,8 @@ class VKUser {
 								resolve(true);
 						    }
 						  })
-						  .catch((error) => { 
+						  .catch((error) => {  
+							this.game.afterExternal();
 						    console.log(error);
 						  });
 	                }
