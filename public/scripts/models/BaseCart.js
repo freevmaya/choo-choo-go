@@ -20,7 +20,74 @@ class BaseCart extends BaseGameObject {
         this.weight = this.defaultWeight();
         this.resetTrackPos();
         this.updateMaxVelocity();
+
+        this.initListeners();
         return this;
+    }
+
+    initListeners() {
+
+        if (!this.data.noDrag) {
+            eventBus.on('gameObject:down', this._onGaDown = this.onGaDown.bind(this));
+            eventBus.on('gameObject:up', this._onGaUp = this.onGaUp.bind(this));
+            this.game.container.on('mouseleave', this._onMouseLeave = this.onMouseLeave.bind(this));
+            $(window).on('blur', this._onMouseLeave);
+        }
+    }
+
+    beginDrag(pos) {
+
+        let train = this.headTrain();
+        if (train) {
+            this.game.cameraController.setEnable(false);
+            this.startDragPoint = this.game.raycasterManager.getIntersectionWithPlane(pos.x, pos.y, this.getPosition());
+            this.isDrag = true;
+            train.State('braking'); 
+        }
+    }
+
+    endDrag(pos) {
+
+        let train = this.headTrain();
+        if (this.isDrag && pos && train) {
+            this.game.cameraController.setEnable(true);
+            this.isDrag = false;
+            let endDragPoint = this.game.raycasterManager.getIntersectionWithPlane(pos.x, pos.y, this.getPosition());
+            let direct = endDragPoint.clone().sub(this.startDragPoint);
+
+            if (!['boarding'].includes(train.State())) {
+                if (direct.length() > 0.2) {
+                    let forward = new THREE.Vector3();
+                    this.model.getWorldDirection(forward);
+
+                    this.max_velocity = Math.max(this.game.getMaxVelocity() * Math.min(1, direct.length() / 1.2),this.getConst('MIN_VELOCITY'));
+
+                    train.setForward(direct.dot(forward) < 0);
+                    train.State('run');
+                    eventBus.emit(this.getUserActionEvent(0), this);
+                }
+            } else eventBus.emit('toast', 'wrong_boarding');
+        }
+    }
+
+    onGaDown(data) {
+
+        if (this.game.isPlaying()) {
+            if (data.intersects.find((i)=>{
+                return i.object.userData.gameObject == this;
+            }))
+                this.beginDrag(data.pos);
+        }
+    }
+
+    onGaUp(data) {
+        if (this.isDrag) 
+            this.endDrag(data.pos);
+    }
+
+    onMouseLeave(data) {
+        if (this.isDrag) 
+            this.endDrag(data.pos);
     }
 
     resetTrackPos() {
@@ -346,6 +413,13 @@ class BaseCart extends BaseGameObject {
             if (idx > -1)
                 t.carts.splice(idx, 1);
         })
+
+        if (!this.data.noDrag) {
+            eventBus.off('gameObject:down', this._onGaDown);
+            eventBus.off('gameObject:up', this._onGaUp);
+            this.game.container.off('mouseleave', this._onMouseLeave);
+            $(window).off('blur', this._onMouseLeave);
+        }
 
         this.deChain();
         super.dispose();

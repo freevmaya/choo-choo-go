@@ -2432,7 +2432,14 @@ var GAME_PARAMS = {
             "RIM_LIGHT_INTENSITY": 0.6,
             "DESCRIPTION": "red-green-level-description",
             "GAME_MODE": "Play",
-            "task": ['magenta', 'blue', 'green', 'red']
+            "task": ['magenta', 'blue', 'green', 'red'],
+            "expect": [
+                {
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
+                }
+            ]
         },
         "items": [
             {
@@ -3299,6 +3306,13 @@ var GAME_PARAMS = {
             "task": [
                 "brown",
                 "blue"
+            ],
+            "expect": [
+                {
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
+                }
             ]
         },
         "items": [
@@ -3634,6 +3648,13 @@ var GAME_PARAMS = {
                 "red",
                 "green",
                 "blue"
+            ],
+            "expect": [
+                {
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
+                }
             ]
         },
         "items": [
@@ -4809,6 +4830,13 @@ var GAME_PARAMS = {
                 "purple-delivered",
                 "cyan-delivered",
                 "pink-delivered"
+            ],
+            "expect": [
+                {
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
+                }
             ]
         },
         "items": [
@@ -6337,7 +6365,14 @@ var GAME_PARAMS = {
             "AMOUNT_TIME": 260,
             "DESCRIPTION": "repare-way-and-place-wagons",
             "GAME_MODE": "Play",
-            "task": ["green", "red"]
+            "task": ["green", "red"],
+            "expect": [
+                {
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
+                }
+            ]
         },
         "items": [
             {
@@ -7489,6 +7524,13 @@ var GAME_PARAMS = {
                 "blue",
                 "pickup",
                 "unload"
+            ],
+            "expect": [
+                {
+                    "event": "created-game-objects",
+                    "element": "span[data-lang=\"shop\"]",
+                    "animClass": "pushAnimUp"
+                }
             ]
         },
         "items": [
