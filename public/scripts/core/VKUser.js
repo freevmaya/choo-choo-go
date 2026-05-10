@@ -139,7 +139,7 @@ class VKUser {
 						Ajax({
 							action: 'initUser',
 							data: {
-								//source_id: this.user_id,
+								source_id: this.user_id,
 								source: this.isOk ? 'ok' : 'vk',
 								user_data:  user
 							}
