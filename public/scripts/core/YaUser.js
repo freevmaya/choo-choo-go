@@ -133,11 +133,7 @@ class YaUser {
                 ysdk.payments.purchase({ id: String(g_item.item_id) })
                   .then((data)=>{
                     this.game.toast.hide();
-
-                    /*
-                    Изображаем ошибку платежа
                     this.handlePurchase(data, requireScore);
-                    */
                     resolve(true);
                   });
               }
