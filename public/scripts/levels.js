@@ -2,6 +2,410 @@
 var GAME_PARAMS = {
     "START": {
         "ENV": {
+            "BACKGROUND_COLOR": "#66EEAA",
+            "GROUND_COLOR": "#66EEAA",
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": "PlayAndEdit",
+            "DESCRIPTION": "three-wagon-description",
+            "task": [
+                "finish"
+            ]
+        },
+        "items": [
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -3,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    0,
+                    2,
+                    0
+                ],
+                "taskName": "finish",
+                "title": "finish"
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -2,
+                    0
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -1,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -1,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    -5,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Train",
+                "location": [
+                    0,
+                    -3,
+                    false
+                ],
+                "expect": ["created-game-objects:0:rightMoveAnim"]
+            }
+        ]
+    },
+    "START-1": {
+        "ENV": {
+            "BACKGROUND_COLOR": "#AA66AA",
+            "GROUND_COLOR": "#AA66AA",
+            "KEY_LIGHT_COLOR": 16777215,
+            "RIM_LIGHT_COLOR": 8490232,
+            "FILL_LIGHT_COLOR": 6529416,
+            "AMBIENT_LIGHT_INTENSITY": 1,
+            "KEY_LIGHT_INTENSITY": 150,
+            "FILL_LIGHT_INTENSITY": 2,
+            "RIM_LIGHT_INTENSITY": 0.6,
+            "GAME_MODE": "PlayAndEdit",
+            "DESCRIPTION": "three-wagon-description",
+            "task": [
+                "finish"
+            ]
+        },
+        "items": [
+            {
+                "type": "EndTrack",
+                "location": [
+                    0,
+                    -3,
+                    2
+                ]
+            },
+            {
+                "type": "PointTrack",
+                "location": [
+                    0,
+                    2,
+                    0
+                ],
+                "taskName": "finish",
+                "title": "finish"
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "ForkRStTrack",
+                "location": [
+                    0,
+                    -1,
+                    0
+                ],
+                "expect": [
+                    "created-game-objects:0:pushAnim"
+                ],
+                "user_action_event": ["user-set-current-path-1"]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    0,
+                    1,
+                    0
+                ]
+            },
+            {
+                "type": "CurvedTrack",
+                "location": [
+                    -1,
+                    -1,
+                    2
+                ]
+            },
+            {
+                "type": "StraightTrack",
+                "location": [
+                    -1,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "EndTrack",
+                "location": [
+                    -1,
+                    1,
+                    0
+                ]
+            }
+        ],
+        "objects": [
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -2,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -2,
+                    -1,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -1,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    4,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    -1,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    0,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "SimpleTree",
+                "location": [
+                    1,
+                    -5,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    0,
+                    0
+                ]
+            },
+            {
+                "type": "DeciduousTree",
+                "location": [
+                    -3,
+                    1,
+                    0
+                ]
+            }
+        ],
+        "carts": [
+            {
+                "type": "Train",
+                "location": [
+                    0,
+                    -3,
+                    false
+                ],
+                "expect": [
+                    "user-set-current-path-1:0:rightMoveAnim"
+                ]
+            }
+        ]
+    },
+    "START-2": {
+        "ENV": {
             "BACKGROUND_COLOR": 12303359,
             "GROUND_COLOR": 8930389,
             "KEY_LIGHT_COLOR": 16777215,
@@ -244,7 +648,7 @@ var GAME_PARAMS = {
             }
         ]
     },
-    "START-1": {
+    "START-3": {
         "ENV": {
             "BACKGROUND_COLOR": "#88AAAA",
             "GROUND_COLOR": "#88AAAA",
@@ -467,7 +871,7 @@ var GAME_PARAMS = {
             }
         ]
     },
-    "START-2": {
+    "START-4": {
         "ENV": {
             "BACKGROUND_COLOR": "#88AAAA",
             "GROUND_COLOR": "#88AAAA",
