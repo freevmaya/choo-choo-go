@@ -110,7 +110,7 @@ class YaUser {
     const purchases = await this.ysdk.payments.getPurchases();
 
     for (let purchase of purchases) {
-        await handlePurchase(purchase);
+        await this.handlePurchase(purchase);
     }
   }
 
