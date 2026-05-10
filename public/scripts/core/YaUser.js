@@ -69,7 +69,6 @@ class YaUser {
 
     this.initListener();
     this.ysdk.features.LoadingAPI?.ready();
-
     this.processPurchases();
   }
 
@@ -108,14 +107,11 @@ class YaUser {
   }
 
   async processPurchases() {
-    /*
-    const purchases = await this.ysdk.payments.getPurchases()
-      .then(purchases => purchases.forEach(consumePurchase));
+    const purchases = await this.ysdk.payments.getPurchases();
 
     for (let purchase of purchases) {
         await handlePurchase(purchase);
     }
-    */
   }
 
   initPaymentDialog() {
