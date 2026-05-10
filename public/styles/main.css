@@ -475,6 +475,8 @@ body {
   align-items: center;
 }
 
+
+
 .with-actor {
   margin-left: 50px;
 }
@@ -1345,6 +1347,10 @@ body {
   padding-bottom: 0.5em;
 }
 
+.modal-content [data-lang="app_name"] {
+  padding-left: 40px;
+}
+
 .stars {
   background-image: url(images/stars.png);
   background-repeat: no-repeat;
@@ -1634,7 +1640,7 @@ body {
   margin-top: 5px;
 }
 
-.show .info {
+.info {
   display: flex;
   justify-content: space-between;
   gap: 10px;
