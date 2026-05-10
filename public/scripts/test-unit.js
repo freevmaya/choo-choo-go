@@ -67,8 +67,8 @@ function DevKeySupport() {
 
 	  } else if (event.key === 't' || event.key === 'T') {
 	  	
-	    //window.game.showVictoryModal(0, 100, 'Warrior');
-	    eventBus.emit('set_user_title', 'Warrior');
+	    window.game.showVictoryModal(0, 100, 'Warrior');
+	    //eventBus.emit('set_user_title', 'Warrior');
 
 	  } else if (event.key === 'c' || event.key === 'C') {
 	    
