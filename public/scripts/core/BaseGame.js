@@ -204,23 +204,28 @@ class BaseGame {
 
     //if (!isDev()) {
       $(window).on('blur', () => {
-        this.gameState.pause();
+        this.beforeExternal();
       });
 
       $(window).on('focus', () => {
-        if (!this.currentModal)
-          this.gameState.resume();
+        this.afterExternal();
       });
 
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-          this.gameState.pause();
-        } else {
-          if (!this.currentModal)
-            this.gameState.resume();
-        }
+          this.beforeExternal();
+        } else this.afterExternal();
       });
     //}
+  }
+
+  beforeExternal() {
+      this.gameState.pause();
+  }
+
+  afterExternal() {
+    if (!this.currentModal)
+      this.gameState.resume();
   }
 
   setState(name, value) {

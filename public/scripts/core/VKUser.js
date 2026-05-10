@@ -40,6 +40,7 @@ class VKUser {
 	          		buttons.push({
 		                caption: this.isOk ? "Оки" : "Голоса",
 		                callback: ()=>{
+							this.game.beforeExternal();
 		                	vkBridge.send('VKWebAppShowOrderBox', 
 								{ 
 									type: 'item',
@@ -48,10 +49,12 @@ class VKUser {
 								.then( (data) => {
 								  	this.game.toast.hide();
 									this.game.userScore(this.game.userScore() + requireScore);
+									this.game.afterExternal();
 									resolve(true);
 								}) 
 								.catch( (e) => {
 									console.log('Ошибка!', e);
+									this.game.afterExternal();
 								});
 		                }
 					});
@@ -62,19 +65,22 @@ class VKUser {
           		buttons.push({
 	                caption: "Реклама",
 	                callback: ()=>{
+						this.game.beforeExternal();
 	                	vkBridge.send('VKWebAppShowNativeAds', {
-						  ad_format: 'reward'
-						  })
-						  .then( (data) => {
-						    if (data.result) {
-						  		this.game.toast.hide();
-						    	this.game.userScore(this.game.userScore() + requireScore);
-						    	resolve(true);
-						    }
-						  })
-						  .catch((error) => { 
-						  	console.log(error); 
-						  });
+							ad_format: 'reward'
+							})
+							.then( (data) => {
+								this.game.afterExternal();
+								if (data.result) {
+										this.game.toast.hide();
+									this.game.userScore(this.game.userScore() + requireScore);
+									resolve(true);
+								}
+							})
+							.catch((error) => { 
+								this.game.afterExternal();
+								console.log(error); 
+							});
 	                }
 	              });
 
@@ -297,15 +303,18 @@ class VKUser {
 	showAd() {
 		return new Promise((resolve, reject) => {
 			if (this.haveAdv) { 
+				this.game.beforeExternal();
 				vkBridge.send('VKWebAppShowNativeAds', {
 					ad_format: 'interstitial' /* Тип рекламы */
 				})
 				.then((data) => { 
 					// Реклама была показана
+					this.game.afterExternal();
 					resolve(data.result)
 				})
 				.catch((error) => { 
 					tracer.log(error);
+					this.game.afterExternal();
 					resolve(false);
 				});
 			} else resolve(false);
