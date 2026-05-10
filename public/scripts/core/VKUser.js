@@ -135,6 +135,8 @@ class VKUser {
 								user_data:  user
 							}
 						}).then((data)=>{
+
+							this.initialized_on_server = true;
 							if (data) {
 								if (data.redirect)
 									document.location.href = data.redirect;

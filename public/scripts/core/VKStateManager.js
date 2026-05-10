@@ -34,8 +34,9 @@ class VKStateManager extends StateManager {
 		  	super.saveStateLocale();
 		    console.log(error);
 		  });
-
-		this.try_saveStateToServer();
+		
+		if (window.user.initialized_on_server)
+			this.try_saveStateToServer();
 
         this.lastHash = this.getHash();
     }
