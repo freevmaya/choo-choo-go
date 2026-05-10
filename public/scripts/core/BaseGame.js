@@ -1137,3 +1137,9 @@ class BaseGame {
 }
 
 const bootstrap = window.bootstrap;
+
+if (typeof structuredClone !== 'function') {
+    window.structuredClone = function(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    };
+}
