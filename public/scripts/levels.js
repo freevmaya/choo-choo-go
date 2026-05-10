@@ -11,7 +11,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "PlayAndEdit",
+            "GAME_MODE": "Play",
             "DESCRIPTION": "start-description",
             "task": [
                 "finish"
@@ -206,7 +206,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "PlayAndEdit",
+            "GAME_MODE": "Play",
             "DESCRIPTION": "start-description",
             "task": [
                 "finish"
@@ -659,7 +659,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "PlayAndEdit",
+            "GAME_MODE": "Play",
             "DESCRIPTION": "three-wagon-description",
             "task": [
                 "blue",
@@ -882,7 +882,7 @@ var GAME_PARAMS = {
             "KEY_LIGHT_INTENSITY": 150,
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
-            "GAME_MODE": "PlayAndEdit",
+            "GAME_MODE": "Play",
             "DESCRIPTION": "three-wagon-description",
             "task": [
                 "blue",
