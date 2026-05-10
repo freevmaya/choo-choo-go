@@ -645,7 +645,7 @@ class BaseGame {
     this.victoryModal = d.modal;
       
     // Обработчик для кнопки рестарта в Victory
-    btnOnClick(this.victoryModalElement.find('.btn'), this.doNextLevel.bind(this));
+    btnOnClick(this.victoryModalElement.find('.btn'), this.doNextLevel.bind(this), 0);
     
     // Обработчик для закрытия модального окна
     this.victoryModalElement.on('hidden.bs.modal', () => {
@@ -844,7 +844,8 @@ class BaseGame {
     // Обновляем статистику в модальном окне победы
     const victoryScoreElement = this.victoryModalElement.find('#victoryScore');
 
-    this.waitBtn(this.victoryModalElement.find('.victoryRestartButton'), 3);    
+    let restartBtn = this.victoryModalElement.find('.victoryRestartButton');
+    this.waitBtn(restartBtn, 3);    
 
     let newTitleElem = this.victoryModalElement.find('.new-title');
     if (newTitle) {

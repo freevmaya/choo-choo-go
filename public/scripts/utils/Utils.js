@@ -216,16 +216,18 @@ function onAllImagesLoaded(callback, includeCSS = true, includeImg = true) {
 }
 
 function btnOnClick(selector, onClick, wait = 3000) {
-  const btn = $(selector);
-  if (btn.length > 0) {
+    const btn = $(selector);
     btn.on('click', () => {
-      btn[0].disabled = true;
-      setTimeout(()=>{
-        btn[0].disabled = false;
-      }, wait);
-      onClick();
+        if (wait <= 0)
+            btn[0].disabled = true;
+        else {
+            btn[0].disabled = true;
+            setTimeout(()=>{
+                btn[0].disabled = false;
+            }, wait);
+        }
+        onClick();
     });
-  }
 }
 
 function delayAnimation(ms, callback) {
