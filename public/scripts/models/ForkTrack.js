@@ -146,9 +146,9 @@ class ForkTrack extends BaseCurveTrack {
         this._updateHandle();
 
         if (this.relPath1)
-            groupTransparent(this.relPath1, this._currentPath == 0 ? 1 : 0.4);
+            groupTransparent(this.relPath1, this._currentPath == 0 ? 1 : 0.3);
         if (this.relPath2)
-            groupTransparent(this.relPath2, this._currentPath == 1 ? 1 : 0.4);
+            groupTransparent(this.relPath2, this._currentPath == 1 ? 1 : 0.3);
     }
 }
 registerClass(ForkTrack);
