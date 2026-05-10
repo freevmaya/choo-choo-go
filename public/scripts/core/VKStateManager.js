@@ -1,6 +1,24 @@
 
 class VKStateManager extends StateManager {
 
+	constructor(config, defaultStage = {}) {
+		super(config, defaultStage);
+		this.config.useServerState = true;
+
+		this.try_saveStateToServer = debounce(()=>{
+            if (this.config.useServerState && window.user.user_id) {
+				Ajax({
+		            action: 'setUserState',
+		            source_id: window.user.user_id,
+		            data: this.state
+		        })
+		        .catch((e)=>{
+		        	this.config.useServerState = false;
+		        })
+			}
+        }, 2000);
+	}
+
     saveStateLocale() {
 
     	let value = JSON.stringify(this.state);
@@ -17,7 +35,7 @@ class VKStateManager extends StateManager {
 		    console.log(error);
 		  });
 
-		 this.try_saveStateToServer();
+		this.try_saveStateToServer();
 
         this.lastHash = this.getHash();
     }

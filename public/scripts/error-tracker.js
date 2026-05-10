@@ -135,7 +135,12 @@ const ErrorTracker = {
                 await Ajax({
                     action: 'addError',
                     data: itm
-                }).catch(error => {
+                })
+                .then(data=>{
+                    if (!data)
+                        this.serverNoAvailable = true;
+                })
+                .catch(error => {
                     this.serverNoAvailable = true;
                 });;
             });

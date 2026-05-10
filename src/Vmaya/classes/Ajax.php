@@ -19,6 +19,17 @@ class Ajax extends BaseAjax {
 		return $result;
 	}
 
+	function getUserId() {
+
+		if (!($user_id = Page::getSession('user_id')) && ($source_id = Page::getRequest('source_id'))) {
+			if ($user = (new UserModel())->getItem($source_id, 'source_id')) {
+				$user_id = $user['id'];
+			}
+		}
+
+		return $user_id;
+	}
+
 	protected function initUser($data) {
 		GLOBAL $dbp;
 
@@ -92,7 +103,7 @@ class Ajax extends BaseAjax {
 	protected function getUserState($data) {
 		GLOBAL $_SESSION;
 		
-		if ($user_id = Page::getSession('user_id')) {
+		if ($user_id = $this->getUserId()) {
     		if ($stateItem = (new UserStateModel())->getItem($user_id, 'user_id')) {
     			
     			if ($json_data = trim($stateItem['data']))
@@ -108,12 +119,14 @@ class Ajax extends BaseAjax {
 	}
 
 	protected function setUserState($data) {
-		if ($user_id = Page::getSession('user_id')) {
-			$data = json_encode($data, JSON_FLAGS);
+		
+
+		if ($user_id = $this->getUserId()) {
+			$user_data = json_encode($data, JSON_FLAGS);
 			return [
 				'success'=> ((new UserStateModel())->Update([
 					    			'user_id'=>$user_id,
-					    			'data' => $data
+					    			'data' => $user_data
 					    		], 'user_id')) ? true : false
 			];
 		} 
@@ -126,7 +139,7 @@ class Ajax extends BaseAjax {
 			unset($data['id']);
 
 		$data['col'] = isset($data['column']) ? intval($data['column']) : 0;
-		$data['user_id'] = Page::getSession('user_id', 0);
+		$data['user_id'] = $this->getUserId() || 0;
 		return [
 			'success'=> $model->Update($data) ? true : false
 		];
