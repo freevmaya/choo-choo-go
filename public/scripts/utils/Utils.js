@@ -135,7 +135,8 @@ async function Ajax(params, after = null, userData = null) {
 
     headers['X-Requested-With'] = 'XMLHttpRequest';
 
-    const request = new Request(window.location.href.replace(/[^/]*$/, '') + "?page=ajax", {
+    let url = window.location.href.replace(/[^/]*$/, '') + "?page=ajax";
+    const request = new Request(url, {
         method: "POST",
         headers: headers,
         body: formData
@@ -147,7 +148,8 @@ async function Ajax(params, after = null, userData = null) {
 
         const response = await fetch(request);
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
+            let json_data = JSON.stringify(formData);
+            throw new Error(`Response status: ${response.status}, url: ${url}, data: ${json_data}`);
         }
 
         if (response.headers.has('Server-Time'))
