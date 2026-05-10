@@ -224,8 +224,10 @@ class BaseGame {
   }
 
   afterExternal() {
-    if (!this.currentModal)
+    if (!this.currentModal) 
       this.gameState.resume();
+
+    this.soundManager.setMuted(false);
   }
 
   setState(name, value) {
