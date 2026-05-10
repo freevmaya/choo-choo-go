@@ -12,7 +12,7 @@ var GAME_PARAMS = {
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "PlayAndEdit",
-            "DESCRIPTION": "three-wagon-description",
+            "DESCRIPTION": "start-description",
             "task": [
                 "finish"
             ]
@@ -207,7 +207,7 @@ var GAME_PARAMS = {
             "FILL_LIGHT_INTENSITY": 2,
             "RIM_LIGHT_INTENSITY": 0.6,
             "GAME_MODE": "PlayAndEdit",
-            "DESCRIPTION": "three-wagon-description",
+            "DESCRIPTION": "start-description",
             "task": [
                 "finish"
             ]
