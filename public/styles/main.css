@@ -402,6 +402,7 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 10px;
+  padding: 10px;
 }
 
 #victory .rays::before {
@@ -416,7 +417,8 @@ body {
   background-position: center;
   animation: rotateBg 10s linear infinite;
   z-index: 0;
-  opacity: 0.5; /* степень прозрачности */
+  opacity: 0.5;
+  filter: hue-rotate(40deg);
 }
 
 #victory .rays > * {
