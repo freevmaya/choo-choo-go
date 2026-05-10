@@ -132,9 +132,12 @@ class YaUser {
                 let g_item = this.goods.find(g => g.count >= requireScore);
                 ysdk.payments.purchase({ id: String(g_item.item_id) })
                   .then((data)=>{
-                    tracer.log(data);
                     this.game.toast.hide();
+
+                    /*
+                    Изображаем ошибку платежа
                     this.handlePurchase(data, requireScore);
+                    */
                     resolve(true);
                   });
               }
