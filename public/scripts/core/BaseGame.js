@@ -627,19 +627,22 @@ class BaseGame {
         <div class="frame padding actor-2">
         </div>
       </div>
-      <div class="modal-subtitle status" data-lang="victory_title"></div>
-      <div class="stars"></div>
-      <div class="new-title" data-lang="new_rank"></div>
-      <div class="stats-container victory-stats shine">
-        <div>
-          <div class="stat-value" id="victoryScore">0</div>
-          <div class="stat-label" data-lang="victory_score"></div>
+      <div class="rays">
+        <div class="modal-subtitle status" data-lang="victory_title"></div>
+        <div class="stars"></div>
+        <div class="new-title" data-lang="new_rank"></div>
+        <div class="stats-container victory-stats shine">
+          <div>
+            <div class="stat-value" id="victoryScore">0</div>
+            <div class="stat-label" data-lang="victory_score"></div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <button type="button" class="btn victoryRestartButton" data-lang="victory_button"></button>
         </div>
       </div>
-
-      <div class="text-center">
-        <button type="button" class="btn victoryRestartButton" data-lang="victory_button"></button>
-      </div>`, 'victory');
+    `, 'victory');
     
     this.victoryModalElement = d.dialog;
     this.victoryModal = d.modal;

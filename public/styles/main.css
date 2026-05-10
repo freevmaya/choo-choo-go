@@ -398,6 +398,41 @@ body {
   background: #572781;
 }
 
+#victory .rays {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+#victory .rays::before {
+  content: '';
+  position: absolute;
+  top: -25%;
+  left: -25%;
+  width: 150%;
+  height: 150%;
+  background-image: url(images/rays.jpg);
+  background-size: cover;
+  background-position: center;
+  animation: rotateBg 10s linear infinite;
+  z-index: 0;
+  opacity: 0.5; /* степень прозрачности */
+}
+
+#victory .rays > * {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes rotateBg {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .new-title {
   text-align: center;
 }
@@ -721,6 +756,7 @@ body {
   margin-top: -50px;
   margin-left: -50px;
   box-shadow: 2px 2px 6px black;
+  z-index: 100;
 }
 
 .actor-icon .frame {
