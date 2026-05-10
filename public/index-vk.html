@@ -184,32 +184,27 @@
   <script src="./scripts/bootstrap.bundle.min.js"></script>
   <script src="./scripts/three.min.js"></script>
   <script src="./scripts/main.mini.js?v=96"></script>
+  <script src="./scripts/error-tracker.js?v=96"></script>
   <script src="./scripts/core/VKUser.js?v=96"></script>
   <script src="./scripts/core/VKStateManager.js?v=96"></script>
   
   <script>
+    ErrorTracker.init({
+      version: 96,
+      user_id: getParam('ok_vk_user_id') || getParam('vk_user_id'),
+      excludeDomains: [
+          'yandex',
+          'google',
+          'example.org'
+        ]
+    });
     var DEV = hasParam('dev');
     if (DEV) {
-      
-
-      var tracer = {
-          log(...arguments) {
-              console.log(...arguments);
-          },
-          error(...arguments) {
-              console.error(...arguments);
-          }
-      }
       loadScript('./scripts/test-unit.js');
       loadScript('./scripts/utils/DevTools.js');
       loadScript('https://cdn.jsdelivr.net/npm/eruda', ()=>{
         eruda.init();
       });
-    } else {
-      var tracer = {
-          log(...arguments) {},
-          error(...arguments) {}
-      }
     }
 
     
@@ -218,7 +213,7 @@
         $(window).ready(()=>{
           window.game = new RailGame(VKStateManager);
           new VKUser(window.game);
-
+          sadsad 
         });
       });
   </script>
