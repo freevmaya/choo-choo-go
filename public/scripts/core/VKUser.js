@@ -209,7 +209,7 @@ class VKUser {
 		});
 
 
-    	//eventBus.on('new_level', this.onNewLevel.bind(this));
+    	eventBus.on('new_level', this.onNewLevel.bind(this));
     	//eventBus.on('new_score', this.onNewScore.bind(this));
     	eventBus.on('set_user_title', this.onNewTitle.bind(this));
 	}
@@ -253,16 +253,8 @@ class VKUser {
 	}
 
 	onNewLevel(level) {
-		Ajax({
-			action: 'vk_apiCall',
-			data: {
-				method: 'secure.addAppEvent',
-				activity_id: 1,
-				value: level
-			}
-		}, (data)=>{
-			tracer.log(data);
-		});
+		if (level > 1)
+			bridge.send('VKWebAppAddToFavorites');
 	}
 
 	onNewScore(value) {
