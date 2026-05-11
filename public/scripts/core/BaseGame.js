@@ -723,7 +723,7 @@ class BaseGame {
         });
   }
 
-  _showLeaders(list) {
+  _showLeaders(data) {
       tracer.log(data);
 
       let layer = this.lidersModalElement.find('.list');
