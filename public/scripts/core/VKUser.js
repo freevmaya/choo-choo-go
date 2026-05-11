@@ -323,4 +323,15 @@ class VKUser {
 			} else resolve(false);
 		});
 	}
+
+	getLeaders() {
+		return new Promise((resolve, reject) => {
+		    Ajax({
+		      action: 'getLeaders',
+		      source: this.isOk ? 'ok' : 'vk'
+		    }, (data)=>{
+		      resolve(data);
+		    });
+		});
+	}
 }

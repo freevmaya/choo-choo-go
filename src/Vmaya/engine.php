@@ -25,7 +25,7 @@
 	define('APP_NAME', 'Тренажер английского языка');
 	define('SITE_NAME', 'English Phrases Trainer');
 
-	define('DEVUSERS', [1]);
+	define('DEVUSERS', [1, 57]);
 	define('DEVUSER', 52);
 	define("JSON_FLAGS", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT);
 

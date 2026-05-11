@@ -715,7 +715,32 @@ class BaseGame {
   }
 
   showLidersModal() {
-    this.lidersModal.show();
+
+    if (window.user)
+      window.user.getLeaders()
+        .then((list)=>{
+          this._showLeaders(list);
+        });
+  }
+
+  _showLeaders(list) {
+      tracer.log(data);
+
+      let layer = this.lidersModalElement.find('.list');
+      layer.empty();
+
+      data.forEach(l => {
+        let item = $(`
+        <div class="item user">
+          <div class="avatar" style="background-image: url(${l.avatar})"></div>
+          <div class="name"></div>
+          <div class="title"></div>
+          <div class="score"></div>
+        </div>`);
+
+        layer.append(item);
+      });
+      this.lidersModal.show();
   }
 
   shopItems() {

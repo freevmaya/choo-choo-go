@@ -65,34 +65,6 @@ class RailGame extends BaseGame {
       }, 1000);
   }
 
-  showLidersModal() {
-    Ajax({
-      action: 'getLeaders'
-    }, (data)=>{
-      this._showLeaders(data);
-    });
-  }
-
-  _showLeaders(list) {
-      tracer.log(data);
-
-      let layer = this.lidersModalElement.find('.list');
-      layer.empty();
-
-      data.forEach(l => {
-        let item = $(`
-        <div class="item user">
-          <div class="avatar" style="background-image: url(${l.avatar})"></div>
-          <div class="name"></div>
-          <div class="title"></div>
-          <div class="score"></div>
-        </div>`);
-
-        layer.append(item);
-      });
-      this.lidersModal.show();
-  }
-
   saveCustom() {
     let data = {
       items: this.items.items.map(item => (item.toSaveData())),

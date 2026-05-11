@@ -96,6 +96,8 @@ class Ajax extends BaseAjax {
     			$result['redirect'] = BASEURL.'?lang='.$language;
     		}
 
+    		$result['leader'] = (new UserStateModel())->getLeaders(1, $source);
+
 			return $result;
 		} else Page::Wrong();
 	}
@@ -136,15 +138,7 @@ class Ajax extends BaseAjax {
 	}
 
 	protected function getLeaders($data) {
-		GLOBAL $dbp;
-
-		$admins = implode(', ', DEVUSERS);
-
-		$query = "SELECT u.id, us.title, us.score, u.first_name, u.last_name, u.username, u.data->'$.photo_100' as avatar FROM ".
-		"`user_state` us LEFT JOIN `users` u ON us.user_id = u.id ".
-		"WHERE us.user_id NOT IN ($admins) ORDER BY us.title DESC, us.score DESC LIMIT 10";
-
-		return $dbp->asArray($query);
+		return (new UserStateModel())->getLeaders(10, $data['source'] || 'vk');
 	}
 
 	protected function addError($data) {

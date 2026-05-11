@@ -29,5 +29,17 @@ class UserStateModel extends BaseModel {
             ]
         ];
     }
+
+    public function getLeaders($count = 10, $source='vk') {
+        GLOBAL $dbp;
+
+        $admins = implode(', ', DEVUSERS);
+
+        $query = "SELECT u.id, us.title, us.score, u.first_name, u.last_name, u.username, u.data->'$.photo_100' as avatar FROM ".
+        "`user_state` us LEFT JOIN `users` u ON us.user_id = u.id ".
+        "WHERE us.user_id NOT IN ({$admins}) AND u.source='{$source}' ORDER BY us.title DESC, us.score DESC LIMIT {$count}";
+
+        return $dbp->asArray($query);
+    }
 }
 ?>
