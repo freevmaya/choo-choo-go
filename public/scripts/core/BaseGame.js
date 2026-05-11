@@ -726,7 +726,7 @@ class BaseGame {
   _showLeaders(data) {
       tracer.log(data);
 
-      let layer = this.lidersModalElement.find('.list');
+      let layer = this.lidersModalElement.find('.list-content');
       layer.empty();
 
       data.forEach(l => {

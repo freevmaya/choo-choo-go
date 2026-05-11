@@ -141,9 +141,15 @@ body {
   flex-direction: row;
 }
 
-#leaders .list-content {
-  width: 300px;
+#leaders .list {
   height: 300px;
+}
+
+.user {
+  width: 300px !important;
+}
+
+.user .avatar {
 }
 
 .game-bottom > div {
