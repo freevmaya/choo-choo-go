@@ -126,11 +126,25 @@ class Ajax extends BaseAjax {
 			return [
 				'success'=> ((new UserStateModel())->Update([
 					    			'user_id'=>$user_id,
-					    			'data' => $user_data
+					    			'data' => $user_data,
+					    			'title' => $data['title'],
+					    			'score' => $data['score']
 					    		], 'user_id')) ? true : false
 			];
 		} 
 		Page::Wrong();
+	}
+
+	protected function getLeaders($data) {
+		GLOBAL $dbp;
+
+		$admins = implode(', ', DEVUSERS);
+
+		$query = "SELECT u.id, us.title, us.score, u.first_name, u.last_name, u.username, u.data->'$.photo_100' as avatar FROM ".
+		"`user_state` us LEFT JOIN `users` u ON us.user_id = u.id ".
+		"WHERE us.user_id NOT IN ($admins) ORDER BY us.title DESC, us.score DESC LIMIT 10";
+
+		return $dbp->asArray($query);
 	}
 
 	protected function addError($data) {

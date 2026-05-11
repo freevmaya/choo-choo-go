@@ -325,6 +325,7 @@ class BaseGame {
     this.initPauseModal();
     this.initLevelsModal();
     this.initShopModal();
+    this.initLidersModal();
     
     // Настройка обработчика нажатия клавиш
     $(window).on('keydown', (e) => {
@@ -694,6 +695,27 @@ class BaseGame {
   initShopModal() {
 
     this.shop = new Shop(this, this.shopItems());
+  }
+
+  initLidersModal() {
+    this.liderBtn = $('#leader-button');
+    this.liderBtn.click(()=>{this.showLidersModal();});
+
+    let d = this.initDialog(`<p class="status" data-lang="leaders"></p>
+      <div class="list">
+        <div class="list-content">
+          
+        </div>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn" data-bs-dismiss="modal" data-lang="close"></button>
+      </div>`, 'leaders');
+    this.lidersModalElement = d.dialog;
+    this.lidersModal = d.modal;
+  }
+
+  showLidersModal() {
+    this.lidersModal.show();
   }
 
   shopItems() {

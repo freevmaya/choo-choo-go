@@ -77,7 +77,11 @@ class DropGame extends BaseModeModule {
     }
 
 	goPlay() {
+		if (this.spawner)
+			this.spawner.dispose();
+		
 		this.spawner = new RailwaySpawner(game, this.types);
+
 		this.game.items.carts.forEach(cart => cart.resetTrackPos());
 	    this.initListeners();		
 	}

@@ -163,7 +163,7 @@ class RailwaySpawner {
   updatePreview() {
     let preview = this.spawnerElement.find('.item-preview');
     if (this.currentItem) {
-      preview.attr('src', `images/library/${this.currentItem}.png`);
+      preview.attr('src', `images/library/${this.currentItem}.jpg`);
       this.spawnerElement.css('display', 'block');
     } else {
       this.spawnerElement.css('display', 'none');

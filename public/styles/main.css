@@ -105,8 +105,13 @@ body {
   background-size: contain;
 }
 
+.game-bottom .frame {
+  gap: 10px !important;
+  height: 58px;
+  min-width: 54px;
+}
+
 .s-view {
-  width: 88px;
   display: flex;
   flex-direction: column;
 }
@@ -122,10 +127,15 @@ body {
   color: var(--tool-text-color);
 }
 
-#state-score {
+#state-score, #leader-button {
   user-select: auto;
   pointer-events: auto !important;
   cursor: pointer;
+}
+
+#leaders .list-content {
+  width: 300px;
+  height: 300px;
 }
 
 .game-bottom > div {

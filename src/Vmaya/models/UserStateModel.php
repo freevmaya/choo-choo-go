@@ -15,6 +15,14 @@ class UserStateModel extends BaseModel {
                 'label' => 'user_id',
                 'dbtype' => 'i'
             ],
+            'title' => [
+                'label' => 'title',
+                'dbtype' => 's'
+            ],
+            'score' => [
+                'label' => 'score',
+                'dbtype' => 'i'
+            ],
             'data' => [
                 'label' => 'data',
                 'dbtype' => 's'

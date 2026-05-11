@@ -9,9 +9,9 @@
   <!-- Bootstrap CSS -->
   <link href="./styles/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="./styles/bootstrap-icons.css?v=124">
+  <link rel="stylesheet" href="./styles/bootstrap-icons.css?v=125">
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="./styles/main.css?v=124">
+  <link rel="stylesheet" href="./styles/main.css?v=125">
 
   <!-- JQUERY -->
   <script src="./scripts/jquery-4.0.0.min.js"></script>
@@ -102,6 +102,16 @@
           </div>
         </div>
         <div class="right">
+          <!--
+          <div class="tools-panel border-block">
+            <div class="frame padding-2">
+              <div class="s-view" id="leader-button">
+                <div class="status" data-lang="leader"></div>
+                <img src=""></img>
+              </div>              
+            </div>
+          </div>
+          -->
         </div>
       </div>
 
@@ -183,10 +193,10 @@
   <!-- Подключаем Bootstrap JS глобально -->
   <script src="./scripts/bootstrap.bundle.min.js"></script>
   <script src="./scripts/three.min.js"></script>
-  <script src="./scripts/main.mini.js?v=124"></script>
-  <script src="./scripts/error-tracker.js?v=124"></script>
-  <script src="./scripts/core/VKUser.js?v=124"></script>
-  <script src="./scripts/core/VKStateManager.js?v=124"></script>
+  <script src="./scripts/main.mini.js?v=125"></script>
+  <script src="./scripts/error-tracker.js?v=125"></script>
+  <script src="./scripts/core/VKUser.js?v=125"></script>
+  <script src="./scripts/core/VKStateManager.js?v=125"></script>
   
   <script>
     ErrorTracker.init({
@@ -200,8 +210,8 @@
     });
     var DEV = hasParam('dev');
     if (DEV) {
-      loadScript('./scripts/test-unit.js?v=124');
-      loadScript('./scripts/utils/DevTools.js?v=124');
+      loadScript('./scripts/test-unit.js?v=125');
+      loadScript('./scripts/utils/DevTools.js?v=125');
       loadScript('https://cdn.jsdelivr.net/npm/eruda', ()=>{
         eruda.init();
       });

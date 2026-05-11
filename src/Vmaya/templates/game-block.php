@@ -30,6 +30,14 @@
           </div>
         </div>
         <div class="right">
+          <div class="tools-panel border-block">
+            <div class="frame padding-2">
+              <div class="s-view" id="leader-button">
+                <div class="status" data-lang="leader"></div>
+                <img src=""></img>
+              </div>              
+            </div>
+          </div>
         </div>
       </div>
 
