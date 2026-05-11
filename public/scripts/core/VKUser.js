@@ -114,7 +114,7 @@ class VKUser {
 		  		tracer.log(error);
 		  	});
 
-		if (this.isOk) {
+		setTimeout(()=>{
 
 			vkBridge.send('VKWebAppShowBannerAd', {
 					banner_location: 'bottom'
@@ -125,7 +125,8 @@ class VKUser {
 				.catch((error) => {
 					tracer.log(error);
 				});
-		}
+				
+		}, 5000);
 
 		if (this.options.useServer)
 			vkBridge.send('VKWebAppGetUserInfo', {})
