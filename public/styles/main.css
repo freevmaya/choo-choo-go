@@ -147,9 +147,14 @@ body {
 
 .user {
   width: 300px !important;
+  flex-direction: row !important;
+  justify-content: left !important;
 }
 
 .user .avatar {
+  width: 80px;
+  height: 80px;
+  background-size: cover;
 }
 
 .game-bottom > div {

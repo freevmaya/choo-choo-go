@@ -730,12 +730,17 @@ class BaseGame {
       layer.empty();
 
       data.forEach(l => {
+
+        let title = lang.get(l.title);
+        let name = l.username || l.first_name || l.last_name;
         let item = $(`
         <div class="item user">
           <div class="avatar" style="background-image: url(${l.avatar})"></div>
-          <div class="name"></div>
-          <div class="title"></div>
-          <div class="score"></div>
+          <div class="user-info">
+            <div class="name">${name}</div>
+            <div class="title">${title}</div>
+            <div class="score">${l.score}</div>
+          </div>
         </div>`);
 
         layer.append(item);
