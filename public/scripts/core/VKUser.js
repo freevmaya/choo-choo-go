@@ -154,6 +154,8 @@ class VKUser {
 
 								if (data.leader) {
 									this.leaderBlock.show();
+									this.leaderBlock.find('#leader-button')
+										.css('background-image', `url(${data.leader[0]['avatar']})`);
 								}
 							} else this.options.useServer = false;
 						});
