@@ -155,6 +155,8 @@ class Lang {
             const key = $el.data('lang-placeholder');
             $el.attr('placeholder', this.get(key));
         });
+
+        return parent;
     }
 
     /**

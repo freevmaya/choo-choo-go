@@ -146,7 +146,7 @@ body {
 }
 
 .user {
-  width: 300px !important;
+  width: 200px !important;
   flex-direction: row !important;
   justify-content: left !important;
 }
