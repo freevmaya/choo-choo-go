@@ -733,7 +733,7 @@ class BaseGame {
 
         let title = lang.get('title_' + l.title);
         let name = l.username || l.first_name || l.last_name;
-        let item = $(`
+        let item = lang.applyToDOM($(`
         <div class="item user">
           <div class="avatar" style="background-image: url(${l.avatar})"></div>
           <div class="user-info">
@@ -741,7 +741,7 @@ class BaseGame {
             <div class="title"><span data-lang="title_label"></span>: ${title}</div>
             <div class="score"><span data-lang="score"></span>: ${l.score}</div>
           </div>
-        </div>`);
+        </div>`));
 
         layer.append(item);
       });
