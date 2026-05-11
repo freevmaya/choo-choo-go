@@ -107,8 +107,8 @@ class VKUser {
 				ad_format: 'reward' /* Тип рекламы */ 
 			})
 			.then((data) => { 
-				this.haveAdv = data.result;
-				this.showAd();
+				if (this.haveAdv = data.result)
+					this.showAd();
 		  	})
 		  	.catch((error) => { 
 		  		tracer.log(error);
