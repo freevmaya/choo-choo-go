@@ -125,7 +125,7 @@ class VKUser {
 				.catch((error) => {
 					tracer.log(error);
 				});
-				
+
 		}, 5000);
 
 		if (this.options.useServer)
@@ -328,20 +328,33 @@ class VKUser {
 
 	showAd() {
 		return new Promise((resolve, reject) => {
+
+			let proccesed = false;
+
+			let doResolve = (result) => {
+				if (!proccesed) {
+					proccesed = true;
+					this.game.afterExternal();
+					resolve(result);
+				}
+			}
+
 			if (this.haveAdv) { 
+
+				setTimeout(()=>{
+					if (!proccesed)
+						doResolve(false);
+				}, 15000);
+
 				this.game.beforeExternal();
 				vkBridge.send('VKWebAppShowNativeAds', {
 					ad_format: 'interstitial' /* Тип рекламы */
 				})
 				.then((data) => { 
-					// Реклама была показана
-					this.game.afterExternal();
-					resolve(data.result)
+					doResolve(data.result);
 				})
 				.catch((error) => { 
-					tracer.log(error);
-					this.game.afterExternal();
-					resolve(false);
+					doResolve(false);
 				});
 			} else resolve(false);
 		});
