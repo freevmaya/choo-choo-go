@@ -486,7 +486,7 @@ function groupTransparent(group, opacity = 0.5, color = null) {
 }
 
 function isDev() {
-    return (typeof DEV != 'undefined') && DEV;
+    return ((typeof DEV != 'undefined') && DEV) || getParam('dev');
 }
 
 async function loadJSON(url) {
