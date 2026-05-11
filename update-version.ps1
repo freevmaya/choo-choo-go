@@ -1,5 +1,5 @@
 # update-version.ps1
-$files = @('.\public\index.html', '.\public\index-vk.html')
+$files = @('.\public\index.html', '.\public\index-vk.html', '.\public\index-std.html' )
 
 foreach ($file in $files) {
     if (Test-Path $file) {
