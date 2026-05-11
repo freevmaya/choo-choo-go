@@ -15,6 +15,8 @@ class VKUser {
 		this.isOk = this.checkOk();
 		this.goods = [];
 		this.user_id = getParam('vk_ok_user_id') || getParam('vk_user_id');
+		this.leaderBlock = $('#leader-block');
+		this.leaderBlock.hide();
 
 		PRICES.UNLOCK_LEVEL = 100;
 
@@ -149,6 +151,10 @@ class VKUser {
 							if (data) {
 								if (data.redirect)
 									document.location.href = data.redirect;
+
+								if (data.leader) {
+									this.leaderBlock.show();
+								}
 							} else this.options.useServer = false;
 						});
 					}

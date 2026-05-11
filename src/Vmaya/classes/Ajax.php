@@ -138,7 +138,7 @@ class Ajax extends BaseAjax {
 	}
 
 	protected function getLeaders($data) {
-		return (new UserStateModel())->getLeaders(10, $data['source'] || 'vk');
+		return (new UserStateModel())->getLeaders(10, Page::getRequest('source', 'vk'));
 	}
 
 	protected function addError($data) {
