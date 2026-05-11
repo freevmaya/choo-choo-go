@@ -157,6 +157,13 @@ body {
   background-size: cover;
 }
 
+.user-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 10px;
+}
+
 .game-bottom > div {
   display: flex;
 }
