@@ -89,22 +89,13 @@ class VKUser {
           		buttons.push({
 	                caption: "За друга",
 	                callback: ()=>{
-						this.game.beforeExternal();
-	                	vkBridge.send('VKWebAppGetFriends')
-						  .then((data) => {  
-							this.game.afterExternal();
-						    if (data && (data.users.length > 0)) {
-						  		this.game.toast.hide();
 
-						      	let overCount = data.users.length - 1;
+	                	this.inviteFrends((users)=>{
+	                		if (users && (users.length > 0)) {
+						      	let overCount = users.length - 1;
 								this.game.userScore(this.game.userScore() + requireScore + (overCount * 100));
-								resolve(true);
-						    }
-						  })
-						  .catch((error) => {  
-							this.game.afterExternal();
-						    console.log(error);
-						  });
+							}
+	                	});
 	                }
           		});
           	}
@@ -165,6 +156,19 @@ class VKUser {
 	  	this.initListeners();
 	}
 
+	inviteFrends(callback) {
+		this.game.beforeExternal();
+    	vkBridge.send('VKWebAppGetFriends')
+		  .then((data) => {  
+			this.game.afterExternal();
+		  	callback(data ? data.users : null);
+		  })
+		  .catch((error) => {  
+			this.game.afterExternal();
+		    callback(null);
+		  });
+	}
+
 	defaultOptions() {
 		return {
 			useServer: true
@@ -191,6 +195,14 @@ class VKUser {
 					} else resolve(true);
 		      });
 		    }
+
+		    this.game.lidersModalElement.find('[data-lang="invite"]').click(()=>{
+		    	this.inviteFrends((users)=>{
+            		if (users && (users.length > 0)) {
+						this.game.userScore(this.game.userScore() + users.length * 100);
+					}
+            	});
+		    });
 		});
 
 
