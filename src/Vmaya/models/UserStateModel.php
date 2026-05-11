@@ -35,7 +35,7 @@ class UserStateModel extends BaseModel {
 
         $admins = implode(', ', DEVUSERS);
 
-        $query = "SELECT u.id, us.title, us.score, u.first_name, u.last_name, u.username, u.data->>'$.photo_100' as avatar FROM ".
+        $query = "SELECT u.id, us.title, us.score, u.first_name, u.last_name, u.username, JSON_UNQUOTE(JSON_EXTRACT(u.data, '$.photo_100')) as avatar FROM ".
         "`user_state` us LEFT JOIN `users` u ON us.user_id = u.id ".
         "WHERE us.user_id NOT IN ({$admins}) AND u.source='{$source}' ORDER BY us.title DESC, us.score DESC LIMIT {$count}";
 
