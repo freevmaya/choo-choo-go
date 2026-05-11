@@ -738,8 +738,8 @@ class BaseGame {
           <div class="avatar" style="background-image: url(${l.avatar})"></div>
           <div class="user-info">
             <div class="name">${name}</div>
-            <div class="title">${title}</div>
-            <div class="score">${l.score}</div>
+            <div class="title"><span data-lang="title_label"></span>: ${title}</div>
+            <div class="score"><span data-lang="score"></span>: ${l.score}</div>
           </div>
         </div>`);
 
