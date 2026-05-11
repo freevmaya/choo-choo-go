@@ -199,7 +199,7 @@ class VKUser {
 		    this.game.lidersModalElement.find('[data-lang="invite"]').click(()=>{
 		    	this.inviteFrends((users)=>{
             		if (users && (users.length > 0)) {
-						this.game.userScore(this.game.userScore() + users.length * 100);
+						this.game.userScore(this.game.userScore() + users.length * 50);
 					}
             	});
 		    });
