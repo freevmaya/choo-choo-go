@@ -82,16 +82,16 @@ const USER_TITLES = {
         step: 1
     },
     Warrior: {
-        step: 3
+        step: 4
     },
     Knight: {
-        step: 6
+        step: 8
     },
     Lord: {
-        step: 9
+        step: 16
     },
     Legend: {
-        step: 16
+        step: 32
     },
 }
 

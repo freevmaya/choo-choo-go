@@ -731,7 +731,7 @@ class BaseGame {
 
       data.forEach(l => {
 
-        let title = lang.get(l.title);
+        let title = lang.get('title_'.l.title);
         let name = l.username || l.first_name || l.last_name;
         let item = $(`
         <div class="item user">
