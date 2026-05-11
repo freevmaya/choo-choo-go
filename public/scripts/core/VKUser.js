@@ -108,7 +108,7 @@ class VKUser {
 			})
 			.then((data) => { 
 				this.haveAdv = data.result;
-				//this.showAd(); на время модерации
+				this.showAd(); на время модерации
 		  	})
 		  	.catch((error) => { 
 		  		tracer.log(error);
