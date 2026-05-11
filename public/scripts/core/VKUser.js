@@ -90,10 +90,9 @@ class VKUser {
 	                caption: "За друга",
 	                callback: ()=>{
 
-	                	this.inviteFrends((users)=>{
-	                		if (users && (users.length > 0)) {
-						      	let overCount = users.length - 1;
-								this.game.userScore(this.game.userScore() + requireScore + (overCount * 100));
+	                	this.inviteFrends((result)=>{
+	                		if (result) {
+								this.game.userScore(this.game.userScore() + requireScore);
 							}
 	                	});
 	                }
@@ -158,14 +157,14 @@ class VKUser {
 
 	inviteFrends(callback) {
 		this.game.beforeExternal();
-    	vkBridge.send('VKWebAppGetFriends')
+    	vkBridge.send('VKWebAppShowInviteBox')
 		  .then((data) => {  
 			this.game.afterExternal();
-		  	callback(data ? data.users : null);
+		  	callback(data.success);
 		  })
 		  .catch((error) => {  
 			this.game.afterExternal();
-		    callback(null);
+		    callback(false);
 		  });
 	}
 
@@ -197,9 +196,9 @@ class VKUser {
 		    }
 
 		    this.game.lidersModalElement.find('[data-lang="invite"]').click(()=>{
-		    	this.inviteFrends((users)=>{
-            		if (users && (users.length > 0)) {
-						this.game.userScore(this.game.userScore() + users.length * 50);
+		    	this.inviteFrends((result)=>{
+            		if (result) {
+						this.game.userScore(this.game.userScore() + 50);
 					}
             	});
 		    });
