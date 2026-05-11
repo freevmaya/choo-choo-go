@@ -157,6 +157,7 @@ window.LANG_EN = {
     'select-payment': 'Select a top-up option',
     'title-require-payment': '`You need to add funds to<br>purchase %0.<br>Select a method.`',
     'title-payment': 'Top up your account by %0.<br>Select a method.`',
+    'invite': 'Invite',
     'leader': 'Leader',
     'leaders': 'Leaders',
     'start': 'Start',

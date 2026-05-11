@@ -709,6 +709,7 @@ class BaseGame {
       </div>
       <div class="text-center">
         <button type="button" class="btn" data-bs-dismiss="modal" data-lang="close"></button>
+        <button type="button" class="btn" data-lang="invite"></button>
       </div>`, 'leaders');
     this.lidersModalElement = d.dialog;
     this.lidersModal = d.modal;
