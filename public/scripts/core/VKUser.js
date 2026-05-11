@@ -254,7 +254,7 @@ class VKUser {
 
 	onNewLevel(level) {
 		if (level > 1)
-			bridge.send('VKWebAppAddToFavorites');
+			vkBridge.send('VKWebAppAddToFavorites');
 	}
 
 	onNewScore(value) {
