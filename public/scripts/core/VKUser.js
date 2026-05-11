@@ -114,15 +114,18 @@ class VKUser {
 		  		tracer.log(error);
 		  	});
 
-		vkBridge.send('VKWebAppShowBannerAd', {
-				banner_location: 'bottom'
-			})
-			.then((data) => { 
-				this.haveBanner = data.result;
-			})
-			.catch((error) => {
-				tracer.log(error);
-			});
+		if (this.isOk) {
+
+			vkBridge.send('VKWebAppShowBannerAd', {
+					banner_location: 'bottom'
+				})
+				.then((data) => { 
+					this.haveBanner = data.result;
+				})
+				.catch((error) => {
+					tracer.log(error);
+				});
+		}
 
 		if (this.options.useServer)
 			vkBridge.send('VKWebAppGetUserInfo', {})
