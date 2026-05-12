@@ -271,7 +271,7 @@ class VKUser {
 	}
 
 	onNewTitle(key) {
-		if (TITLE_MISSION_IDS[key]) {
+		if (TITLE_MISSION_IDS[key] && !this.isOk) {
 			Ajax({
 				action: 'vk_apiCall',
 				data: {
