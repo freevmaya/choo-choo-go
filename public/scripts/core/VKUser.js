@@ -107,26 +107,26 @@ class VKUser {
 				ad_format: 'reward' /* Тип рекламы */ 
 			})
 			.then((data) => { 
+				this.haveAdv = data.result;
+				/*
 				if (this.haveAdv = data.result)
 					this.showAd();
+				*/
 		  	})
 		  	.catch((error) => { 
 		  		tracer.log(error);
 		  	});
 
-		setTimeout(()=>{
-
-			vkBridge.send('VKWebAppShowBannerAd', {
-					banner_location: 'bottom'
-				})
-				.then((data) => { 
-					this.haveBanner = data.result;
-				})
-				.catch((error) => {
-					tracer.log(error);
-				});
-
-		}, 5000);
+		
+		vkBridge.send('VKWebAppShowBannerAd', {
+				banner_location: 'bottom'
+			})
+			.then((data) => { 
+				this.haveBanner = data.result;
+			})
+			.catch((error) => {
+				tracer.log(error);
+			});
 
 		if (this.options.useServer)
 			vkBridge.send('VKWebAppGetUserInfo', {})
