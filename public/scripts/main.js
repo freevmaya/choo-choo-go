@@ -19,6 +19,8 @@ class RailGame extends BaseGame {
 
     this.gameModes = ['Play', 'Editor', 'Delete', 'PlayAndEdit', 'DropGame'];
     this.gameMode('Play');
+
+    this._afterResize = debounce(this._doAfterResize.bind(this), 200);
   }
 
   onUserAction(data) {
@@ -649,16 +651,21 @@ class RailGame extends BaseGame {
 
     eventBus.emit('cleared-game-objects', this);
   }
-  
-  onResize() {
+
+  _doAfterResize() {
     this.rendererManager.resize();
     if (this.cameraController)
       this.cameraController.resize(this.rendererManager.getAspectRatio());
+
+    this.rendererManager.render(this.scene, this.camera);
+  }
+  
+  onResize() {
+    this._afterResize();
   }
 
   update(dt) {
-    if (this.isPlaying())
-      super.update(dt);
+    super.update(dt);
 
     if (this.handTouch)
       this.handTouch.update(dt);
