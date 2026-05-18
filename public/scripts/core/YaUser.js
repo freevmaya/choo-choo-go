@@ -167,11 +167,8 @@ class YaUser {
         let title = text != null ? text : lang.get('title-require-payment', [countStr]);
 
         if (g_item) {
-          ysdk.payments.getCatalog()
-            .then((data)=>{
-              console.log(data);
-              this.game.showTip(title, 0, null, null, buttons);
-            })
+          let catalog = ysdk.payments.getCatalog();
+          this.game.showTip(title, 0, null, null, buttons);
         } else this.game.showTip(title, 0, null, null, buttons);
       });
     }
