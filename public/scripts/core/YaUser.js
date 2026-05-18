@@ -163,8 +163,9 @@ class YaUser {
           });
           */
         }
-        
 
+        let catalog = ysdk.payments.getCatalog();
+        console.log(catalog);
         this.game.showTip(text != null ? text : lang.get('title-require-payment', [countStr]), 0, null, null, buttons);
       });
     }
