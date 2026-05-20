@@ -126,7 +126,7 @@ class YaUser {
 
           if (g_item) {
             buttons.push({
-              caption: window.lang.get("yan"),
+              caption: g_item.price + ' ' + window.lang.get("yan"),
               callback: ()=>{
                 tracer.log(this.game.preparePurchases);
                 let g_item = this.goods.find(g => g.count >= requireScore);
