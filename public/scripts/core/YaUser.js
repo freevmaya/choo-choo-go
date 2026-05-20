@@ -167,10 +167,10 @@ class YaUser {
           */
         }
 
-        let catalog = ysdk.payments.getCatalog();
-        let countStr = strEnum(countScore);
-        console.log(catalog);
-        this.game.showTip(text != null ? text : lang.get('title-require-payment', [countStr]), 0, null, null, buttons);
+        if (buttons.length > 0) {
+          let countStr = strEnum(countScore);
+          this.game.showTip(text != null ? text : lang.get('title-require-payment', [countStr]), 0, null, null, buttons);
+        }
       });
     }
   }
