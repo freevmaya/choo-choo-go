@@ -32,13 +32,12 @@ function strEnum(number, pattern=null, language = 'ru', show_number = true) {
     if (language === 'ru') {
         const num = Math.abs(Number(number));
         
-        if (num % 10 === 1 && num % 100 !== 11) {
+        if (num % 10 === 1 && num % 100 !== 11)
             return `${leftpart}${base}${forms[0]}`;
-        } else if (num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)) {
+        else if (num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20))
             return `${leftpart}${base}${forms[1]}`;
-        } else {
+        else
             return `${leftpart}${base}${forms[2]}`;
-        }
     }
     else if (language === 'en') {
         const num = Math.abs(Number(number));
