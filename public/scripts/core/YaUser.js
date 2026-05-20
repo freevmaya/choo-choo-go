@@ -117,23 +117,26 @@ class YaUser {
   initPaymentDialog() {
     this.game.accountAddScore = (requireScore, text=null) => {
       return new Promise((resolve, reject) => {
-        let countStr = strEnum(requireScore);
+        let countScore = requireScore;
         let buttons = [];
 
         if (this.goods) {
 
-          let g_item = this.goods.find(g => g.count >= requireScore);
+          let g_item = this.goods.find(g => g.count >= countScore);
 
           if (g_item) {
+
+            countScore = g_item.count;
+            countStr = strEnum(countScore);
             buttons.push({
               caption: g_item.price + ' ' + window.lang.get("yan"),
               callback: ()=>{
                 tracer.log(this.game.preparePurchases);
-                
+
                 ysdk.payments.purchase({ id: String(g_item.item_id) })
                   .then((data)=>{
                     this.game.toast.hide();
-                    this.handlePurchase(data, requireScore);
+                    this.handlePurchase(data, countScore);
                     resolve(true);
                   });
               }
@@ -165,6 +168,7 @@ class YaUser {
         }
 
         let catalog = ysdk.payments.getCatalog();
+        let countStr = strEnum(countScore);
         console.log(catalog);
         this.game.showTip(text != null ? text : lang.get('title-require-payment', [countStr]), 0, null, null, buttons);
       });
