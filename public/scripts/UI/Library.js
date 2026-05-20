@@ -177,7 +177,7 @@ class Library {
 		let _this = this;
 
 		if (item.count) {
-			let countCtl = $(`<div class="counter"><span data-lang="count">Кол-во</span>: <span class="value">${item.count}</span></div>`);
+			let countCtl = $(`<div class="counter"><span data-lang="count">${lang.get('count')}</span>: <span class="value">${item.count}</span></div>`);
 			itemCtrl.append(countCtl);
 		}
 

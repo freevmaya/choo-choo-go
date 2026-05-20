@@ -134,7 +134,7 @@ window.LANG_EN = {
     'hint_red_platforms': 'Avoid red platforms!',
     'hint_green_platforms': 'Green platforms are safe',
     'hint_crystal': 'Reach the crystal to win',
-    'bonuse-enum': 'coin[s]',
+    'bonuse-enum': 'coin[,s,s]',
     
     // Statuses
     'status_playing': 'Playing',

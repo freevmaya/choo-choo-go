@@ -54,8 +54,9 @@ class Shop {
 			let itm = this.items[i];
 
 			let path = `images/library/${itm.type.name}.jpg`;
+			let price = strEnum(itm.price);
 			let item = $(`<div class="item" style="background-image: url(${path})" data-type="${itm.type.name}">
-				<div class="price"><span data-lang="price"></span>: ${itm.price}</div>
+				<div class="price">${price}</div>
 			</div>`);
 			item.click(()=>{
 				this.toBasket(itm);
