@@ -91,7 +91,8 @@ class Shop {
 				if (result)
 					this.game.addPurchased(this.spend);
 			})
-			.catch(()=>{
+			.catch((e)=>{
+				console.error(e);
 				this.modal.hide();
 			});
 	}
