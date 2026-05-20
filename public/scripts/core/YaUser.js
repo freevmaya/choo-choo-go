@@ -118,6 +118,7 @@ class YaUser {
     this.game.accountAddScore = (requireScore, text=null) => {
       return new Promise((resolve, reject) => {
         let countScore = requireScore;
+        let countStr = strEnum(countScore);
         let buttons = [];
 
         if (this.goods) {
