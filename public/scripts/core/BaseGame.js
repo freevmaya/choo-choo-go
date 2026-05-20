@@ -1033,25 +1033,29 @@ class BaseGame {
     this.updateScoreIndicator();
   }
   
-  init() {    
-    this.initRaycaster();
-    this.animate();
+  init() {
 
-    this.showStartModal();
-    this.updateStateView();
-    this.visibleLoader(false);
+    if (!this.initialized) {
+      this.initialized = true;
+      this.initRaycaster();
+      this.animate();
 
-    this.soundControl();
-    
-    $(window).on('resize', this.onResize.bind(this));
-    $(window).trigger('game-ready');
-    document.addEventListener('show.bs.modal', this.onShowModal.bind(this));
-    document.addEventListener('hide.bs.modal', this.onHideModal.bind(this));
+      this.showStartModal();
+      this.updateStateView();
+      this.visibleLoader(false);
 
-    /*
-    if (isDev()) 
-      setTimeout(this.gameState.start.bind(this.gameState), 1000);
-      */
+      this.soundControl();
+      
+      $(window).on('resize', this.onResize.bind(this));
+      $(window).trigger('game-ready');
+      document.addEventListener('show.bs.modal', this.onShowModal.bind(this));
+      document.addEventListener('hide.bs.modal', this.onHideModal.bind(this));
+
+      /*
+      if (isDev()) 
+        setTimeout(this.gameState.start.bind(this.gameState), 1000);
+        */
+    }
   }
 
   onShowModal(event) {
