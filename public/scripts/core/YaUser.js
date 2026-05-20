@@ -129,7 +129,7 @@ class YaUser {
               caption: g_item.price + ' ' + window.lang.get("yan"),
               callback: ()=>{
                 tracer.log(this.game.preparePurchases);
-                let g_item = this.goods.find(g => g.count >= requireScore);
+                
                 ysdk.payments.purchase({ id: String(g_item.item_id) })
                   .then((data)=>{
                     this.game.toast.hide();
